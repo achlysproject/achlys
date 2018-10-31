@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Module achlys_pmod_nav_worker</title>
+<link rel="stylesheet" type="text/css" href="stylesheet.css" title="EDoc">
+</head>
+<body bgcolor="white">
+<div class="navbar"><a name="#navbar_top"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<hr>
+
+<h1>Module achlys_pmod_nav_worker</h1>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>The Pmod_NAV worker server.
+
+<p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
+<p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys/" target="_top">https://github.com/Laymer/achlys/</a></tt>].</p>
+<p><b>See also:</b> <a href="pmod_nav.html"><b>Pmod_NAV</b>
+ </a>.</p>
+
+<h2><a name="description">Description</a></h2><p>The Pmod_NAV worker server.  
+The general purpose of this worker is to gather  
+and process sensor data from one of the 3 components  
+available on the Pmod_NAV :</p>
+ 
+    <p>- Accelerometer =&gt; acc    
+- Gyroscope =&gt; alt    
+- Magnetometer =&gt; mag</p>
+ 
+    <p>Data can be retrieved as follows :</p>
+ 
+    <p>[Temperature] = pmod_nav:read(acc, [out_temp]).</p>
+ 
+    Where <em>acc</em> is the component providing the
+    data and <em>[out_temp]</em> is the list of registers
+    that is read.
+<h2><a name="index">Function Index</a></h2>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#code_change-3">code_change/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#get_crdt-0">get_crdt/0</a></td><td>Returns the current view of the contents in the temperatures
+  Lasp variable.</td></tr>
+<tr><td valign="top"><a href="#get_table-0">get_table/0</a></td><td>Returns the current view of the contents in the temperatures
+  Lasp variable.</td></tr>
+<tr><td valign="top"><a href="#handle_call-3">handle_call/3</a></td><td></td></tr>
+<tr><td valign="top"><a href="#handle_cast-2">handle_cast/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#handle_continue-2">handle_continue/2</a></td><td></td></tr>
+<tr><td valign="top"><a href="#handle_info-2">handle_info/2</a></td><td>fetches the temperature value from the <a href="pmod_nav.html"><code>pmod_nav</code></a> sensor
+  and stores it in the corresponding ETS table.</td></tr>
+<tr><td valign="top"><a href="#run-0">run/0</a></td><td>declares a Lasp variable for temperature aggregates
+  and sets triggers for handlers after intervals have expired.</td></tr>
+<tr><td valign="top"><a href="#start_link-1">start_link/1</a></td><td>starts the pmod_nav process using the configuration
+  given in the sys.config file.</td></tr>
+<tr><td valign="top"><a href="#terminate-2">terminate/2</a></td><td></td></tr>
+</table>
+
+<h2><a name="functions">Function Details</a></h2>
+
+<h3 class="function"><a name="code_change-3">code_change/3</a></h3>
+<div class="spec">
+<p><tt>code_change(OldVsn, State, Extra) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="get_crdt-0">get_crdt/0</a></h3>
+<div class="spec">
+<p><tt>get_crdt() -&gt; list()</tt><br></p>
+</div><p>Returns the current view of the contents in the temperatures
+  Lasp variable.</p>
+
+<h3 class="function"><a name="get_table-0">get_table/0</a></h3>
+<div class="spec">
+<p><tt>get_table() -&gt; list()</tt><br></p>
+</div><p>Returns the current view of the contents in the temperatures
+  Lasp variable.</p>
+
+<h3 class="function"><a name="handle_call-3">handle_call/3</a></h3>
+<div class="spec">
+<p><tt>handle_call(Request, From, State) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="handle_cast-2">handle_cast/2</a></h3>
+<div class="spec">
+<p><tt>handle_cast(Msg, State) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="handle_continue-2">handle_continue/2</a></h3>
+<div class="spec">
+<p><tt>handle_continue(Continue, State) -&gt; any()</tt></p>
+</div>
+
+<h3 class="function"><a name="handle_info-2">handle_info/2</a></h3>
+<div class="spec">
+<p><tt>handle_info(Info, State) -&gt; any()</tt></p>
+</div><p><p>fetches the temperature value from the <a href="pmod_nav.html"><code>pmod_nav</code></a> sensor
+  and stores it in the corresponding ETS table. It is paired with
+  the <a href="erlang.html#monotonic_time-0"><code>erlang:monotonic_time/0</code></a> to guarantee unique keys.
+  For large amounts of sensor data
+  e.g. accumulated for a long time and being larger than
+  the maximum available memory, an alternative would be to use the
+  <a href="dets.html"><code>dets</code></a> storage module. They can also be combined as described  
+below.</p>
+ 
+  <p>From OTP documentation :</p>
+ 
+  Dets tables provide efficient file-based Erlang term storage.
+  They are used together with ETS tables when fast access
+  needs to be complemented with persistency.</p>
+
+<h3 class="function"><a name="run-0">run/0</a></h3>
+<div class="spec">
+<p><tt>run() -&gt; ok</tt><br></p>
+</div><p>declares a Lasp variable for temperature aggregates
+  and sets triggers for handlers after intervals have expired.</p>
+
+<h3 class="function"><a name="start_link-1">start_link/1</a></h3>
+<div class="spec">
+<p><tt>start_link(NavConfig::map()) -&gt; {ok, pid()} | ignore | {error, {already_started, pid()} | term()}</tt><br></p>
+</div><p>starts the pmod_nav process using the configuration
+  given in the sys.config file.</p>
+
+<h3 class="function"><a name="terminate-2">terminate/2</a></h3>
+<div class="spec">
+<p><tt>terminate(Reason, State) -&gt; any()</tt></p>
+</div>
+<hr>
+
+<div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>
+<p><i>Generated by EDoc</i></p>
+</body>
+</html>

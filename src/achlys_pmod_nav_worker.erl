@@ -1,25 +1,47 @@
 %%%-------------------------------------------------------------------
-%% @author Igor Kopestenski <i.kopest@gmail.com>
+%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
 %%   [https://github.com/Laymer/achlys/]
-%% @doc This is a Pmod_NAV worker server.
+%% @doc The Pmod_NAV worker server.
+%% The general purpose of this worker is to gather
+%% and process sensor data from one of the 3 components
+%% available on the Pmod_NAV :
+%%
+%%   - Accelerometer => acc
+%%   - Gyroscope => alt
+%%   - Magnetometer => mag
+%%
+%%   Data can be retrieved as follows :
+%%
+%%   [Temperature] = pmod_nav:read(acc, [out_temp]).
+%%
+%%   Where <em>acc</em> is the component providing the
+%%   data and <em>[out_temp]</em> is the list of registers
+%%   that is read.
+%%   @see pmod_nav. <b>Pmod_NAV</b>
+%%
 %% @end
 %%%-------------------------------------------------------------------
 
--module(achlys_temp).
+-module(achlys_pmod_nav_worker).
+-author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -behaviour(gen_server).
 
 -include("achlys.hrl").
 
+%%====================================================================
 %% API
--export([start_link/1]).
--export([create_table/1]).
--export([declare_crdt/2]).
--export([store_temp/0]).
--export([get_mean/0]).
--export([run/0]).
+%%====================================================================
 
+-export([start_link/1]).
+-export([run/0]).
+-export([get_crdt/0]).
+-export([get_table/0]).
+
+%%====================================================================
 %% Gen Server Callbacks
+%%====================================================================
+
 -export([init/1,
          handle_call/3,
          handle_cast/2,
@@ -29,90 +51,84 @@
          code_change/3]).
 
 %%====================================================================
-%% Macros
-%%====================================================================
-
--define(MACRO_TEMPLATE(X), {X} ).
-
-%%====================================================================
 %% Records
 %%====================================================================
 
 -record(state, {
-  crdt :: any(),
-  gc_interval :: pos_integer(),
-  poll_interval :: pos_integer(),
-  mean_interval :: pos_integer(),
-  table :: any()
+  crdt                    :: any(),
+  gc_interval             :: pos_integer(),
+  poll_interval           :: pos_integer(),
+  mean_interval           :: pos_integer(),
+  table                   :: any()
 }).
+
+-type state() :: #state{}.
 
 %%====================================================================
 %% API
 %%====================================================================
 
+%% @doc starts the pmod_nav process using the configuration
+%% given in the sys.config file.
+-spec start_link(map()) ->
+  {ok, pid()} | ignore | {error, {already_started, pid()} | term()}.
 start_link(NavConfig) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, NavConfig, []).
 
-create_table(Name) ->
-    gen_server:call(?MODULE, {table, Name}).
-
-declare_crdt(Name, Type) ->
-    gen_server:call(?MODULE, {declare, Name, Type}).
-% achlys_temp:store_temp().
-store_temp() ->
-    gen_server:call(?MODULE, store_temp).
-
+%% @doc declares a Lasp variable for temperature aggregates
+%% and sets triggers for handlers after intervals have expired.
+-spec run() -> ok.
 run() ->
-    gen_server:call(?MODULE, run).
+    gen_server:call(self(), run).
 
-get_mean() ->
-    gen_server:cast(?MODULE, mean).
+%% @doc Returns the current view of the contents in the temperatures
+%% Lasp variable.
+-spec get_crdt() -> list().
+get_crdt() ->
+    gen_server:call(self(), get_crdt).
+
+%% @doc Returns the current view of the contents in the temperatures
+%% Lasp variable.
+-spec get_table() -> list().
+get_table() ->
+    gen_server:call(self(), get_table).
 
 %%====================================================================
 %% Gen Server Callbacks
 %%====================================================================
 
+%% @private
+-spec init(map()) -> {ok, state()}.
 init(NavConfig) ->
-    %% For test purposes. Grisp_app allows calls to emulated pmod_nav.
-    {ok, _} = application:ensure_all_started(grisp),
-    T = ets:new(maps:get(table, NavConfig), [ordered_set, public, named_table]),
-    PollInterval = maps:get(poll_interval, NavConfig),
-    {ok, #state{gc_interval = maps:get(gc_interval, NavConfig)
-        , poll_interval = PollInterval
-        , mean_interval = (PollInterval * 10)
+    #{table := T
+    , gc_interval := GC
+    , poll_interval := P
+    , aggregation_trigger := Agg} = NavConfig,
+
+    T = ets:new(T, [ordered_set
+    , public
+    , named_table
+    , {heir, whereis(achlys_sup), []}
+    ]),
+    M = (P * Agg),
+
+    erlang:send_after(GC,self(),gc),
+
+    {ok, #state{gc_interval = GC
+        , poll_interval = P
+        , mean_interval = M
         , table = T}}.
-    % {ok, #state{temp = [], table = }}.
 
 %%--------------------------------------------------------------------
 
 handle_call(run, _From, State) ->
-    logger:log(notice, "DECLARED ~n"),
     Id = achlys_util:declare_crdt(temp, state_awset),
-    achlys_util:insert_timed_key(State#state.table, pmod_nav:read(acc, [out_temp])),
+    logger:log(notice, "Declared CRDT ~p for temperature aggregates ~n", [Id]),
+
     erlang:send_after(State#state.poll_interval,self(),poll),
-    erlang:send_after(State#state.gc_interval,self(),gc),
     erlang:send_after(State#state.mean_interval,self(),mean),
+
     {reply, ok, State#state{crdt = Id}};
-
-handle_call(store_temp, _From, State) ->
-    achlys_util:insert_timed_key(State#state.table, pmod_nav:read(acc, [out_temp])),
-    % achlys_util:insert_timed_key(State#state.table, get_temp()).
-    {reply, ok, State};
-
-%%--------------------------------------------------------------------
-
-handle_call({table, Name}, _From, State) ->
-    T = achlys_util:table(Name),
-    {reply, ok, State#state{table = T}};
-
-%%--------------------------------------------------------------------
-
-handle_call({declare, Name, Type}, _From, State) ->
-    logger:log(notice, "DECLARED ~n"),
-    Id = achlys_util:declare_crdt(Name, Type),
-    {reply, ok, State#state{crdt = Id}};
-
-%%--------------------------------------------------------------------
 
 handle_call(_Request, _From, State) ->
     {reply, ignored, State}.
@@ -131,16 +147,30 @@ handle_cast(_Msg, State) ->
 
 %%--------------------------------------------------------------------
 
+%% @doc fetches the temperature value from the {@link pmod_nav} sensor
+%% and stores it in the corresponding ETS table. It is paired with
+%% the {@link erlang:monotonic_time/0} to guarantee unique keys.
+%% For large amounts of sensor data
+%% e.g. accumulated for a long time and being larger than
+%% the maximum available memory, an alternative would be to use the
+%% {@link dets} storage module. They can also be combined as described
+%% below.
+%%
+%% From OTP documentation :
+%%
+%% Dets tables provide efficient file-based Erlang term storage.
+%% They are used together with ETS tables when fast access
+%% needs to be complemented with persistency.
 handle_info(poll, State) ->
-    achlys_util:insert_timed_key(State#state.table, pmod_nav:read(acc, [out_temp])),
-    erlang:send_after(State#state.poll_interval,self(),poll),
-    {noreply, State};
+  Temp = pmod_nav:read(acc, [out_temp]),
+  true = ets:insert_new(State#state.table, {erlang:monotonic_time(), Temp}),
+  erlang:send_after(State#state.poll_interval,self(),poll),
+  {noreply, State};
 
 %%--------------------------------------------------------------------
 
 handle_info(gc, State) ->
-    lasp:update(State#state.crdt, {add, get_temp_mean(State#state.table)}, self()),
-    achlys_util:gc(),
+    ok = achlys_util:do_gc(),
     erlang:send_after(State#state.gc_interval,self(),gc),
     {noreply, State};
 
@@ -189,6 +219,9 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal functions
 %%====================================================================
 
+-spec get_temp_mean(atom() | ets:tid()) -> {number(),float()}.
+%% @doc Returns the temperature average
+%% based on entries in the
 get_temp_mean(Tab) ->
     Sum = ets:foldl(fun
       (Elem, AccIn) ->

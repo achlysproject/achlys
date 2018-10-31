@@ -6,6 +6,7 @@ CACHE_DIR         ?= $(HOME)/.cache/rebar3
 COOKIE           ?= MyCookie
 VERSION 	       ?= 0.1.0
 DEPLOY_DEST		?=	/media/laymer/GRISP
+PDFDIR			?=	$(BASE_DIR)/doc/internal
 
 .PHONY: compile shell testshell deploy \
 	clean buildclean grispclean cacheclean ⁠fullclean testsrc prodsrc
@@ -65,5 +66,18 @@ testsrc:
 
 prodsrc:
 	cp $(PROD_SRC_FILE) $(SRC_FILE)
+
+htmldoc:
+	xsltproc --noout --stringparam outdir /tmp/myhtmldoc \
+	      --stringparam docgen $(ERL_TOP)/lib/erl_docgen \
+              --stringparam topdocdir . \
+              --stringparam pdfdir "$(PDFDIR)" \
+              --xinclude \
+	      --stringparam gendate "October 31 2018" \
+              --stringparam appname Achlys \
+              --stringparam appver 0.1.0 \
+              -path $(ERL_TOP)/lib/erl_docgen/priv/dtd \
+              -path $(ERL_TOP)/lib/erl_docgen/priv/dtd_html_entities \
+	      $(ERL_TOP)/lib/erl_docgen/priv/xsl/db_html.xsl mybook.xml
 
 include tools.mk

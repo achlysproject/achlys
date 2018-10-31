@@ -1,5 +1,5 @@
 {application, achlys, [
-    {description, "Lasp on GRiSP"},
+    {description, "An application using Lasp on GRiSP at the edge"},
     {vsn, "0.1.0"},
     {registered, []},
     {mod, {achlys_app, []}},
@@ -7,7 +7,7 @@
         kernel,
         stdlib,
         sasl,
-        % grisp,
+        grisp,
         lager,
         partisan,
         lasp

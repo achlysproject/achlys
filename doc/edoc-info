@@ -1,0 +1,4 @@
+%% encoding: UTF-8
+{application,achlys}.
+{modules,[achlys,achlys_app,achlys_config,achlys_pmod_nav_worker,achlys_sup,
+          achlys_util]}.
