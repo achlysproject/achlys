@@ -12,3 +12,7 @@ rel/example_project
 # GRiSP
 _grisp
 _build
+
+# Achlys
+achlys_21.0_plt
+LICENSE.md
