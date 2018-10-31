@@ -16,7 +16,7 @@ For Achlys, it is currently an additional asset to structure software improvemen
 ### NOTE : HQ detailed PDF is in file tree, but the map is not rendered by the GitHub preview. Simply download the PDF file and open it locally for a correct display.
 
 <p align="center">
-  <img src="MindMapPreview.png" alt="MMap"/>
+  <img src="Achlys.png" alt="MMap"/>
 </p>
 
 
