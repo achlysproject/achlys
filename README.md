@@ -3,10 +3,10 @@ Achlys is the goddess of deadly poison ... but fortunately there is an [Antidote
 
 ## Minimum requirements
 
-- `rebar3 3.6.2 `
-- `otp 21.0.1`
-- `partisan 3.0.0`
-- `lasp 0.9.0`
+- `[otp](https://github.com/erlang/otp) 21.0.1`
+- `[rebar3](https://github.com/erlang/rebar3) 3.6.2`
+- `[partisan](https://github.com/lasp-lang/partisan) 3.0.0`
+- `[lasp](https://github.com/lasp-lang/lasp) 0.9.0`
 
 ## EDoc preview
 
