@@ -51,6 +51,12 @@
          code_change/3]).
 
 %%====================================================================
+%% Macros
+%%====================================================================
+
+-define (SERVER, ?MODULE).
+
+%%====================================================================
 %% Records
 %%====================================================================
 
@@ -85,19 +91,19 @@ start_link(NavConfig) ->
 %% and sets triggers for handlers after intervals have expired.
 -spec run() -> ok.
 run() ->
-    gen_server:cast(self(), run).
+    gen_server:cast(?SERVER, run).
 
 %% @doc Returns the current view of the contents in the temperatures
 %% Lasp variable.
--spec get_crdt() -> ok.
+-spec get_crdt() -> list().
 get_crdt() ->
-    gen_server:cast(self(), get_crdt).
+    gen_server:call(?SERVER, get_crdt, ?TEN).
 
 %% @doc Returns the current view of the contents in the temperatures
 %% Lasp variable.
 -spec get_table() -> ok.
 get_table() ->
-    gen_server:cast(self(), get_table).
+    gen_server:call(?SERVER, get_table).
 
 %%====================================================================
 %% Gen Server Callbacks
@@ -118,12 +124,28 @@ init(NavConfig) ->
     ]),
     M = (P * Agg),
 
-    erlang:send_after(GC,self(),gc),
+    erlang:send_after(GC,?SERVER,gc),
 
     {ok, #state{gc_interval = GC
         , poll_interval = P
         , mean_interval = M
         , table = T}}.
+
+%%--------------------------------------------------------------------
+
+handle_call(get_crdt, _From, State) ->
+    {ok, S} = lasp:query(State#state.crdt),
+    L = sets:to_list(S),
+    {reply, L, State};
+
+%%--------------------------------------------------------------------
+
+handle_call(get_table, _From, State) ->
+    Match = ets:match(State#state.table, '$1'),
+    logger:log(notice, "Table info : ~p ~n", [ets:info(State#state.table)]),
+    {reply, Match, State};
+
+%%--------------------------------------------------------------------
 
 handle_call(_Request, _From, State) ->
     {reply, ignored, State}.
@@ -132,33 +154,19 @@ handle_call(_Request, _From, State) ->
 %%--------------------------------------------------------------------
 
 handle_cast(run, State) ->
-    _Remotes = achlys_util:clusterize(),
     Id = achlys_util:declare_crdt(temp, state_awset),
     logger:log(notice, "Declared CRDT ~p for temperature aggregates ~n", [Id]),
 
-    erlang:send_after(State#state.poll_interval,self(),poll),
-    erlang:send_after(State#state.mean_interval,self(),mean),
+    erlang:send_after(State#state.poll_interval,?SERVER,poll),
+    erlang:send_after(State#state.mean_interval,?SERVER,mean),
 
     {noreply, State#state{crdt = Id}};
 
 %%--------------------------------------------------------------------
 
-handle_cast(get_crdt, State) ->
-    {ok, S} = lasp:query(State#state.crdt),
-    logger:log(notice, "CRDT ~p temperature aggregates ~n", [sets:to_list(S)]),
-    {noreply, State};
-
-%%--------------------------------------------------------------------
-
-handle_cast(get_table, State) ->
-    logger:log(notice, "Table info : ~p ~n", [ets:info(State#state.table)]),
-    {noreply, State};
-
-%%--------------------------------------------------------------------
-
 handle_cast(mean, State) ->
     Mean = get_temp_mean(State#state.table),
-    _ = lasp:update(State#state.crdt, {add, Mean}, self()),
+    _ = lasp:update(State#state.crdt, {add, Mean}, ?SERVER),
     {noreply, State};
 
 %%--------------------------------------------------------------------
@@ -185,22 +193,22 @@ handle_cast(_Msg, State) ->
 handle_info(poll, State) ->
   Temp = pmod_nav:read(acc, [out_temp]),
   true = ets:insert_new(State#state.table, {erlang:monotonic_time(), Temp}),
-  erlang:send_after(State#state.poll_interval,self(),poll),
+  erlang:send_after(State#state.poll_interval,?SERVER,poll),
   {noreply, State};
 
 %%--------------------------------------------------------------------
 
 handle_info(gc, State) ->
     ok = achlys_util:do_gc(),
-    erlang:send_after(State#state.gc_interval,self(),gc),
+    erlang:send_after(State#state.gc_interval,?SERVER,gc),
     {noreply, State};
 
 %%--------------------------------------------------------------------
 
 handle_info(mean, State) ->
     Mean = get_temp_mean(State#state.table),
-    _ = lasp:update(State#state.crdt, {add, Mean}, self()),
-    erlang:send_after(State#state.mean_interval,self(),mean),
+    _ = lasp:update(State#state.crdt, {add, Mean}, ?SERVER),
+    erlang:send_after(State#state.mean_interval,?SERVER,mean),
     {noreply, State};
 
 %%--------------------------------------------------------------------
@@ -243,7 +251,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 -spec get_temp_mean(atom() | ets:tid()) -> {number(),float()}.
 %% @doc Returns the temperature average
-%% based on entries in the
+%% based on entries in the ETS table
 get_temp_mean(Tab) ->
     Sum = ets:foldl(fun
       (Elem, AccIn) ->
