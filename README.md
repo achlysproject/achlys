@@ -18,7 +18,7 @@ Once a satisfactory amount of testing and features will be implemented, a versio
 
 The online version of the documentation is found at :
 
-https://hexdocs.pm/achlys
+[HexDocs](https://hexdocs.pm/achlys)
 
 ### Architecture
 
