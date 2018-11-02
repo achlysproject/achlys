@@ -19,3 +19,5 @@ LICENSE.md
 \.DS_Store
 
 *.crashdump
+
+log/
