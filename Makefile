@@ -9,7 +9,7 @@ DEPLOY_DEST		?=	/media/laymer/GRISP
 PDFDIR			?=	$(BASE_DIR)/doc/internal
 
 .PHONY: compile shell testshell deploy \
-	clean buildclean grispclean cacheclean ⁠fullclean testsrc prodsrc
+	clean buildclean grispclean cacheclean ⁠fullclean testsrc rel
 	# cleaning targets :
 	# command-line utils
 
@@ -58,14 +58,11 @@ shell:
 ## Release targets
 ##
 
-deploy: prodsrc
+rel:
+	$(REBAR) release -d false
+
+deploy:
 	$(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
-
-testsrc:
-	cp $(TEST_SRC_FILE) $(SRC_FILE)
-
-prodsrc:
-	cp $(PROD_SRC_FILE) $(SRC_FILE)
 
 htmldoc:
 	xsltproc --noout --stringparam outdir /tmp/myhtmldoc \
