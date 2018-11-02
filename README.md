@@ -1,21 +1,28 @@
 # Achlys
 Achlys is the goddess of deadly poison ... but fortunately there is an [AntidoteDB](https://www.antidotedb.eu/)
 
+## Minimum requirements
+
+- `rebar3 3.6.2 `
+- `otp 21.0.1`
+- `partisan 3.0.0`
+- `lasp 0.9.0`
+
 ## EDoc preview
 
 The development process has not yet reached a level of maturity allowing for an actual release of the program.
-Therefore, the documentation is currently more of an insight at the software design and more generally at 
+Therefore, the documentation is currently more of an insight at the software design and more generally at
 the features that will be provided.
 
 Once a satisfactory amount of testing and features will be implemented, a versioned package will be released and the documentation will be a reliable set of specifications.
 
 The online version of the documentation is found at :
 
-https://hexdocs.pm/achlys/
+https://hexdocs.pm/achlys
 
 ### Architecture
 
-The design pattern will follow the "facade" concept as much as possible, hence there will be an API that will provide an easy access to all the modules and functions. The documentation will be reorganized to focus on thoroughly explaining the usage, and will regroup the information of submodules like these : 
+The design pattern will follow the "facade" concept as much as possible, hence there will be an API that will provide an easy access to all the modules and functions. The documentation will be reorganized to focus on thoroughly explaining the usage, and will regroup the information of submodules like these :
 
 <p align="center">
   <img src="priv/resources/Doc_preview.png" alt="EDoc"/>
