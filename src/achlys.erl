@@ -2,7 +2,7 @@
 % @end
 -module(achlys).
 
--export([start/0, stop/0]).
+-export([start/0]).
 
 %% ===================================================================
 %% Entry point functions

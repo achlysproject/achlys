@@ -1,0 +1,8 @@
+@author Igor Kopestenski <igor.kopestenski@uclouvain.be>
+  [https://github.com/Laymer/]
+@version : 0.1.0
+@title The Achlys framework
+@doc A base for building Erlang applications combining
+<a target="_blank" href="https://lasp-lang.readme.io/">Lasp</a> components for
+<a target="_blank" href="https://www.grisp.org">GRiSP</a> embedded systems at
+the edge.

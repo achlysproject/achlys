@@ -9,6 +9,9 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be").
 
 -include_lib("common_test/include/ct.hrl").
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
 
 %% Test server callbacks
 -export([suite/0
@@ -106,15 +109,15 @@ groups() ->
 %%--------------------------------------------------------------------
 all() ->
     [
-      my_test_case,
-      just_a_test
+      nav_worker_test,
+      nav_worker_test_pressure
     ].
 
 %%--------------------------------------------------------------------
 %% Function: TestCase() -> Info
 %% Info = [tuple()]
 %%--------------------------------------------------------------------
-my_test_case() ->
+nav_worker_test() ->
     [].
 
 %%--------------------------------------------------------------------
@@ -125,10 +128,14 @@ my_test_case() ->
 %% Reason = term()
 %% Comment = term()
 %%--------------------------------------------------------------------
-my_test_case(_Config) ->
+nav_worker_test(_Config) ->
+    application:ensure_all_started(grisp),
+    T = pmod_nav:read(acc, [out_temp]),
+    ?assertEqual([25.0], T),
     ok.
 
 
-just_a_test(_Config) ->
-  pmod_nav:read(acc, [out_temp]),
+nav_worker_test_pressure(_Config) ->
+  %% @todo testing
+  % pmod_nav:read(acc, [out_temp]),
   ct:fail("fail").
