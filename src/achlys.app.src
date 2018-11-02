@@ -1,6 +1,6 @@
 {application,achlys,
              [{description,"A framework for applications using Lasp\n    on GRiSP embedded systems at the edge"},
-              {vsn,"0.1.1"},
+              {vsn,"0.1.2"},
               {registered,[]},
               {mod,{achlys_app,[]}},
               {applications,[kernel,stdlib,sasl,grisp,lager,partisan,lasp]},
