@@ -54,7 +54,13 @@ start_link() ->
 -spec init(term()) ->
   {ok,{supervisor:sup_flags(),[supervisor:child_spec()]}} | ignore.
 init([Args]) ->
-  {ok, {?SUPFLAGS(?THREE, ?TEN), [?CHILD(achlys_pmod_nav_worker, worker, Args)]}}.
+  IsMap = is_map(Args),
+  case IsMap of
+    true ->
+      {ok, {?SUPFLAGS(?THREE, ?TEN), [?CHILD(achlys_pmod_nav_worker, worker, Args)]}};
+    _ ->
+      ignore
+  end.
 
 %%====================================================================
 %% Internal functions
