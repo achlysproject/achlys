@@ -1,0 +1,332 @@
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.780.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.781.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 359
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.780.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =ERROR REPORT====
+** Generic server lasp_distribution_backend terminating 
+** Last message in was {query,undefined}
+** When Server state == {state,<0.750.0>,[],<<241,255,5,206,147,108,76,111,133,204,197,160,99,52,15,182,215,58,138,118>>}
+** Reason for termination == 
+** {{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+** Client achlys_pmod_nav_worker stacktrace
+** [{gen,do_call,4,[{file,"gen.erl"},{line,169}]},{gen_server,call,3,[{file,"gen_server.erl"},{line,219}]},{achlys_pmod_nav_worker,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/test/lib/achlys/src/achlys_pmod_nav_worker.erl"},{line,131}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.782.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.783.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.782.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: lasp_distribution_backend:init/1
+    pid: <0.748.0>
+    registered_name: lasp_distribution_backend
+    exception error: {{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_sup,<0.700.0>]
+    message_queue_len: 0
+    messages: []
+    links: [<0.750.0>,<0.752.0>,<0.701.0>]
+    dictionary: [{rand_seed,{#{jump => #Fun<rand.16.10897371>,max => 288230376151711743,next => #Fun<rand.15.10897371>,type => exsplus},[173002137924171712|43066647515660801]}}]
+    trap_exit: false
+    status: running
+    heap_size: 10958
+    stack_size: 27
+    reductions: 202606
+  neighbours:
+    neighbour: [{pid,<0.751.0>},{registered_name,lasp_ets_storage_backend},{initial_call,{lasp_ets_storage_backend,init,['Argument__1']}},{current_function,{gen_server,loop,7}},{ancestors,[lasp_storage_backend,lasp_distribution_backend,lasp_sup,<0.700.0>]},{message_queue_len,0},{links,[<0.750.0>]},{trap_exit,false},{status,waiting},{heap_size,233},{stack_size,10},{reductions,886},{current_stacktrace,[{gen_server,loop,7,[{file,"gen_server.erl"},{line,403}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}]
+    neighbour: [{pid,<0.752.0>},{registered_name,lasp_delta_based_synchronization_backend},{initial_call,{lasp_delta_based_synchronization_backend,init,['Argument__1']}},{current_function,{gen_server,loop,7}},{ancestors,[lasp_distribution_backend,lasp_sup,<0.700.0>]},{message_queue_len,0},{links,[<0.748.0>]},{trap_exit,false},{status,waiting},{heap_size,233},{stack_size,10},{reductions,1498},{current_stacktrace,[{gen_server,loop,7,[{file,"gen_server.erl"},{line,403}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}]
+    neighbour: [{pid,<0.750.0>},{registered_name,lasp_storage_backend},{initial_call,{lasp_storage_backend,init,['Argument__1']}},{current_function,{gen_server,loop,7}},{ancestors,[lasp_distribution_backend,lasp_sup,<0.700.0>]},{message_queue_len,0},{links,[<0.748.0>,<0.751.0>]},{trap_exit,false},{status,waiting},{heap_size,233},{stack_size,10},{reductions,1377},{current_stacktrace,[{gen_server,loop,7,[{file,"gen_server.erl"},{line,403}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}]
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.784.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.785.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.784.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.786.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.787.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.786.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_sup}
+     Context:    child_terminated
+     Reason:     {{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.748.0>},{id,lasp_distribution_backend},{mfargs,{lasp_distribution_backend,start_link,[]}},{restart_type,permanent},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =ERROR REPORT====
+** Generic server achlys_pmod_nav_worker terminating 
+** Last message in was get_crdt
+** When Server state == {state,undefined,20000,3000,60000,temp}
+** Reason for termination == 
+** {{{{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]},{gen_server,call,[lasp_distribution_backend,{query,undefined},infinity]}},[{gen_server,call,3,[{file,"gen_server.erl"},{line,223}]},{achlys_pmod_nav_worker,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/test/lib/achlys/src/achlys_pmod_nav_worker.erl"},{line,131}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+** Client <0.775.0> stacktrace
+** [{gen,do_call,4,[{file,"gen.erl"},{line,169}]},{gen_server,call,2,[{file,"gen_server.erl"},{line,211}]},{erl_eval,do_apply,6,[{file,"erl_eval.erl"},{line,681}]},{shell,exprs,7,[{file,"shell.erl"},{line,686}]},{shell,eval_exprs,7,[{file,"shell.erl"},{line,642}]},{shell,eval_loop,3,[{file,"shell.erl"},{line,627}]}]
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.788.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.789.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.788.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.790.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.791.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: achlys_pmod_nav_worker:init/1
+    pid: <0.758.0>
+    registered_name: achlys_pmod_nav_worker
+    exception exit: {{{{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]},{gen_server,call,[lasp_distribution_backend,{query,undefined},infinity]}},[{gen_server,call,3,[{file,"gen_server.erl"},{line,223}]},{achlys_pmod_nav_worker,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/test/lib/achlys/src/achlys_pmod_nav_worker.erl"},{line,131}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [achlys_sup,<0.756.0>]
+    message_queue_len: 0
+    messages: []
+    links: [<0.757.0>]
+    dictionary: []
+    trap_exit: false
+    status: running
+    heap_size: 17731
+    stack_size: 27
+    reductions: 347013
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.790.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.792.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.793.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.792.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =ERROR REPORT====
+Supervisor received unexpected message: {'ETS-TRANSFER',temp,<0.758.0>,[]}
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,achlys_sup}
+     Context:    child_terminated
+     Reason:     {{{badmatch,{error,{function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}}},[{lasp_distribution_backend,handle_call,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_distribution_backend.erl"},{line,506}]},{gen_server,try_handle_call,4,[{file,"gen_server.erl"},{line,661}]},{gen_server,handle_msg,6,[{file,"gen_server.erl"},{line,690}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]},{gen_server,call,[lasp_distribution_backend,{query,undefined},infinity]}}
+     Offender:   [{pid,<0.758.0>},{id,achlys_pmod_nav_worker},{mfargs,{achlys_pmod_nav_worker,start_link,[#{aggregation_trigger => 20,gc_interval => 20000,poll_interval => 3000,table => temp}]}},{restart_type,temporary},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.798.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.799.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.798.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.803.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.804.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.803.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.805.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.806.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.805.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =CRASH REPORT====
+  crasher:
+    initial call: gen_flow:init/4
+    pid: <0.807.0>
+    registered_name: []
+    exception error: {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+    ancestors: [lasp_process_sup,lasp_sup,<0.700.0>]
+    message_queue_len: 1
+    messages: [{'EXIT',<0.808.0>,normal}]
+    links: [<0.753.0>]
+    dictionary: []
+    trap_exit: true
+    status: running
+    heap_size: 987
+    stack_size: 27
+    reductions: 326
+  neighbours:
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    child_terminated
+     Reason:     {function_clause,[{lasp_core,query_var,[undefined,<0.750.0>],[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_core.erl"},{line,355}]},{lasp_process,process,2,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/lasp/src/lasp_process.erl"},{line,201}]},{gen_flow,loop,3,[{file,"/Users/Laymer/EdgeComputing/New/achlys/_build/default/lib/gen_flow/src/gen_flow.erl"},{line,174}]},{proc_lib,init_p_do_apply,3,[{file,"proc_lib.erl"},{line,249}]}]}
+     Offender:   [{pid,<0.807.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_process_sup}
+     Context:    shutdown
+     Reason:     reached_max_restart_intensity
+     Offender:   [{pid,<0.807.0>},{id,gen_flow},{mfargs,{gen_flow,start_link,[lasp_process,1,[[{undefined,#Fun<lasp_process.2.33366935>}],#Fun<lasp_process.3.33366935>,{<0.748.0>,#Fun<lasp_process.4.33366935>}]]}},{restart_type,transient},{shutdown,5000},{child_type,worker}]
+
+2018-11-02 09:23:41 =SUPERVISOR REPORT====
+     Supervisor: {local,lasp_sup}
+     Context:    child_terminated
+     Reason:     shutdown
+     Offender:   [{pid,<0.753.0>},{id,lasp_process_sup},{mfargs,{lasp_process_sup,start_link,[]}},{restart_type,permanent},{shutdown,infinity},{child_type,supervisor}]
+
