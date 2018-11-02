@@ -86,7 +86,12 @@ maxrecon(usage) ->
 maxrecon(cache) ->
     recon_alloc:cache_hit_rates().
 
-
+remotes_to_atoms([H|T]) ->
+  C = unicode:characters_to_list(["achlys@",H]),
+  R = list_to_atom(C),
+  [R|remotes_to_atoms(T)];
+remotes_to_atoms([]) ->
+  [].
 %% Stress intensity
 %% achlys_util:stress_throughput().
 % stress_throughput() ->
@@ -127,64 +132,3 @@ declare_awset(Name) ->
   {ok, {AWSet, _, _, _}} = lasp:declare({AWName, AWSetType}, AWSetType),
   application:set_env(achlys, awset, AWSet),
   AWSet.
-
-%%====================================================================
-%% Clustering functions
-%%====================================================================
-
-remotes_to_atoms([H|T]) ->
-    C = unicode:characters_to_list(["achlys@",H]),
-    R = list_to_atom(C),
-    [R|remotes_to_atoms(T)];
-remotes_to_atoms([]) ->
-    [].
-
-binary_remotes_to_atoms([H|T]) ->
-    [binary_to_atom(H,utf8)|binary_remotes_to_atoms(T)];
-binary_remotes_to_atoms([]) ->
-    [].
-
-seek_neighbors() ->
-    Rc = inet_db:get_rc(),
-    seek_neighbors(Rc).
-seek_neighbors([{host,_Addr,N}|T]) ->
-    [list_to_bitstring(["achlys@",N])|seek_neighbors(T)];
-seek_neighbors([{_Arg,_Val}|T]) ->
-    seek_neighbors(T);
-seek_neighbors([]) ->
-    [].
-
-join(Host) ->
-  Manager = rpc:call(Host, partisan_peer_service, manager, []),
-  case Manager of
-    partisan_hyparview_peer_service_manager ->
-      Node = rpc:call(Host, Manager, myself, []),
-      ok = partisan_peer_service:join(Node),
-      logger:log(info, "Joined ~p~n", [Host]),
-      Node;
-    {badrpc, Reason} ->
-      logger:log(error, "Unable to RPC remote : ~p~n", [Reason]),
-      {error, Reason};
-    {error, Reason} ->
-      logger:log(error, "Unable to retrieve remote : ~p~n", [Manager]),
-      {error, Reason}
-  end.
-
-clusterize() ->
-    N = seek_neighbors(),
-    Remotes = binary_remotes_to_atoms(N),
-    Self = node(),
-    clusterize(Remotes,Self).
-
-clusterize([H|Remotes],Self) ->
-    case H =/= Self of
-        true ->
-            Res = achlys_util:join(H),
-            % Res = achlys_util:fakejoin(H),
-            [Res|clusterize(Remotes,Self)];
-        _ ->
-            [clusterize(Remotes,Self)]
-    end;
-
-clusterize([],_Self) ->
-    [].
