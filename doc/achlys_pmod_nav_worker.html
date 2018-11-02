@@ -10,7 +10,7 @@
 <hr>
 
 <h1>Module achlys_pmod_nav_worker</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>The Pmod_NAV worker server.
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>The Pmod_NAV worker server.
 
 <p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
 <p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys/" target="_top">https://github.com/Laymer/achlys/</a></tt>].</p>
@@ -33,6 +33,12 @@ available on the Pmod_NAV :</p>
     Where <em>acc</em> is the component providing the
     data and <em>[out_temp]</em> is the list of registers
     that is read.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-nav_config">nav_config()</a></h3>
+<p><tt>nav_config() = #{table := atom(), gc_interval := pos_integer(), poll_interval := pos_integer(), aggregation_trigger := pos_integer()}</tt></p>
+
+
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#code_change-3">code_change/3</a></td><td></td></tr>
 <tr><td valign="top"><a href="#get_crdt-0">get_crdt/0</a></td><td>Returns the current view of the contents in the temperatures
@@ -66,7 +72,7 @@ available on the Pmod_NAV :</p>
 
 <h3 class="function"><a name="get_table-0">get_table/0</a></h3>
 <div class="spec">
-<p><tt>get_table() -&gt; list()</tt><br></p>
+<p><tt>get_table() -&gt; ok</tt><br></p>
 </div><p>Returns the current view of the contents in the temperatures
   Lasp variable.</p>
 
@@ -111,7 +117,7 @@ below.</p>
 
 <h3 class="function"><a name="start_link-1">start_link/1</a></h3>
 <div class="spec">
-<p><tt>start_link(NavConfig::map()) -&gt; {ok, pid()} | ignore | {error, {already_started, pid()} | term()}</tt><br></p>
+<p><tt>start_link(NavConfig::<a href="#type-nav_config">nav_config()</a>) -&gt; {ok, pid()} | ignore | {error, {already_started, pid()} | term()}</tt><br></p>
 </div><p>starts the pmod_nav process using the configuration
   given in the sys.config file.</p>
 
