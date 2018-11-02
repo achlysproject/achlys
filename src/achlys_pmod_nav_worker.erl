@@ -64,13 +64,19 @@
 
 -type state() :: #state{}.
 
+%% Configuration parameters
+-type nav_config()        :: #{table := atom()
+                            , gc_interval := pos_integer()
+                            , poll_interval := pos_integer()
+                            , aggregation_trigger := pos_integer() }.
+
 %%====================================================================
 %% API
 %%====================================================================
 
 %% @doc starts the pmod_nav process using the configuration
 %% given in the sys.config file.
--spec start_link(map()) ->
+-spec start_link(nav_config()) ->
   {ok, pid()} | ignore | {error, {already_started, pid()} | term()}.
 start_link(NavConfig) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, NavConfig, []).
@@ -79,26 +85,26 @@ start_link(NavConfig) ->
 %% and sets triggers for handlers after intervals have expired.
 -spec run() -> ok.
 run() ->
-    gen_server:call(self(), run).
+    gen_server:cast(self(), run).
 
 %% @doc Returns the current view of the contents in the temperatures
 %% Lasp variable.
--spec get_crdt() -> list().
+-spec get_crdt() -> ok.
 get_crdt() ->
-    gen_server:call(self(), get_crdt).
+    gen_server:cast(self(), get_crdt).
 
 %% @doc Returns the current view of the contents in the temperatures
 %% Lasp variable.
--spec get_table() -> list().
+-spec get_table() -> ok.
 get_table() ->
-    gen_server:call(self(), get_table).
+    gen_server:cast(self(), get_table).
 
 %%====================================================================
 %% Gen Server Callbacks
 %%====================================================================
 
 %% @private
--spec init(map()) -> {ok, state()}.
+-spec init(nav_config()) -> {ok, state()}.
 init(NavConfig) ->
     #{table := T
     , gc_interval := GC
@@ -119,25 +125,40 @@ init(NavConfig) ->
         , mean_interval = M
         , table = T}}.
 
+handle_call(_Request, _From, State) ->
+    {reply, ignored, State}.
+
+
 %%--------------------------------------------------------------------
 
-handle_call(run, _From, State) ->
+handle_cast(run, State) ->
+    _Remotes = achlys_util:clusterize(),
     Id = achlys_util:declare_crdt(temp, state_awset),
     logger:log(notice, "Declared CRDT ~p for temperature aggregates ~n", [Id]),
 
     erlang:send_after(State#state.poll_interval,self(),poll),
     erlang:send_after(State#state.mean_interval,self(),mean),
 
-    {reply, ok, State#state{crdt = Id}};
+    {noreply, State#state{crdt = Id}};
 
-handle_call(_Request, _From, State) ->
-    {reply, ignored, State}.
+%%--------------------------------------------------------------------
+
+handle_cast(get_crdt, State) ->
+    {ok, S} = lasp:query(State#state.crdt),
+    logger:log(notice, "CRDT ~p temperature aggregates ~n", [sets:to_list(S)]),
+    {noreply, State};
+
+%%--------------------------------------------------------------------
+
+handle_cast(get_table, State) ->
+    logger:log(notice, "Table info : ~p ~n", [ets:info(State#state.table)]),
+    {noreply, State};
 
 %%--------------------------------------------------------------------
 
 handle_cast(mean, State) ->
     Mean = get_temp_mean(State#state.table),
-    lasp:update(State#state.crdt, {add, Mean}, self()),
+    _ = lasp:update(State#state.crdt, {add, Mean}, self()),
     {noreply, State};
 
 %%--------------------------------------------------------------------
@@ -178,7 +199,8 @@ handle_info(gc, State) ->
 
 handle_info(mean, State) ->
     Mean = get_temp_mean(State#state.table),
-    lasp:update(State#state.crdt, {add, Mean}, self()),
+    _ = lasp:update(State#state.crdt, {add, Mean}, self()),
+    erlang:send_after(State#state.mean_interval,self(),mean),
     {noreply, State};
 
 %%--------------------------------------------------------------------
