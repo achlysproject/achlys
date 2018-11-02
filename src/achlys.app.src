@@ -1,46 +1,18 @@
-{application, achlys, [
-    {description, "A framework for applications using Lasp
-    on GRiSP embedded systems at the edge"},
-    {vsn, "0.1.0"},
-    {registered, []},
-    {mod, {achlys_app, []}},
-    {applications, [ kernel
-        , stdlib
-        , sasl
-        , grisp
-        , lager
-        , partisan
-        , lasp
-    ]},
-
-    {env,[]},
-    {modules, [
-        achlys
-      , achlys_app
-      , achlys_sup
-      , achlys_util
-      , achlys_config
-      , achlys_pmod_nav_worker
-    ]},
-
-    {maintainers, ["Igor Kopestenski"]},
-    {licenses, ["Apache 2.0"]},
-
-    {links,[
-      {"Github", "https://github.com/Laymer/achlys"}
-      , {"GRiSP", "https://www.grisp.org"}
-      , {"Lasp", "https://lasp-lang.readme.io"}
-      , {"LightKone", "https://lightkone.eu/"}
-    ]},
-
-    {files, [ "LICENSE"
-        , "README.md"
-        , "rebar.lock"
-        , "src"
-        , "grisp"
-        , "priv"
-        , "tools.mk"
-        , "Makefile"
-    ]},
-    {build_tools, ["rebar3"]}
-]}.
+{application,achlys,
+             [{description,"A framework for applications using Lasp\n    on GRiSP embedded systems at the edge"},
+              {vsn,"0.1.0"},
+              {registered,[]},
+              {mod,{achlys_app,[]}},
+              {applications,[kernel,stdlib,sasl,grisp,lager,partisan,lasp]},
+              {env,[]},
+              {modules,[achlys,achlys_app,achlys_sup,achlys_util,
+                        achlys_config,achlys_pmod_nav_worker]},
+              {maintainers,["Igor Kopestenski"]},
+              {licenses,["Apache 2.0"]},
+              {links,[{"Github","https://github.com/Laymer/achlys"},
+                      {"GRiSP","https://www.grisp.org"},
+                      {"Lasp","https://lasp-lang.readme.io"},
+                      {"LightKone","https://lightkone.eu/"}]},
+              {files,["LICENSE","README.md","rebar.lock","src","grisp","priv",
+                      "tools.mk","Makefile"]},
+              {build_tools,["rebar3"]}]}.
