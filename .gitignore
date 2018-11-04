@@ -21,3 +21,4 @@ LICENSE.md
 *.crashdump
 
 log/
+doc/
