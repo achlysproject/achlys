@@ -55,6 +55,8 @@
 %%====================================================================
 
 -define (SERVER, ?MODULE).
+-define (PMOD_NAV_SLOT, spi1).
+-define (TIME, erlang:monotonic_time()).
 
 %%====================================================================
 %% Records
@@ -75,6 +77,8 @@
                             , gc_interval := pos_integer()
                             , poll_interval := pos_integer()
                             , aggregation_trigger := pos_integer() }.
+-type pmod_nav_status() :: {ok, pmod_nav}
+                          | {error, no_device | no_pmod_nav | unknown }.
 
 %%====================================================================
 %% API
@@ -191,8 +195,12 @@ handle_cast(_Msg, State) ->
 %% They are used together with ETS tables when fast access
 %% needs to be complemented with persistency.
 handle_info(poll, State) ->
-  Temp = pmod_nav:read(acc, [out_temp]),
-  true = ets:insert_new(State#state.table, {erlang:monotonic_time(), Temp}),
+  case Res = maybe_get_temp() of
+    {ok, [Temp]} when is_number(Temp) ->
+      true = ets:insert_new(State#state.table, {?TIME, [Temp]});
+    _ ->
+      logger:log(notice, "Could not fetch temperature : ~p ~n", [Res])
+  end,
   erlang:send_after(State#state.poll_interval,?SERVER,poll),
   {noreply, State};
 
@@ -206,9 +214,15 @@ handle_info(gc, State) ->
 %%--------------------------------------------------------------------
 
 handle_info(mean, State) ->
-    Mean = get_temp_mean(State#state.table),
-    _ = lasp:update(State#state.crdt, {add, Mean}, ?SERVER),
-    erlang:send_after(State#state.mean_interval,?SERVER,mean),
+    Len = ets:info(State#state.table, size),
+    _ = case Len >= (State#state.mean_interval / State#state.mean_interval) of
+      true ->
+        Mean = get_temp_mean(State#state.table),
+        _ = lasp:update(State#state.crdt, {add, {node(), Mean}}, ?SERVER);
+      _ ->
+        logger:log(notice, "Could not compute mean with ~p values ~n", [Len])
+    end,
+    erlang:send_after(State#state.mean_interval, ?SERVER, mean),
     {noreply, State};
 
 %%--------------------------------------------------------------------
@@ -249,9 +263,9 @@ code_change(_OldVsn, State, _Extra) ->
 %% Internal functions
 %%====================================================================
 
--spec get_temp_mean(atom() | ets:tid()) -> {number(),float()}.
 %% @doc Returns the temperature average
 %% based on entries in the ETS table
+-spec get_temp_mean(atom() | ets:tid()) -> {number(),float()}.
 get_temp_mean(Tab) ->
     Sum = ets:foldl(fun
       (Elem, AccIn) ->
@@ -260,3 +274,33 @@ get_temp_mean(Tab) ->
     end, 0, Tab),
     Len = ets:info(Tab, size),
     {Len, (Sum / Len)}.
+
+%% @doc Returns the current temperature
+%% if a Pmod_NAV module is active on slot SPI1
+-spec maybe_get_temp() -> {ok, [float()]} | pmod_nav_status().
+maybe_get_temp() ->
+    {Code, Val} = is_pmod_nav_alive(),
+    case {Code, Val} of
+      {ok, pmod_nav} ->
+        {ok, pmod_nav:read(acc, [out_temp])};
+      _ ->
+        {Code, Val}
+    end.
+
+%% @doc Checks the SPI1 slot of the GRiSP board
+%% for presence of a Pmod_NAV module.
+-spec is_pmod_nav_alive() -> pmod_nav_status().
+is_pmod_nav_alive() ->
+  try grisp_devices:slot(?PMOD_NAV_SLOT) of
+    {device, ?PMOD_NAV_SLOT, Device, _Pid, _Ref} when Device =:= pmod_nav ->
+      {ok, pmod_nav};
+    {device, ?PMOD_NAV_SLOT, Device, _Pid, _Ref} when Device =/= pmod_nav ->
+      {error, no_pmod_nav}
+  catch
+    error:{no_device_connected, ?PMOD_NAV_SLOT} ->
+      {error, no_device};
+    _:_ ->
+      {error, unknown}
+  end.
+  %   error:{badmatch, {device, ?PMOD_NAV_SLOT, pmod_nav, _Pid, _Ref}} ->
+  %     {error, no_pmod_nav};
