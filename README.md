@@ -8,6 +8,11 @@ Achlys is the goddess of deadly poison ... but fortunately there is an [Antidote
 - [partisan](https://github.com/lasp-lang/partisan) `3.0.0`
 - [lasp](https://github.com/lasp-lang/lasp) `0.9.0`
 
+## Wiki
+
+A [Wiki](https://github.com/Laymer/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
+range of examples and tutorials in order to demonstrate the capabilities of Lasp on GRiSP at the Edge.
+
 ## EDoc preview
 
 The development process has not yet reached a level of maturity allowing for an actual release of the program.
