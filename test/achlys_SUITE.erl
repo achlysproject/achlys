@@ -9,9 +9,7 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be").
 
 -include_lib("common_test/include/ct.hrl").
--ifdef(TEST).
 -include_lib("eunit/include/eunit.hrl").
--endif.
 
 %% Test server callbacks
 -export([suite/0
@@ -37,33 +35,21 @@ suite() ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 init_per_suite(Config) ->
-  {ok, Deps} = application:ensure_all_started(grisp),
-  [{ok, Deps} | Config].
+  application:set_env(grisp, drivers, [
+      {spi, grisp_spi_drv_emu}
+  ]),
+  application:set_env(grisp, devices, [
+      {spi1, pmod_nav}
+  ]),
+  {ok, _Deps} = application:ensure_all_started(grisp),
+  Config.
 
 %%--------------------------------------------------------------------
 %% Function: end_per_suite(Config0) -> term() | {save_config,Config1}
 %% Config0 = Config1 = [tuple()]
 %%--------------------------------------------------------------------
 end_per_suite(_Config) ->
-    ok.
-
-%%--------------------------------------------------------------------
-%% Function: init_per_group(GroupName, Config0) ->
-%%               Config1 | {skip,Reason} | {skip_and_save,Reason,Config1}
-%% GroupName = atom()
-%% Config0 = Config1 = [tuple()]
-%% Reason = term()
-%%--------------------------------------------------------------------
-init_per_group(_GroupName, Config) ->
-    Config.
-
-%%--------------------------------------------------------------------
-%% Function: end_per_group(GroupName, Config0) ->
-%%               term() | {save_config,Config1}
-%% GroupName = atom()
-%% Config0 = Config1 = [tuple()]
-%%--------------------------------------------------------------------
-end_per_group(_GroupName, _Config) ->
+    application:stop(grisp),
     ok.
 
 %%--------------------------------------------------------------------
@@ -87,21 +73,6 @@ end_per_testcase(_TestCase, _Config) ->
     ok.
 
 %%--------------------------------------------------------------------
-%% Function: groups() -> [Group]
-%% Group = {GroupName,Properties,GroupsAndTestCases}
-%% GroupName = atom()
-%% Properties = [parallel | sequence | Shuffle | {RepeatType,N}]
-%% GroupsAndTestCases = [Group | {group,GroupName} | TestCase]
-%% TestCase = atom()
-%% Shuffle = shuffle | {shuffle,{integer(),integer(),integer()}}
-%% RepeatType = repeat | repeat_until_all_ok | repeat_until_all_fail |
-%%              repeat_until_any_ok | repeat_until_any_fail
-%% N = integer() | forever
-%%--------------------------------------------------------------------
-groups() ->
-    [].
-
-%%--------------------------------------------------------------------
 %% Function: all() -> GroupsAndTestCases | {skip,Reason}
 %% GroupsAndTestCases = [{group,GroupName} | TestCase]
 %% GroupName = atom()
@@ -110,9 +81,10 @@ groups() ->
 %%--------------------------------------------------------------------
 all() ->
     [
-      nav_worker_test,
+      nav_worker_test_temperature,
       nav_worker_test_pressure,
-      nav_worker_test_mag
+      nav_worker_test_mag,
+      nav_worker_test
     ].
 
 %%--------------------------------------------------------------------
@@ -120,7 +92,7 @@ all() ->
 %% Info = [tuple()]
 %%--------------------------------------------------------------------
 nav_worker_test() ->
-    [].
+    ok.
 
 %%--------------------------------------------------------------------
 %% Function: TestCase(Config0) ->
@@ -130,13 +102,13 @@ nav_worker_test() ->
 %% Reason = term()
 %% Comment = term()
 %%--------------------------------------------------------------------
-nav_worker_test(_Config) ->
+nav_worker_test_temperature() ->
     T = pmod_nav:read(acc, [out_temp]),
     ?assertEqual([25.0], T),
     ok.
 
 
-nav_worker_test_pressure(_Config) ->
+nav_worker_test_pressure() ->
   P = pmod_nav:read(alt, [out_press]),
   ?assertEqual([0.0], P),
   ok.
@@ -149,7 +121,7 @@ nav_worker_test_pressure(_Config) ->
 %% Reason = term()
 %% Comment = term()
 %%--------------------------------------------------------------------
-nav_worker_test_mag(_Config) ->
+nav_worker_test_mag() ->
   Mag = [_X,_Y,_Z] = pmod_nav:read(mag, [out_x_m, out_y_m, out_z_m]),
   ?assertEqual([0.0, 0.0, 0.0], Mag),
   ok.
