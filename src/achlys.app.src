@@ -2,7 +2,15 @@
     {description, "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"},
     {vsn, "0.1.0"},
-    {registered, []},
+    
+    {registered, [ achlys
+      , achlys_app
+      , achlys_sup
+      , achlys_util
+      , achlys_config
+      , achlys_pmod_nav_worker
+    ]},
+
     {mod, {achlys_app, []}},
     {applications, [ kernel
         , stdlib
