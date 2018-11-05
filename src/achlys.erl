@@ -12,12 +12,29 @@
 
 %% API
 -export([clusterize/0]).
+
+%% Pmod_NAV related functions API
+-export([aggregate_sensor_data/0]).
 -export([get_temp/0]).
+
+
+%%====================================================================
+%% Type definitions
+%%====================================================================
+
+%% TODO : aggregation parameters must be more generic and should provide
+%% configuration possibilities that are loosely coupled, even completely
+%% independent from each other if possible e.g. several temperature aggregation
+%% configurations that do not interfere.
+%% Configuration parameters
+%% -type data_config()        :: {atom(),  #{table := atom()
+%%                                     , device := atom()
+%%                                     , poll_interval := pos_integer()
+%%                                     , aggregation_trigger := pos_integer() }}.
 
 %% ===================================================================
 %% Entry point functions
 %% ===================================================================
-
 
 %% @doc Start the application.
 -spec start() -> ok.
@@ -46,12 +63,23 @@ clusterize() ->
               , net_adm:ping(R) =:= pong ],
   clusterize(Reachable).
 
-
 %% @doc Returns the temperature aggregates seen by the current node.
 -spec get_temp() -> list().
 get_temp() ->
   logger:log(notice, "Reading temp CRDT ~n"),
   achlys_pmod_nav_worker:get_crdt().
+
+% TODO : add genericity by specifying the desired aggregates in the
+% data_config() argument, and start corresponding pmod worker as a child
+% in the supervision tree if not yet present. Add the value to the polling
+% process otherwise.
+% -spec aggregate_sensor_data(data_config()) -> ok | {error, Reason}.
+%
+%% @doc Collect data based on sensors available on Pmod modules and store
+%% aggregated values in corresponding Lasp variable.
+-spec aggregate_sensor_data() -> ok.
+aggregate_sensor_data() ->
+  achlys_pmod_nav_worker:run().
 
 
 %%====================================================================
