@@ -6,7 +6,7 @@ REBAR_CONFIG	 ?= $(BASE_DIR)/rebar.config
 GRISPFILES_DIR		?= $(BASE_DIR)/grisp/grisp_base/files
 CACHE_DIR         ?= $(HOME)/.cache/rebar3
 COOKIE           ?= MyCookie
-VERSION 	       ?= 0.1.0
+VERSION 	       ?= 0.1.3
 PDFDIR			?=	$(BASE_DIR)/doc/internal
 
 REBAR_APPEND	?= {extra_src_dirs, [\"$(GRISP_TEST_SRC_DIR)\"]}.
