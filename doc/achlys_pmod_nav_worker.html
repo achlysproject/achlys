@@ -15,24 +15,24 @@
 <p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
 <p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys/" target="_top">https://github.com/Laymer/achlys/</a></tt>].</p>
 <p><b>See also:</b> <a href="pmod_nav.html"><b>Pmod_NAV</b>
- </a>.</p>
+  </a>.</p>
 
-<h2><a name="description">Description</a></h2><p>The Pmod_NAV worker server.  
-The general purpose of this worker is to gather  
-and process sensor data from one of the 3 components  
+<h2><a name="description">Description</a></h2><p>The Pmod_NAV worker server.   
+The general purpose of this worker is to gather   
+and process sensor data from one of the 3 components   
 available on the Pmod_NAV :</p>
- 
-    <p>- Accelerometer =&gt; acc    
-- Gyroscope =&gt; alt    
+  
+     <p>- Accelerometer =&gt; acc     
+- Gyroscope =&gt; alt     
 - Magnetometer =&gt; mag</p>
- 
-    <p>Data can be retrieved as follows :</p>
- 
-    <p>[Temperature] = pmod_nav:read(acc, [out_temp]).</p>
- 
-    Where <em>acc</em> is the component providing the
-    data and <em>[out_temp]</em> is the list of registers
-    that is read.
+  
+     <p>Data can be retrieved as follows :</p>
+  
+     <p>[Temperature] = pmod_nav:read(acc, [out_temp]).</p>
+  
+     Where <em>acc</em> is the component providing the
+     data and <em>[out_temp]</em> is the list of registers
+     that is read.
 <h2><a name="types">Data Types</a></h2>
 
 <h3 class="typedecl"><a name="type-nav_config">nav_config()</a></h3>
