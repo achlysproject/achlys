@@ -33,7 +33,8 @@
 %% API
 %%====================================================================
 
--export([start_link/1]).
+-export([start_link/0]).
+% -export([start_link/1]).
 -export([run/0]).
 -export([get_crdt/0]).
 -export([get_table/0]).
@@ -63,8 +64,7 @@
 %%====================================================================
 
 -record(state , {
-    crdt :: any() ,
-    gc_interval :: pos_integer() ,
+    crdts :: [crdt()] ,
     poll_interval :: pos_integer() ,
     mean_interval :: pos_integer() ,
     table :: any()
@@ -72,9 +72,10 @@
 
 -type state() :: #state{}.
 
+-type crdt() :: {bitstring(), atom()}.
+
 %% Configuration parameters
 -type nav_config() :: #{table := atom()
-    , gc_interval := pos_integer()
     , poll_interval := pos_integer()
     , aggregation_trigger := pos_integer()
 }.
@@ -88,10 +89,17 @@
 
 %% @doc starts the pmod_nav process using the configuration
 %% given in the sys.config file.
--spec start_link(nav_config()) ->
+% -spec start_link(nav_config()) ->
+%     {ok , pid()} | ignore | {error , {already_started , pid()} | term()}.
+% start_link(NavConfig) ->
+%     gen_server:start_link({local , ?MODULE} , ?MODULE , NavConfig , []).
+
+%% @doc starts the pmod_nav process using the configuration
+%% given in the sys.config file.
+-spec start_link() ->
     {ok , pid()} | ignore | {error , {already_started , pid()} | term()}.
-start_link(NavConfig) ->
-    gen_server:start_link({local , ?MODULE} , ?MODULE , NavConfig , []).
+start_link() ->
+    gen_server:start_link({local , ?MODULE} , ?MODULE , [] , []).
 
 %% @doc declares a Lasp variable for temperature aggregates
 %% and sets triggers for handlers after intervals have expired.
@@ -116,26 +124,35 @@ get_table() ->
 %%====================================================================
 
 %% @private
--spec init(nav_config()) -> {ok , state()}.
-init(NavConfig) ->
-    #{    table := T
-        , gc_interval := GC
-        , poll_interval := P
-        , aggregation_trigger := Agg} = NavConfig ,
+% -spec init(nav_config() | []) -> {ok , state()}.
+% init(NavConfig) ->
+%     #{    table := T
+%         , poll_interval := P
+%         , aggregation_trigger := Agg} = NavConfig ,
+%
+%     T = ets:new(T , [ordered_set
+%         ,            public
+%         ,            named_table
+%         ,            {heir , whereis(achlys_sup) , []}
+%     ]) ,
+%     M = (P * Agg) ,
+%
+%     {ok , #state{poll_interval = P
+%         ,        mean_interval = M
+%         ,        table         = T}};
+init([]) ->
+    case achlys_config:get(streams) of
+        {ok, Config} when is_map(Config) ->
+            initialize_sensors(Config);
+        undefined ->
+            {error, badconfig}
+    end,
 
-    T = ets:new(T , [ordered_set
-        ,            public
-        ,            named_table
-        ,            {heir , whereis(achlys_sup) , []}
-    ]) ,
-    M = (P * Agg) ,
 
-    erlang:send_after(GC , ?SERVER , gc) ,
+    % #{ table := T
+    % , poll_interval := P
+    % , aggregation_trigger := Agg} = NavConfig ,
 
-    {ok , #state{gc_interval   = GC
-        ,        poll_interval = P
-        ,        mean_interval = M
-        ,        table         = T}}.
 
 %%--------------------------------------------------------------------
 
