@@ -38,7 +38,14 @@
 
 -define(SERVER , ?MODULE).
 
--record(state , {}).
+-record(state , {
+    gc_interval :: pos_integer()
+}).
+
+-type state() :: #state{}.
+
+%% Configuration parameters
+-type gc_config() :: pos_integer().
 
 %%%===================================================================
 %%% API
@@ -70,11 +77,11 @@ start_link() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
--spec(init(Args :: term()) ->
-    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term()} | ignore).
-init([]) ->
-    {ok , #state{}}.
+-spec(init(Args :: term()) -> {ok , State :: state()}).
+init(_Args) ->
+    {ok, I} = achlys_config:get(gc_interval),
+    erlang:send_after(I , ?SERVER , gc) ,
+    {ok , #state{ gc_interval = I }}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -85,12 +92,13 @@ init([]) ->
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
                   State :: #state{}) ->
-                     {reply , Reply :: term() , NewState :: #state{}} |
-                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
-                     {noreply , NewState :: #state{}} |
-                     {noreply , NewState :: #state{} , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
-                     {stop , Reason :: term() , NewState :: #state{}}).
+                     {reply , ok , NewState :: #state{}}).
+                     % {reply , Reply :: term() , NewState :: #state{}} |
+                     % {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
+                     % {noreply , NewState :: #state{}} |
+                     % {noreply , NewState :: #state{} , timeout() | hibernate} |
+                     % {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
+                     % {stop , Reason :: term() , NewState :: #state{}}).
 handle_call(_Request , _From , State) ->
     {reply , ok , State}.
 
@@ -102,26 +110,24 @@ handle_call(_Request , _From , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_cast(Request :: term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+    {noreply , NewState :: #state{}}).
+    % {noreply , NewState :: #state{}} |
+    % {noreply , NewState :: #state{} , timeout() | hibernate} |
+    % {stop , Reason :: term() , NewState :: #state{}}).
 handle_cast(_Request , State) ->
     {noreply , State}.
 
 %%--------------------------------------------------------------------
 %% @private
 %% @doc
-%% Handling all non call/cast messages
-%%
-%% @spec handle_info(Info, State) -> {noreply, State} |
-%%                                   {noreply, State, Timeout} |
-%%                                   {stop, Reason, State}
+%% Handling the garbage collection periodical triggers.
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+handle_info(gc , State) ->
+    ok = achlys_util:do_gc() ,
+    erlang:send_after(State#state.gc_interval , ?SERVER , gc) ,
+    {noreply , State};
+
 handle_info(_Info , State) ->
     {noreply , State}.
 
@@ -151,7 +157,8 @@ terminate(_Reason , _State) ->
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
                   Extra :: term()) ->
-                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
+                      {ok , NewState :: #state{}}).
+                     % {ok , NewState :: #state{}} | {error , Reason :: term()}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 

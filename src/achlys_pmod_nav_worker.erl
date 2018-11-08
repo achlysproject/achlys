@@ -74,11 +74,13 @@
 
 %% Configuration parameters
 -type nav_config() :: #{table := atom()
-, gc_interval := pos_integer()
-, poll_interval := pos_integer()
-, aggregation_trigger := pos_integer()}.
+    , gc_interval := pos_integer()
+    , poll_interval := pos_integer()
+    , aggregation_trigger := pos_integer()
+}.
+
 -type pmod_nav_status() :: {ok , pmod_nav}
-| {error , no_device | no_pmod_nav | unknown}.
+    | {error , no_device | no_pmod_nav | unknown}.
 
 %%====================================================================
 %% API
@@ -120,16 +122,16 @@ init(NavConfig) ->
         , gc_interval := GC
         , poll_interval := P
         , aggregation_trigger := Agg} = NavConfig ,
-    
+
     T = ets:new(T , [ordered_set
         ,            public
         ,            named_table
         ,            {heir , whereis(achlys_sup) , []}
     ]) ,
     M = (P * Agg) ,
-    
+
     erlang:send_after(GC , ?SERVER , gc) ,
-    
+
     {ok , #state{gc_interval   = GC
         ,        poll_interval = P
         ,        mean_interval = M
@@ -160,10 +162,10 @@ handle_call(_Request , _From , State) ->
 handle_cast(run , State) ->
     Id = achlys_util:declare_crdt(temp , state_awset) ,
     logger:log(notice , "Declared CRDT ~p for temperature aggregates ~n" , [Id]) ,
-    
+
     erlang:send_after(State#state.poll_interval , ?SERVER , poll) ,
     erlang:send_after(State#state.mean_interval , ?SERVER , mean) ,
-    
+
     {noreply , State#state{crdt = Id}};
 
 %%--------------------------------------------------------------------
@@ -208,8 +210,9 @@ handle_info(poll , State) ->
 %%--------------------------------------------------------------------
 
 handle_info(gc , State) ->
-    ok = achlys_util:do_gc() ,
-    erlang:send_after(State#state.gc_interval , ?SERVER , gc) ,
+    % TODO : remove completely in favor of cleaner server.
+    % ok = achlys_util:do_gc() ,
+    % erlang:send_after(State#state.gc_interval , ?SERVER , gc) ,
     {noreply , State};
 
 %%--------------------------------------------------------------------
