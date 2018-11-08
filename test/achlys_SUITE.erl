@@ -13,11 +13,11 @@
 
 %% Test server callbacks
 -export([suite/0
-  , all/0
-  , init_per_suite/1
-  , end_per_suite/1
-  , init_per_testcase/2
-  , end_per_testcase/2]).
+    ,    all/0
+    ,    init_per_suite/1
+    ,    end_per_suite/1
+    ,    init_per_testcase/2
+    ,    end_per_testcase/2]).
 
 -compile(export_all).
 
@@ -26,7 +26,7 @@
 %% Info = [tuple()]
 %%--------------------------------------------------------------------
 suite() ->
-    [{timetrap,{seconds,30}}].
+    [{timetrap , {seconds , 30}}].
 
 %%--------------------------------------------------------------------
 %% Function: init_per_suite(Config0) ->
@@ -35,21 +35,21 @@ suite() ->
 %% Reason = term()
 %%--------------------------------------------------------------------
 init_per_suite(Config) ->
-  application:set_env(grisp, drivers, [
-      {spi, grisp_spi_drv_emu}
-  ]),
-  application:set_env(grisp, devices, [
-      {spi1, pmod_nav}
-  ]),
-  {ok, _Deps} = application:ensure_all_started(grisp),
-  Config.
+    application:set_env(grisp , drivers , [
+        {spi , grisp_spi_drv_emu}
+    ]) ,
+    application:set_env(grisp , devices , [
+        {spi1 , pmod_nav}
+    ]) ,
+    {ok , _Deps} = application:ensure_all_started(grisp) ,
+    Config.
 
 %%--------------------------------------------------------------------
 %% Function: end_per_suite(Config0) -> term() | {save_config,Config1}
 %% Config0 = Config1 = [tuple()]
 %%--------------------------------------------------------------------
 end_per_suite(_Config) ->
-    application:stop(grisp),
+    application:stop(grisp) ,
     ok.
 
 %%--------------------------------------------------------------------
@@ -59,7 +59,7 @@ end_per_suite(_Config) ->
 %% Config0 = Config1 = [tuple()]
 %% Reason = term()
 %%--------------------------------------------------------------------
-init_per_testcase(_TestCase, Config) ->
+init_per_testcase(_TestCase , Config) ->
     Config.
 
 %%--------------------------------------------------------------------
@@ -69,7 +69,7 @@ init_per_testcase(_TestCase, Config) ->
 %% Config0 = Config1 = [tuple()]
 %% Reason = term()
 %%--------------------------------------------------------------------
-end_per_testcase(_TestCase, _Config) ->
+end_per_testcase(_TestCase , _Config) ->
     ok.
 
 %%--------------------------------------------------------------------
@@ -81,10 +81,10 @@ end_per_testcase(_TestCase, _Config) ->
 %%--------------------------------------------------------------------
 all() ->
     [
-      nav_worker_test_temperature,
-      nav_worker_test_pressure,
-      nav_worker_test_mag,
-      nav_worker_test
+        nav_worker_test_temperature ,
+        nav_worker_test_pressure ,
+        nav_worker_test_mag ,
+        nav_worker_test
     ].
 
 %%--------------------------------------------------------------------
@@ -103,15 +103,15 @@ nav_worker_test() ->
 %% Comment = term()
 %%--------------------------------------------------------------------
 nav_worker_test_temperature() ->
-    T = pmod_nav:read(acc, [out_temp]),
-    ?assertEqual([25.0], T),
+    T = pmod_nav:read(acc , [out_temp]) ,
+    ?assertEqual([25.0] , T) ,
     ok.
 
 
 nav_worker_test_pressure() ->
-  P = pmod_nav:read(alt, [out_press]),
-  ?assertEqual([0.0], P),
-  ok.
+    P = pmod_nav:read(alt , [out_press]) ,
+    ?assertEqual([0.0] , P) ,
+    ok.
 
 %%--------------------------------------------------------------------
 %% Function: TestCase(Config0) ->
@@ -122,6 +122,6 @@ nav_worker_test_pressure() ->
 %% Comment = term()
 %%--------------------------------------------------------------------
 nav_worker_test_mag() ->
-  Mag = [_X,_Y,_Z] = pmod_nav:read(mag, [out_x_m, out_y_m, out_z_m]),
-  ?assertEqual([0.0, 0.0, 0.0], Mag),
-  ok.
+    Mag = [_X , _Y , _Z] = pmod_nav:read(mag , [out_x_m , out_y_m , out_z_m]) ,
+    ?assertEqual([0.0 , 0.0 , 0.0] , Mag) ,
+    ok.

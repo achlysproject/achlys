@@ -21,3 +21,5 @@ LICENSE.md
 *.crashdump
 
 log/
+
+\.idea/
