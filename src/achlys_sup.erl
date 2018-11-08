@@ -27,7 +27,7 @@
 }).
 
 -define(CHILD(Name , Type , Args) , #{id     => Name
-    ,                                 start    => {Name , start_link , [Args]}
+    ,                                 start    => {Name , start_link , Args}
     ,                                 restart  => temporary
     ,                                 shutdown => 5000
     ,                                 type     => Type
@@ -58,8 +58,8 @@ init([Args]) ->
     case IsMap of
         true ->
             {ok , {?SUPFLAGS(?THREE , ?TEN) , [
-                  ?CHILD(achlys_pmod_nav_worker , worker , Args)
-                , ?CHILD(achlys_cleaner , worker , Args)]}};
+                  ?CHILD(achlys_pmod_nav_worker , worker , [Args])
+                , ?CHILD(achlys_cleaner , worker , [])]}};
         _ ->
             ignore
     end.

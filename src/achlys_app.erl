@@ -33,7 +33,6 @@
 -spec(start(StartType :: normal | {takeover , node()} | {failover , node()} ,
             StartArgs :: term()) ->
                {ok , pid()} |
-               {ok , pid() , State :: term()} |
                {error , Reason :: term()}).
 start(_StartType , _StartArgs) ->
     case achlys_sup:start_link() of
@@ -48,7 +47,7 @@ start(_StartType , _StartArgs) ->
             [grisp_led:color(L, red) || L <- LEDs],
             {ok , Pid};
         Error ->
-            Error
+            {error, Error}
     end.
 
 %%--------------------------------------------------------------------
@@ -60,7 +59,7 @@ start(_StartType , _StartArgs) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(stop(State :: term()) -> term()).
+-spec(stop(State :: term()) -> ok).
 stop(_State) ->
     achlys:stop(),
     ok.
