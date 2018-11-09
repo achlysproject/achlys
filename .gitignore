@@ -23,3 +23,5 @@ LICENSE.md
 log/
 
 \.idea/
+
+stale_outputs_checked
