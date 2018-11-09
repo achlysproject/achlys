@@ -41,7 +41,9 @@ start_link() ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}} | ignore.
 init([]) ->
     {ok , {?SUPFLAGS(?THREE , ?TEN) , [
-          ?NAV_WORKER
+          % ?NAV_WORKER
+          ?SENSOR_COMMANDER
+          % , ?CLEANER_WORKER]}}.
         , ?CLEANER_WORKER]}}.
     % IsMap = is_map(Args) ,
     % case IsMap of

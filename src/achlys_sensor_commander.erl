@@ -12,8 +12,11 @@
 
 -behaviour(gen_server).
 
+-include ("achlys.hrl").
+
 %% API
 -export([start_link/0]).
+-export([run_nav/0]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -25,7 +28,15 @@
 
 -define(SERVER , ?MODULE).
 
--record(state , {}).
+%%====================================================================
+%% Records
+%%====================================================================
+
+-record(state , {
+    streams :: map()
+}).
+
+-type state() :: #state{}.
 
 %%%===================================================================
 %%% API
@@ -41,6 +52,10 @@
     {ok , Pid :: pid()} | ignore | {error , Reason :: term()}).
 start_link() ->
     gen_server:start_link({local , ?SERVER} , ?MODULE , [] , []).
+
+run_nav() ->
+    Sup = whereis(achlys_sup),
+    supervisor:start_child(Sup, ?NAV_WORKER).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -64,12 +79,9 @@ init([]) ->
     %% TODO : initialize pmod workers
     %% based on configuration from environment
     %% variables.
-    % {ok, Config} = achlys_config:get(streams),
-    % case Config of
-    %     pattern when guard ->
-    %         body
-    % end
-    {ok , #state{}}.
+    {ok, Streams} = achlys_config:get(streams),
+    self() ! {setup_stream_workers},
+    {ok , #state{streams = Streams}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -117,7 +129,26 @@ handle_cast(_Request , State) ->
     {noreply , NewState :: #state{}} |
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
+handle_info({setup_stream_workers} , State) when is_map(State#state.streams) ->
+    logger:log(notice, "Initializing data stream workers ~n "),
+    _ = [ self() ! {run, X} || X <- maps:keys(State#state.streams)],
+    % case check_streams(Streams) of
+    %     {ok, [Ks]} ->
+    %         maybe_run_workers([Ks]);
+    %     _ ->
+    %         %% retry in case configuration
+    %         %% has been changed at runtime
+    % end,
+    % erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
+    % maybe_run_workers(Streams),
+    {noreply , State};
+
+handle_info({run, pmod_nav} , State) ->
+    run_nav(),
+    {noreply , State};
+
 handle_info(_Info , State) ->
+    logger:log(notice, "Unhandled Info ~n "),
     {noreply , State}.
 
 %%--------------------------------------------------------------------
@@ -154,6 +185,28 @@ code_change(_OldVsn , State , _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
+check_streams(Streams) ->
+    try maps:keys(Streams) of
+        [Ks] ->
+            {ok, [Ks]}
+    catch
+        _:_ ->
+            {error, no_streams}
+    end.
+
+maybe_run_workers([Ks]) ->
+    % ok.
+    RunningDevices = [ X || {device, _Slot, X, _Pid, _Ref} <- grisp_devices:list()
+        , lists:member(X, [Ks]) ],
+    run_workers(RunningDevices, whereis(achlys_sup)).
+
+run_workers([pmod_nav|T], Sup) ->
+    supervisor:start_child(Sup, ?NAV_WORKER),
+    run_workers(T, Sup);
+run_workers([H|T], Sup) ->
+    logger:log(notice, "Worker not yet implemented ~p ~n ", [H]),
+    run_workers(T, Sup).
+    % ach
 % initialize_sensors(Config) ->
 %     Iterator = maps:iterator(Config),
 %     Pred = fun(K , V) -> is_atom(K) andalso is_map(V) andalso is_able(K) =:= true end,

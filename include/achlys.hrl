@@ -16,6 +16,8 @@
 -define(TEN , 10000).
 -define(HMIN , 30000).
 -define(MIN , 60000).
+-define(TWOMIN , 120000).
+-define(THREEMIN , 180000).
 
 -define(MILLION , 1000000).
 
