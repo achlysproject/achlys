@@ -37,6 +37,7 @@
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#aggregate_sensor_data-0">aggregate_sensor_data/0</a></td><td>Collect data based on sensors available on Pmod modules and store
   aggregated values in corresponding Lasp variable.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
+<tr><td valign="top"><a href="#get_aggregate-1">get_aggregate/1</a></td><td>Returns the temperature aggregates seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#get_temp-0">get_temp/0</a></td><td>Returns the temperature aggregates seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
 <tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>Stop the Application.</td></tr>
@@ -54,6 +55,11 @@
 <div class="spec">
 <p><tt>clusterize() -&gt; [<a href="#type-node_spec">node_spec()</a>]</tt><br></p>
 </div><p>Attempts to discover and join other neighboring nodes.</p>
+
+<h3 class="function"><a name="get_aggregate-1">get_aggregate/1</a></h3>
+<div class="spec">
+<p><tt>get_aggregate(Data::atom()) -&gt; list()</tt><br></p>
+</div><p>Returns the temperature aggregates seen by the current node.</p>
 
 <h3 class="function"><a name="get_temp-0">get_temp/0</a></h3>
 <div class="spec">
