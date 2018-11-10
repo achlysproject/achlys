@@ -349,9 +349,14 @@ is_pmod_nav_alive() ->
 %   error:{badmatch, {device, ?PMOD_NAV_SLOT, pmod_nav, _Pid, _Ref}} ->
 %     {error, no_pmod_nav};
 create_table(Name) ->
-    T = ets:new(Name , [ordered_set
+    case ets:info(Name, size) of
+      undefined ->
+        T = ets:new(Name , [ordered_set
         ,            public
         ,            named_table
         ,            {heir , whereis(achlys_sup) , []}
-    ]),
-    T.
+        ]);
+      _ ->
+        Name
+      end.
+    % T.
