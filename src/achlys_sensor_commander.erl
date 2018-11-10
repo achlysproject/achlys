@@ -79,6 +79,7 @@ init([]) ->
     %% TODO : initialize pmod workers
     %% based on configuration from environment
     %% variables.
+    ok = achlys_config:set(number, achlys_util:get_inet_least_significant()),
     {ok, Streams} = achlys_config:get(streams),
     self() ! {setup_stream_workers},
     {ok , #state{streams = Streams}}.

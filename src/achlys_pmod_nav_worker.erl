@@ -63,15 +63,9 @@
 %% Records
 %%====================================================================
 
-% -record(state , {
-%     % crdts :: [crdt()] ,
-%     crdt :: crdt() ,
-%     poll_interval :: pos_integer() ,
-%     mean_interval :: pos_integer() ,
-%     table :: any()
-% }).
 -record(state , {
-    measures :: map()
+    measures :: map(),
+    number :: binary()
 }).
 
 -type state() :: #state{}.
@@ -93,19 +87,10 @@
 
 % @doc starts the pmod_nav process using the configuration
 % given in the sys.config file.
-% -spec start_link(nav_config()) ->
-%     {ok , pid()} | ignore | {error , {already_started , pid()} | term()}.
-% start_link(NavConfig) ->
-%     gen_server:start_link({local , ?MODULE} , ?MODULE , NavConfig , []).
+-spec start_link() ->
+  {ok , pid()} | ignore | {error , {already_started , pid()} | term()}.
 start_link() ->
     gen_server:start_link({local , ?MODULE} , ?MODULE , [] , []).
-
-%% @doc starts the pmod_nav process using the configuration
-%% given in the sys.config file.
-% -spec start_link() ->
-%     {ok , pid()} | ignore | {error , {already_started , pid()} | term()}.
-% start_link() ->
-%     gen_server:start_link({local , ?MODULE} , ?MODULE , [] , []).
 
 %% @doc declares a Lasp variable for temperature aggregates
 %% and sets triggers for handlers after intervals have expired.
@@ -131,43 +116,17 @@ get_table(Name) ->
 %%====================================================================
 
 % @private
+-spec init([]) -> {ok , state()}.
 init([]) ->
     {ok, Streams} = achlys_config:get(streams),
+    {ok, Num} = achlys_config:get(number),
     MeasuresMap = mapz:deep_get([pmod_nav], Streams),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
-    {ok, #state{measures = MeasuresMap}}.
-% -spec init(nav_config() | []) -> {ok , state()}.
-% init(NavConfig) ->
-%     #{    table := T
-%         , poll_interval := P
-%         , aggregation_trigger := Agg} = NavConfig ,
-%
-%     T = ets:new(T , [ordered_set
-%         ,            public
-%         ,            named_table
-%         ,            {heir , whereis(achlys_sup) , []}
-%     ]) ,
-%     M = (P * Agg) ,
-%
-%     {ok , #state{poll_interval = P
-%         ,        mean_interval = M
-%         ,        table         = T}}.
-% init([]) ->
-%     case achlys_config:get(streams) of
-%         {ok, Config} when is_map(Config) ->
-%             initialize_sensors(Config);
-%         undefined ->
-%             {error, badconfig}
-%     end,
-
-
-    % #{ table := T
-    % , poll_interval := P
-    % , aggregation_trigger := Agg} = NavConfig ,
-
+    {ok, #state{measures = MeasuresMap, number = Num}}.
 
 %%--------------------------------------------------------------------
 
+% @private
 handle_call({get_crdt, Name} , _From , State) ->
     Id = mapz:deep_get([Name, crdt], State#state.measures),
     % {ok , S} = lasp:query(State#state.crdt) ,
@@ -177,6 +136,7 @@ handle_call({get_crdt, Name} , _From , State) ->
 
 %%--------------------------------------------------------------------
 
+% @private
 handle_call({get_table, Name} , _From , State) ->
     Tab = mapz:deep_get([Name, table], State#state.measures),
     % Match = ets:match(State#state.table , '$1') ,
@@ -186,61 +146,46 @@ handle_call({get_table, Name} , _From , State) ->
 
 %%--------------------------------------------------------------------
 
+% @private
 handle_call(_Request , _From , State) ->
     {reply , ignored , State}.
 
-
-% %%--------------------------------------------------------------------
-%
-% handle_cast(run , State) ->
-%     Id = achlys_util:declare_crdt(temp , state_awset) ,
-%     logger:log(notice , "Declared CRDT ~p for temperature aggregates ~n" , [Id]) ,
-%
-%     erlang:send_after(State#state.poll_interval , ?SERVER , poll) ,
-%     erlang:send_after(State#state.mean_interval , ?SERVER , mean) ,
-%
-%     {noreply , State#state{crdt = Id}};
 %%--------------------------------------------------------------------
 
+% @private
 handle_cast(run , State) ->
-    ok = lists:foreach(fun
-        (Elem) ->
-            Id = achlys_util:declare_crdt(Elem , state_awset),
-            mapz:deep_put([Elem, crdt], Id , State#state.measures),
-            T = create_table(Elem),
-            mapz:deep_put([Elem, table], T , State#state.measures)
-    end, maps:keys(State#state.measures)),
-    % L = [ achlys_util:declare_crdt(X , state_awset) || X <- maps:keys(State#state.measures) ],
     logger:log(notice , "Declared CRDTs for aggregates ~n"),
+    I = maps:iterator(State#state.measures),
 
+    NewState = maps:map(fun
+      (K, V1) when is_map(V1) ->
+        Id = achlys_util:declare_crdt(K , state_awset),
+
+        V2 = mapz:deep_put([crdt], Id , V1),
+        T = create_table(K),
+
+        V3 = mapz:deep_put([table], T , V2),
+        #{poll_interval := P
+        , aggregation_trigger := A} = V3,
+        erlang:send_after(((P * A) + ?THREE), ?SERVER, {mean, K}),
+        V3
+    end, I),
     erlang:send_after(?ONE , ?SERVER , poll) ,
-    {noreply , State};
-    % {noreply , State#state{crdt = Id}};
-    % Id = achlys_util:declare_crdt(temp , state_awset) ,
-    % logger:log(notice , "Declared CRDT ~p for temperature aggregates ~n" , [Id]) ,
-    %
-    % erlang:send_after(State#state.poll_interval , ?SERVER , poll) ,
-    % erlang:send_after(State#state.mean_interval , ?SERVER , mean) ,
-    %
-    % {noreply , State#state{crdt = Id}};
+    {noreply , State#state{measures = NewState}};
 
 %%--------------------------------------------------------------------
 
-handle_cast(mean , State) ->
-    % Mean = get_temp_mean(State#state.table) ,
-    % _ = lasp:update(State#state.crdt , {add , Mean} , ?SERVER) ,
-    {noreply , State};
-
-%%--------------------------------------------------------------------
-
+% @private
 handle_cast(_Msg , State) ->
     {noreply , State}.
 
 %%--------------------------------------------------------------------
 
-%% @doc fetches the temperature value from the {@link pmod_nav} sensor
-%% and stores it in the corresponding ETS table. It is paired with
+%% @doc fetches the values from the {@link pmod_nav} sensor
+%% and stores them in the corresponding ETS table. It is paired with
 %% the {@link erlang:monotonic_time/0} to guarantee unique keys.
+%% The first call is used to redirect towards implemented handlers
+%% e.g. temperature, pressure.
 %% For large amounts of sensor data
 %% e.g. accumulated for a long time and being larger than
 %% the maximum available memory, an alternative would be to use the
@@ -252,16 +197,6 @@ handle_cast(_Msg , State) ->
 %% Dets tables provide efficient file-based Erlang term storage.
 %% They are used together with ETS tables when fast access
 %% needs to be complemented with persistency.
-% handle_info(poll , State) ->
-%     Res = maybe_get_temp() ,
-%     case Res of
-%         {ok , [Temp]} when is_number(Temp) ->
-%             true = ets:insert_new(State#state.table , {?TIME , [Temp]});
-%         _ ->
-%             logger:log(notice , "Could not fetch temperature : ~p ~n" , [Res])
-%     end ,
-%     erlang:send_after(State#state.poll_interval , ?SERVER , poll) ,
-%     {noreply , State};
 handle_info(poll , State) ->
     [ erlang:send_after(mapz:deep_get([K, poll_interval],
         State#state.measures),
@@ -283,27 +218,38 @@ handle_info(temperature , State) ->
     , temperature) ,
     {noreply , State};
 
+handle_info(pressure , State) ->
+    Res = maybe_get_press() ,
+    case Res of
+        {ok , [Press]} when is_number(Press) ->
+            % true = ets:insert_new(State#state.measures , {?TIME , [Press]});
+            true = ets:insert_new(pressure , {?TIME , [Press]});
+        _ ->
+            logger:log(notice , "Could not fetch pressure : ~p ~n" , [Res])
+    end ,
+    erlang:send_after(mapz:deep_get([pressure, poll_interval],State#state.measures)
+    , ?SERVER
+    , pressure) ,
+    {noreply , State};
+
 %%--------------------------------------------------------------------
 
-% handle_info(gc , State) ->
-%     % TODO : remove completely in favor of cleaner server.
-%     % ok = achlys_util:do_gc() ,
-%     % erlang:send_after(State#state.gc_interval , ?SERVER , gc) ,
-%     {noreply , State};
+handle_info({mean, Val} , State) ->
+    #{table := T
+    , crdt := C
+    , poll_interval := P
+    , aggregation_trigger := A} = mapz:deep_get([Val],State#state.measures),
+    Len = ets:info(Val, size),
+    _ = case Len >= A of
+            true ->
+                Mean = get_mean(Val) ,
+                _ = lasp:update(C , {add , {State#state.number , T, Mean}} , ?SERVER);
+            _ ->
+                logger:log(notice , "Could not compute mean with ~p values ~n" , [Len])
+        end ,
+    erlang:send_after((P * A) , ?SERVER , {mean, Val}) ,
+    {noreply , State};
 
-%%--------------------------------------------------------------------
-
-% handle_info(mean , State) ->
-%     Len = ets:info(State#state.table , size) ,
-%     _ = case Len >= (State#state.mean_interval / State#state.mean_interval) of
-%             true ->
-%                 Mean = get_temp_mean(State#state.table) ,
-%                 _ = lasp:update(State#state.crdt , {add , {node() , Mean}} , ?SERVER);
-%             _ ->
-%                 logger:log(notice , "Could not compute mean with ~p values ~n" , [Len])
-%         end ,
-%     erlang:send_after(State#state.mean_interval , ?SERVER , mean) ,
-%     {noreply , State};
 %%--------------------------------------------------------------------
 
 handle_info({measure, Map} , State) ->
@@ -351,8 +297,8 @@ code_change(_OldVsn , State , _Extra) ->
 
 %% @doc Returns the temperature average
 %% based on entries in the ETS table
--spec get_temp_mean(atom() | ets:tid()) -> {number() , float()}.
-get_temp_mean(Tab) ->
+-spec get_mean(atom() | ets:tid()) -> {number() , float()}.
+get_mean(Tab) ->
     Sum = ets:foldl(fun
                         (Elem , AccIn) ->
                             {_ , [Temp]} = Elem ,
@@ -369,6 +315,18 @@ maybe_get_temp() ->
     case {Code , Val} of
         {ok , pmod_nav} ->
             {ok , pmod_nav:read(acc , [out_temp])};
+        _ ->
+            {Code , Val}
+    end.
+
+%% @doc Returns the current pressure
+%% if a Pmod_NAV module is active on slot SPI1
+-spec maybe_get_press() -> {ok , [float()]} | pmod_nav_status().
+maybe_get_press() ->
+    {Code , Val} = is_pmod_nav_alive() ,
+    case {Code , Val} of
+        {ok , pmod_nav} ->
+            {ok , pmod_nav:read(alt , [press_out])};
         _ ->
             {Code , Val}
     end.
