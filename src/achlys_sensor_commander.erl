@@ -1,7 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
 %%%     [https://github.com/Laymer/achlys]
-%%% 2018, <Universite Catholique de Louvain>
+%%% 2018, Universite Catholique de Louvain
 %%% @doc
 %%%
 %%% @end
@@ -186,6 +186,7 @@ code_change(_OldVsn , State , _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
+%% @private
 check_streams(Streams) ->
     try maps:keys(Streams) of
         [Ks] ->
@@ -195,24 +196,17 @@ check_streams(Streams) ->
             {error, no_streams}
     end.
 
+%% @private
 maybe_run_workers([Ks]) ->
     % ok.
     RunningDevices = [ X || {device, _Slot, X, _Pid, _Ref} <- grisp_devices:list()
         , lists:member(X, [Ks]) ],
     run_workers(RunningDevices, whereis(achlys_sup)).
 
+%% @private
 run_workers([pmod_nav|T], Sup) ->
     supervisor:start_child(Sup, ?NAV_WORKER),
     run_workers(T, Sup);
 run_workers([H|T], Sup) ->
     logger:log(notice, "Worker not yet implemented ~p ~n ", [H]),
     run_workers(T, Sup).
-    % ach
-% initialize_sensors(Config) ->
-%     Iterator = maps:iterator(Config),
-%     Pred = fun(K , V) -> is_atom(K) andalso is_map(V) andalso is_able(K) =:= true end,
-%     maps:filter(Pred,M).
-%     {K1, V1, I2} = maps:next(I)
-
-%% @private
-% can_measure(Type) ->
