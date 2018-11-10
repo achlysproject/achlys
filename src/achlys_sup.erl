@@ -18,21 +18,6 @@
 
 -define(SERVER , ?MODULE).
 
-%% Thanks to https://github.com/erszcz
-%% Helper macro for declaring children of supervisor
-% -define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
--define(SUPFLAGS(Intensity , Period) , #{strategy  => one_for_one
-    ,                                    intensity => Intensity
-    ,                                    period    => Period
-}).
-
--define(CHILD(Name , Type , Args) , #{id     => Name
-    ,                                 start    => {Name , start_link , Args}
-    ,                                 restart  => temporary
-    ,                                 shutdown => 5000
-    ,                                 type     => Type
-    ,                                 modules  => [Name]
-}).
 %%====================================================================
 %% API functions
 %%====================================================================
@@ -42,8 +27,9 @@
 -spec start_link() ->
     {ok , pid()} | ignore | {error , {already_started , pid()} | {shutdown , term()} | term()}.
 start_link() ->
-    {ok , NavConfig} = achlys_config:get(temperature) ,
-    supervisor:start_link({local , ?SERVER} , ?MODULE , [NavConfig]).
+    % {ok , NavConfig} = achlys_config:get(temperature) ,
+    % supervisor:start_link({local , ?SERVER} , ?MODULE , [NavConfig]).
+    supervisor:start_link({local , ?SERVER} , ?MODULE , []).
 
 %%====================================================================
 %% Supervisor callbacks
@@ -53,16 +39,25 @@ start_link() ->
 %% @private
 -spec init(term()) ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}} | ignore.
-init([Args]) ->
-    IsMap = is_map(Args) ,
-    case IsMap of
-        true ->
-            {ok , {?SUPFLAGS(?THREE , ?TEN) , [
-                  ?CHILD(achlys_pmod_nav_worker , worker , [Args])
-                , ?CHILD(achlys_cleaner , worker , [])]}};
-        _ ->
-            ignore
-    end.
+init([]) ->
+    {ok , {?SUPFLAGS(?THREE , ?TEN) , [
+          % ?NAV_WORKER
+          ?SENSOR_COMMANDER
+          % , ?CLEANER_WORKER]}}.
+        , ?CLEANER_WORKER]}}.
+    % IsMap = is_map(Args) ,
+    % case IsMap of
+    %     true ->
+    %         {ok , {?SUPFLAGS(?THREE , ?TEN) , [
+    %               ?CHILD(achlys_pmod_nav_worker , worker , [Args])
+    %             , ?CHILD(achlys_cleaner , worker , [])]}};
+    %             %   ?CHILD({achlys_pmod_nav_worker , worker , [Args]}, transient, ?FIVE, worker)
+    %             % , ?CHILD({achlys_cleaner , worker , []), permanent, ?THREE, worker}
+    %             % ]}
+    %         % };
+    %     _ ->
+    %         ignore
+    % end.
 
 %%====================================================================
 %% Internal functions

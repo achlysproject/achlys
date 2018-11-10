@@ -2,16 +2,17 @@
     {description , "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"} ,
     {vsn , "0.1.3"} ,
-    
+
     {registered , [achlys
         ,          achlys_app
         ,          achlys_sup
         ,          achlys_util
         ,          achlys_config
         ,          achlys_cleaner
+        ,          achlys_sensor_commander
         ,          achlys_pmod_nav_worker
     ]} ,
-    
+
     {mod , {achlys_app , []}} ,
     {applications , [kernel
         ,            stdlib
@@ -21,7 +22,7 @@
         ,            partisan
         ,            lasp
     ]} ,
-    
+
     {env , []} ,
     {modules , [
           achlys
@@ -30,19 +31,20 @@
         , achlys_util
         , achlys_config
         , achlys_cleaner
+        , achlys_sensor_commander
         , achlys_pmod_nav_worker
     ]} ,
-    
+
     {maintainers , ["Igor Kopestenski"]} ,
     {licenses , ["Apache 2.0"]} ,
-    
+
     {links , [
           {"Github" , "https://github.com/Laymer/achlys"}
         , {"GRiSP" , "https://www.grisp.org"}
         , {"Lasp" , "https://lasp-lang.readme.io"}
         , {"LightKone" , "https://lightkone.eu/"}
     ]} ,
-    
+
     {files , ["LICENSE"
         ,     "README.md"
         ,     "rebar.lock"

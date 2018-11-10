@@ -23,21 +23,12 @@
 %% Pmod_NAV related functions API
 -export([aggregate_sensor_data/0]).
 -export([get_temp/0]).
-
+-export([get_aggregate/1]).
 
 %%====================================================================
 %% Type definitions
 %%====================================================================
 
-%% TODO : aggregation parameters must be more generic and should provide
-%% configuration possibilities that are loosely coupled, even completely
-%% independent from each other if possible e.g. several temperature aggregation
-%% configurations that do not interfere.
-%% Configuration parameters
-%% -type data_config()        :: {atom(),  #{table := atom()
-%%                                     , device := atom()
-%%                                     , poll_interval := pos_integer()
-%%                                     , aggregation_trigger := pos_integer() }}.
 
 %% ===================================================================
 %% Entry point functions
@@ -76,18 +67,19 @@ get_temp() ->
     logger:log(notice , "Reading temp CRDT ~n") ,
     achlys_pmod_nav_worker:get_crdt().
 
-% TODO : add genericity by specifying the desired aggregates in the
-% data_config() argument, and start corresponding pmod worker as a child
-% in the supervision tree if not yet present. Add the value to the polling
-% process otherwise.
-% -spec aggregate_sensor_data(data_config()) -> ok | {error, Reason}.
-%
+%% @doc Returns the temperature aggregates seen by the current node.
+-spec get_aggregate(atom()) -> list().
+get_aggregate(Data) ->
+    logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
+    Id = {atom_to_binary(Data, utf8), state_awset},
+    {ok, S} = lasp:query(Id),
+    sets:to_list(S).
+
 %% @doc Collect data based on sensors available on Pmod modules and store
 %% aggregated values in corresponding Lasp variable.
 -spec aggregate_sensor_data() -> ok.
 aggregate_sensor_data() ->
     achlys_pmod_nav_worker:run().
-
 
 %%====================================================================
 %% Clustering helper functions

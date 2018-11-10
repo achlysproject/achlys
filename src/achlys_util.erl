@@ -70,7 +70,7 @@ remotes_to_atoms([]) ->
     [].
 
 fetch_resolv_conf() ->
-    
+
     {ok , F} = case os:type() of
                    {unix , rtems} ->
                        {ok , "nofile"};
@@ -87,6 +87,14 @@ get_packet(Size) ->
 
 bitstring_name() ->
     atom_to_binary(node() , utf8).
+
+get_inet_least_significant() ->
+  {ok, [{{_,_,_,In},_,_}|T]} = inet:getif(),
+  integer_to_binary(In).
+
+%% https://stackoverflow.com/a/12795014/6687529
+random_bytes(Bytes) ->
+  re:replace(base64:encode(crypto:strong_rand_bytes(Bytes)),"\\W","",[global,{return,binary}]).
 
 declare_awset(Name) ->
     String = atom_to_list(Name) ,
