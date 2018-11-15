@@ -159,7 +159,8 @@ handle_cast(run , State) ->
 
     NewState = maps:map(fun
       (K, V1) when is_map(V1) ->
-        Id = achlys_util:declare_crdt(K , state_awset),
+        % Id = achlys_util:declare_crdt(K , state_awset),
+        Id = maybe_declare_crdt(K , state_awset),
 
         V2 = mapz:deep_put([crdt], Id , V1),
         T = create_table(K),
@@ -351,12 +352,24 @@ is_pmod_nav_alive() ->
 create_table(Name) ->
     case ets:info(Name, size) of
       undefined ->
-        T = ets:new(Name , [ordered_set
-        ,            public
-        ,            named_table
-        ,            {heir , whereis(achlys_sup) , []}
+        T = ets:new(Name , [
+            ordered_set
+            , public
+            , named_table
+            , {heir , whereis(achlys_sup) , []}
         ]);
       _ ->
         Name
       end.
     % T.
+-spec maybe_declare_crdt(atom(), atom()) -> atom().
+maybe_declare_crdt(Name, Type) ->
+    case achlys_util:query(Name, Type) of
+        [] ->
+            Bitstring = atom_to_binary(Name , utf8) ,
+            {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
+            Id;
+        _ ->
+            Name
+    end.
+    % declare_crdt(Name , Type) ->
