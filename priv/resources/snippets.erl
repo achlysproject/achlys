@@ -47,3 +47,14 @@ ets:match(node()).
 %         exit:{noproc, _NoProcDetails} ->
 %             {badrpc, rpc_process_down}
 %     end.
+
+
+% case check_streams(Streams) of
+%     {ok, [Ks]} ->
+%         maybe_run_workers([Ks]);
+%     _ ->
+%         %% retry in case configuration
+%         %% has been changed at runtime
+% end,
+% erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
+% maybe_run_workers(Streams),
