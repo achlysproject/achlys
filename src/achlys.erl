@@ -22,7 +22,6 @@
 
 %% Pmod_NAV related functions API
 -export([aggregate_sensor_data/0]).
--export([get_temp/0]).
 -export([get_aggregate/1]).
 
 %%====================================================================
@@ -51,7 +50,7 @@ stop() ->
 %% ===================================================================
 
 %% @doc Attempts to discover and join other neighboring nodes.
--spec clusterize() -> [node_spec()].
+-spec clusterize() -> [atom()].
 clusterize() ->
     logger:log(notice , "Cluster formation attempt ~n") ,
     N = seek_neighbors() ,
@@ -61,13 +60,8 @@ clusterize() ->
         ,        net_adm:ping(R) =:= pong] ,
     clusterize(Reachable).
 
-%% @doc Returns the temperature aggregates seen by the current node.
--spec get_temp() -> list().
-get_temp() ->
-    logger:log(notice , "Reading temp CRDT ~n") ,
-    achlys_pmod_nav_worker:get_crdt().
-
-%% @doc Returns the temperature aggregates seen by the current node.
+%% @doc Returns the aggregates for the given variable
+%% as seen by the current node.
 -spec get_aggregate(atom()) -> list().
 get_aggregate(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
@@ -102,20 +96,37 @@ seek_neighbors([{_Arg , _Val} | T]) ->
 seek_neighbors([]) ->
     [].
 
+% %% @private
+% join(Host) ->
+%     Manager = rpc:call(Host , partisan_peer_service , manager , []) ,
+%     case Manager of
+%         partisan_hyparview_peer_service_manager ->
+%             Node = rpc:call(Host , Manager , myself , []) ,
+%             ok = partisan_peer_service:join(Node) ,
+%             logger:log(info , "Joined ~p~n" , [Host]) ,
+%             {ok , Node};
+%         {badrpc , Reason} ->
+%             logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
+%             {error , Reason};
+%         {error , Reason} ->
+%             logger:log(error , "Unable to retrieve remote : ~p~n" , [Manager]) ,
+%             {error , Reason}
+%     end.
 %% @private
 join(Host) ->
-    Manager = rpc:call(Host , partisan_peer_service , manager , []) ,
-    case Manager of
-        partisan_hyparview_peer_service_manager ->
-            Node = rpc:call(Host , Manager , myself , []) ,
-            ok = partisan_peer_service:join(Node) ,
-            logger:log(info , "Joined ~p~n" , [Host]) ,
-            {ok , Node};
-        {badrpc , Reason} ->
+    try rpc:call(Host , lasp_peer_service:manager() , myself , []) of
+        #{channels := _Channels
+        , listen_addrs := _Addresses
+        , name := _Name
+        , parallelism := _Parallelism } = Node ->
+            ok = lasp_peer_service:join(Node),
+            {ok, Host}
+    catch
+        {badrpc, Reason} ->
             logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
             {error , Reason};
-        {error , Reason} ->
-            logger:log(error , "Unable to retrieve remote : ~p~n" , [Manager]) ,
+        {error, Reason} ->
+            logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
             {error , Reason}
     end.
 

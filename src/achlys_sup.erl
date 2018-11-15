@@ -25,7 +25,7 @@
 % {ok, Pid :: pid()} | ignore | {error, Reason :: term()}.
 %% @doc Start achlys top level supervisor.
 -spec start_link() ->
-    {ok , pid()} | ignore | {error , {already_started , pid()} | {shutdown , term()} | term()}.
+    {ok , pid()} | {error , {already_started , pid()} | {shutdown , term()} | term()}.
 start_link() ->
     % {ok , NavConfig} = achlys_config:get(temperature) ,
     % supervisor:start_link({local , ?SERVER} , ?MODULE , [NavConfig]).
@@ -38,7 +38,7 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 %% @private
 -spec init(term()) ->
-    {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}} | ignore.
+    {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
     {ok , {?SUPFLAGS(?THREE , ?TEN) , [
           % ?NAV_WORKER
