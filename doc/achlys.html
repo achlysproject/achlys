@@ -10,7 +10,7 @@
 <hr>
 
 <h1>Module achlys</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
    Top level module operating the achlys application
    as well as providing the main API to the underlying components.
 
@@ -19,26 +19,12 @@
 <h2><a name="description">Description</a></h2>
    Top level module operating the achlys application
    as well as providing the main API to the underlying components.
-<h2><a name="types">Data Types</a></h2>
-
-<h3 class="typedecl"><a name="type-channel">channel()</a></h3>
-<p><tt>channel() = atom()</tt></p>
-
-
-<h3 class="typedecl"><a name="type-listen_addr">listen_addr()</a></h3>
-<p><tt>listen_addr() = #{ip =&gt; <a href="inet.html#type-ip_address">inet:ip_address()</a>, port =&gt; non_neg_integer()}</tt></p>
-
-
-<h3 class="typedecl"><a name="type-node_spec">node_spec()</a></h3>
-<p><tt>node_spec() = #{name =&gt; node(), listen_addrs =&gt; [<a href="#type-listen_addr">listen_addr()</a>], channels =&gt; [<a href="#type-channel">channel()</a>], parallelism =&gt; non_neg_integer()}</tt></p>
-
-
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#aggregate_sensor_data-0">aggregate_sensor_data/0</a></td><td>Collect data based on sensors available on Pmod modules and store
   aggregated values in corresponding Lasp variable.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
-<tr><td valign="top"><a href="#get_aggregate-1">get_aggregate/1</a></td><td>Returns the temperature aggregates seen by the current node.</td></tr>
-<tr><td valign="top"><a href="#get_temp-0">get_temp/0</a></td><td>Returns the temperature aggregates seen by the current node.</td></tr>
+<tr><td valign="top"><a href="#get_aggregate-1">get_aggregate/1</a></td><td>Returns the aggregates for the given variable
+  as seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
 <tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>Stop the Application.</td></tr>
 </table>
@@ -53,18 +39,14 @@
 
 <h3 class="function"><a name="clusterize-0">clusterize/0</a></h3>
 <div class="spec">
-<p><tt>clusterize() -&gt; [<a href="#type-node_spec">node_spec()</a>]</tt><br></p>
+<p><tt>clusterize() -&gt; [atom()]</tt><br></p>
 </div><p>Attempts to discover and join other neighboring nodes.</p>
 
 <h3 class="function"><a name="get_aggregate-1">get_aggregate/1</a></h3>
 <div class="spec">
 <p><tt>get_aggregate(Data::atom()) -&gt; list()</tt><br></p>
-</div><p>Returns the temperature aggregates seen by the current node.</p>
-
-<h3 class="function"><a name="get_temp-0">get_temp/0</a></h3>
-<div class="spec">
-<p><tt>get_temp() -&gt; list()</tt><br></p>
-</div><p>Returns the temperature aggregates seen by the current node.</p>
+</div><p>Returns the aggregates for the given variable
+  as seen by the current node.</p>
 
 <h3 class="function"><a name="start-0">start/0</a></h3>
 <div class="spec">
