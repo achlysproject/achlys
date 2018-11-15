@@ -72,13 +72,8 @@ run_nav() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
--spec(init(Args :: term()) ->
-    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term()} | ignore).
+-spec(init([]) -> {ok , state()}).
 init([]) ->
-    %% TODO : initialize pmod workers
-    %% based on configuration from environment
-    %% variables.
     ok = achlys_config:set(number, achlys_util:get_inet_least_significant()),
     {ok, Streams} = achlys_config:get(streams),
     self() ! {setup_stream_workers},
@@ -93,14 +88,9 @@ init([]) ->
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
                   State :: #state{}) ->
-                     {reply , Reply :: term() , NewState :: #state{}} |
-                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
-                     {noreply , NewState :: #state{}} |
-                     {noreply , NewState :: #state{} , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
-                     {stop , Reason :: term() , NewState :: #state{}}).
+                     {reply , ignore , NewState :: #state{}}).
 handle_call(_Request , _From , State) ->
-    {reply , ok , State}.
+    {reply , ignore , State}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -109,10 +99,7 @@ handle_call(_Request , _From , State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_cast(Request :: term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+-spec(handle_cast(Request :: term() , State :: #state{}) -> {noreply , NewState :: #state{}}).
 handle_cast(_Request , State) ->
     {noreply , State}.
 
@@ -127,25 +114,14 @@ handle_cast(_Request , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+    {noreply , NewState :: #state{}}).
 handle_info({setup_stream_workers} , State) when is_map(State#state.streams) ->
     logger:log(notice, "Initializing data stream workers ~n "),
     _ = [ self() ! {run, X} || X <- maps:keys(State#state.streams)],
-    % case check_streams(Streams) of
-    %     {ok, [Ks]} ->
-    %         maybe_run_workers([Ks]);
-    %     _ ->
-    %         %% retry in case configuration
-    %         %% has been changed at runtime
-    % end,
-    % erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
-    % maybe_run_workers(Streams),
     {noreply , State};
 
 handle_info({run, pmod_nav} , State) ->
-    run_nav(),
+    _ = run_nav(),
     {noreply , State};
 
 handle_info(_Info , State) ->
@@ -178,7 +154,7 @@ terminate(_Reason , _State) ->
 %%--------------------------------------------------------------------
 -spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
                   Extra :: term()) ->
-                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
+                     {ok , NewState :: #state{}}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 
