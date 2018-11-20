@@ -104,6 +104,32 @@ declare_awset(Name) ->
     application:set_env(achlys , awset , AWSet) ,
     AWSet.
 
+do_ping(1) ->
+    net_adm:ping(achlys@my_grisp_board_1);
+do_ping(2) ->
+    net_adm:ping(achlys@my_grisp_board_2);
+do_ping(3) ->
+    net_adm:ping(achlys@my_grisp_board_3);
+do_ping(4) ->
+    net_adm:ping(achlys@my_grisp_board_4);
+do_ping(5) ->
+    net_adm:ping(achlys@my_grisp_board_5);
+do_ping(6) ->
+    net_adm:ping(achlys@my_grisp_board_6).
+
+do_disconnect(1) ->
+    net_kernel:disconnect(achlys@my_grisp_board_1);
+do_disconnect(2) ->
+    net_kernel:disconnect(achlys@my_grisp_board_2);
+do_disconnect(3) ->
+    net_kernel:disconnect(achlys@my_grisp_board_3);
+do_disconnect(4) ->
+    net_kernel:disconnect(achlys@my_grisp_board_4);
+do_disconnect(5) ->
+    net_kernel:disconnect(achlys@my_grisp_board_5);
+do_disconnect(6) ->
+    net_kernel:disconnect(achlys@my_grisp_board_6).
+
 %%====================================================================
 %% Snippets
 %%====================================================================
