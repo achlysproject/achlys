@@ -31,6 +31,10 @@ lasp_peer_service:members().
 lasp:query({<<"temperature">>, state_awset}).
 atom_to_binary(temperature, utf8).
 
+{ok, {AWPSSet, _, _, _}} = lasp:declare({<<"set">>,state_awset_ps}, state_awset_ps).
+lasp:update(AWPSSet, {add, one}, self()).
+lasp:query({<<"set">>,state_awset_ps}).
+
 ets:match(node()).
 %% from riak_core :
 %% @doc Wraps an rpc:call/4 in a try/catch to handle the case where the
