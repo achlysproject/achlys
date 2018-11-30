@@ -62,3 +62,11 @@ ets:match(node()).
 % end,
 % erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
 % maybe_run_workers(Streams),
+
+
+% lasp:declare({<<"set">>,state_awset_ps},state_awset_ps).
+% lasp_peer_service:join(achlys@LaymerMac).
+% lasp:join(#{channels => [undefined],listen_addrs => [#{ip => {169,254,16,6},port => 17768}],name => achlys@my_grisp_board_6,parallelism => 1}).
+% net_adm:ping(achlys@LaymerMac).
+% lasp:update({<<"set">>,state_awset_ps},{add, test},self()).
+% lasp:query({<<"set">>,state_awset_ps}).

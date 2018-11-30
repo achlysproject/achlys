@@ -159,8 +159,8 @@ handle_cast(run , State) ->
 
     NewState = maps:map(fun
       (K, V1) when is_map(V1) ->
-        % Id = achlys_util:declare_crdt(K , state_awset),
-        Id = maybe_declare_crdt(K , state_awset_ps),
+        Id = achlys_util:declare_crdt(K , state_awset),
+        % Id = maybe_declare_crdt(K , state_awset_ps),
 
         V2 = mapz:deep_put([crdt], Id , V1),
         T = create_table(K),

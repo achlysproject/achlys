@@ -20,6 +20,7 @@
 %% API
 -export([clusterize/0]).
 -export([contagion/0]).
+-export([pandemia/0]).
 -export([get_preys/0]).
 
 %% Pmod_NAV related functions API
@@ -72,7 +73,8 @@ clusterize() ->
 -spec bane(atom()) -> list().
 bane(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
-    Id = {atom_to_binary(Data, utf8), state_awset_ps},
+    % Id = {atom_to_binary(Data, utf8), state_awset_ps},
+    Id = {atom_to_binary(Data, utf8), state_awset},
     {ok, S} = lasp:query(Id),
     sets:to_list(S).
 
@@ -86,6 +88,12 @@ venom() ->
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
     [ lasp_peer_service:join(X) || X <- get_preys() ].
+
+-spec pandemia() -> list().
+pandemia() ->
+    logger:log(notice , "Closing native Erlang connections ~n") ,
+    _ = [ net_kernel:disconnect(X) || X <- get_preys() ],
+    ok.
 
 %%====================================================================
 %% Clustering helper functions
