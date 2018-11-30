@@ -19,15 +19,23 @@
 
 %% API
 -export([clusterize/0]).
+-export([contagion/0]).
+-export([pandemia/0]).
+-export([get_preys/0]).
 
 %% Pmod_NAV related functions API
--export([aggregate_sensor_data/0]).
--export([get_aggregate/1]).
+-export([venom/0]).
+-export([bane/1]).
 
 %%====================================================================
 %% Type definitions
 %%====================================================================
 
+%%====================================================================
+%% Macros
+%%====================================================================
+
+-define(MANAGER,    lasp_peer_service:manager()).
 
 %% ===================================================================
 %% Entry point functions
@@ -62,22 +70,39 @@ clusterize() ->
 
 %% @doc Returns the aggregates for the given variable
 %% as seen by the current node.
--spec get_aggregate(atom()) -> list().
-get_aggregate(Data) ->
+-spec bane(atom()) -> list().
+bane(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
+    % Id = {atom_to_binary(Data, utf8), state_awset_ps},
     Id = {atom_to_binary(Data, utf8), state_awset},
     {ok, S} = lasp:query(Id),
     sets:to_list(S).
 
 %% @doc Collect data based on sensors available on Pmod modules and store
 %% aggregated values in corresponding Lasp variable.
--spec aggregate_sensor_data() -> ok.
-aggregate_sensor_data() ->
+-spec venom() -> ok.
+venom() ->
     achlys_pmod_nav_worker:run().
+
+-spec contagion() -> list().
+contagion() ->
+    logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
+    [ lasp_peer_service:join(X) || X <- get_preys() ].
+
+-spec pandemia() -> list().
+pandemia() ->
+    logger:log(notice , "Closing native Erlang connections ~n") ,
+    _ = [ net_kernel:disconnect(X) || X <- get_preys() ],
+    ok.
 
 %%====================================================================
 %% Clustering helper functions
 %%====================================================================
+
+%% @doc Returns a list of known remote hostnames
+%% that could be potential neighbors.
+get_preys() ->
+    binary_remotes_to_atoms(seek_neighbors()).
 
 %% @private
 binary_remotes_to_atoms([H | T]) ->
