@@ -33,7 +33,7 @@ The online version of the documentation is found at :
 The design pattern will follow the "facade" concept as much as possible, hence there will be an API that will provide an easy access to all the modules and functions. The documentation will be reorganized to focus on thoroughly explaining the usage, and will regroup the information of submodules like these :
 
 <p align="center">
-  <img src="priv/resources/Doc_preview.png" alt="EDoc"/>
+  <img src="resources/Doc_preview.png" alt="EDoc"/>
 </p>
 
 
@@ -46,5 +46,5 @@ For Achlys, it is currently an additional asset to structure software improvemen
 ### NOTE : An online interactive version is available [here](https://laymer.github.io/achlys-map/)
 
 <p align="center">
-  <img src="priv/resources/Achlys.png" alt="MMap"/>
+  <img src="resources/Achlys.png" alt="MMap"/>
 </p>
