@@ -42,6 +42,14 @@
     , modules  => [achlys_pmod_nav_worker]
 }).
 
+-define(ALS_WORKER , #{id     => achlys_pmod_als_worker
+    , start    => {achlys_pmod_als_worker , start_link , []}
+    , restart  => transient
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_pmod_als_worker]
+}).
+
 -define(CLEANER_WORKER , #{id     => achlys_cleaner
     , start    => {achlys_cleaner , start_link , []}
     , restart  => permanent

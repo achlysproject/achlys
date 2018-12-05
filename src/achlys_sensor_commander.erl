@@ -118,6 +118,20 @@ handle_cast(_Request , State) ->
 handle_info({setup_stream_workers} , State) when is_map(State#state.streams) ->
     logger:log(notice, "Initializing data stream workers ~n "),
     _ = [ self() ! {run, X} || X <- maps:keys(State#state.streams)],
+
+    {_Code, Val} = case check_streams(State#state.streams) of
+        {ok, [Ks]} ->
+            _ = maybe_run_workers([Ks]),
+            {ok, [Ks]};
+        {ok, [H|T]} ->
+            _ = maybe_run_workers([H|T]),
+            {ok, [H|T]};
+        {error, Reason} ->
+            {error, Reason}
+    end,
+
+    logger:log(notice, "Workers = ~p ~n", [Val]),
+
     {noreply , State};
 
 handle_info({run, pmod_nav} , State) ->
@@ -166,23 +180,30 @@ code_change(_OldVsn , State , _Extra) ->
 check_streams(Streams) ->
     try maps:keys(Streams) of
         [Ks] ->
-            {ok, [Ks]}
+            {ok, [Ks]};
+        [H|T] ->
+            {ok, [H|T]}
     catch
         _:_ ->
             {error, no_streams}
     end.
 
 %% @private
-maybe_run_workers([Ks]) ->
-    % ok.
+% maybe_run_workers([Ks]) ->
+maybe_run_workers(Ks) when is_list(Ks) ->
     RunningDevices = [ X || {device, _Slot, X, _Pid, _Ref} <- grisp_devices:list()
-        , lists:member(X, [Ks]) ],
+        , lists:member(X, Ks) ],
     run_workers(RunningDevices, whereis(achlys_sup)).
 
 %% @private
 run_workers([pmod_nav|T], Sup) ->
     supervisor:start_child(Sup, ?NAV_WORKER),
     run_workers(T, Sup);
+run_workers([pmod_als|T], Sup) ->
+    supervisor:start_child(Sup, ?ALS_WORKER),
+    run_workers(T, Sup);
 run_workers([H|T], Sup) ->
     logger:log(notice, "Worker not yet implemented ~p ~n ", [H]),
-    run_workers(T, Sup).
+    run_workers(T, Sup);
+run_workers([], _Sup) ->
+    [].
