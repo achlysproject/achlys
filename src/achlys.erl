@@ -25,6 +25,7 @@
 
 %% Pmod_NAV related functions API
 -export([venom/0]).
+-export([venom/1]).
 -export([bane/1]).
 
 %%====================================================================
@@ -83,6 +84,13 @@ bane(Data) ->
 -spec venom() -> ok.
 venom() ->
     achlys_pmod_nav_worker:run().
+
+%% @doc Collect data based on sensors available on Pmod modules and store
+%% aggregated values in corresponding Lasp variable.
+-spec venom(atom()) -> ok.
+venom(Worker) ->
+    Worker:run().
+    % achlys_pmod_nav_worker:run().
 
 -spec contagion() -> list().
 contagion() ->

@@ -298,7 +298,7 @@ code_change(_OldVsn , State , _Extra) ->
 get_mean(Tab) ->
     Sum = ets:foldl(fun
                         (Elem , AccIn) ->
-                            {_ , [Light]} = Elem ,
+                            {_ , Light} = Elem ,
                             Light + AccIn
                     end , 0 , Tab) ,
     Len = ets:info(Tab , size) ,
