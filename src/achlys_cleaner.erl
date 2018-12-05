@@ -27,6 +27,8 @@
 
 %% API
 -export([start_link/0]).
+% TODO : add API function to clean ETS table T upon request
+% -export([flush_table/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
