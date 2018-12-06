@@ -130,6 +130,16 @@ do_disconnect(5) ->
 do_disconnect(6) ->
     net_kernel:disconnect(achlys@my_grisp_board_6).
 
+sample_task() ->
+    F = sample_function(),
+    #{
+        name => sample_task,
+        targets => all,
+        function => F
+    }.
+
+sample_function() ->
+    fun F() -> io:format("Sample function ! ~n") end.
 %%====================================================================
 %% Snippets
 %%====================================================================
