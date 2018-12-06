@@ -43,8 +43,9 @@ init([]) ->
     {ok , {?SUPFLAGS(?THREE , ?TEN) , [
           % ?NAV_WORKER
           ?SENSOR_COMMANDER
+        , ?CLEANER_WORKER
           % , ?CLEANER_WORKER]}}.
-        , ?CLEANER_WORKER]}}.
+        , ?TASK_SERVER]}}.
     % IsMap = is_map(Args) ,
     % case IsMap of
     %     true ->
