@@ -1,5 +1,14 @@
 # Achlys
-Achlys is the goddess of deadly poison ... but fortunately there is an [AntidoteDB](https://www.antidotedb.eu/)
+The Achlys framework is a tool designed to help application developers build Erlang/OTP programs using the [Lasp](https://lasp-lang.readme.io) libraries and running on [GRiSP](https://grisp.org) embedded systems in a wireless sensor network configuration.
+
+Achlys is being developed in the context of edge computing research within the H2020 [LightKone](https://lightkone.eu) project. The 2 main objectives of the framework are to provide :
+
+- Resilient storage across a cluster of IoT sensing devices
+- A general purpose task model allowing any function to be propagated and executed in the cluster
+
+Disclaimer : Achlys is currently under active development, hence a production-ready release is not yet available. 
+
+> Achlys is the goddess of deadly poison ... but fortunately there is an [AntidoteDB](https://www.antidotedb.eu/)
 
 ## Minimum requirements
 
