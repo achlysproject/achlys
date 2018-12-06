@@ -10,7 +10,7 @@
 <hr>
 
 <h1>Module achlys</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>
    Top level module operating the achlys application
    as well as providing the main API to the underlying components.
 
@@ -19,34 +19,73 @@
 <h2><a name="description">Description</a></h2>
    Top level module operating the achlys application
    as well as providing the main API to the underlying components.
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-task">task()</a></h3>
+<p><tt>task() = #{name =&gt; atom(), targets =&gt; <a href="#type-task_targets">task_targets()</a>, function =&gt; function()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-task_targets">task_targets()</a></h3>
+<p><tt>task_targets() = [node()] | all</tt></p>
+
+
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#aggregate_sensor_data-0">aggregate_sensor_data/0</a></td><td>Collect data based on sensors available on Pmod modules and store
-  aggregated values in corresponding Lasp variable.</td></tr>
-<tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
-<tr><td valign="top"><a href="#get_aggregate-1">get_aggregate/1</a></td><td>Returns the aggregates for the given variable
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#bane-1">bane/1</a></td><td>Returns the aggregates for the given variable
   as seen by the current node.</td></tr>
+<tr><td valign="top"><a href="#bite-1">bite/1</a></td><td>Adds the given task in the replicated task set.</td></tr>
+<tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
+<tr><td valign="top"><a href="#contagion-0">contagion/0</a></td><td>Form Lasp cluster without attempting to ping neighbors beforehand.</td></tr>
+<tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
+<tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
+  that could be potential neighbors.</td></tr>
+<tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
 <tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>Stop the Application.</td></tr>
+<tr><td valign="top"><a href="#venom-0">venom/0</a></td><td>Collect data based on sensors available on Pmod modules and store
+  aggregated values in corresponding Lasp variable.</td></tr>
+<tr><td valign="top"><a href="#venom-1">venom/1</a></td><td>Collect data based on sensors available on Pmod modules and store
+  aggregated values in corresponding Lasp variable.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
 
-<h3 class="function"><a name="aggregate_sensor_data-0">aggregate_sensor_data/0</a></h3>
+<h3 class="function"><a name="bane-1">bane/1</a></h3>
 <div class="spec">
-<p><tt>aggregate_sensor_data() -&gt; ok</tt><br></p>
-</div><p>Collect data based on sensors available on Pmod modules and store
-  aggregated values in corresponding Lasp variable.</p>
+<p><tt>bane(Data::atom()) -&gt; list()</tt><br></p>
+</div><p>Returns the aggregates for the given variable
+  as seen by the current node.</p>
+
+<h3 class="function"><a name="bite-1">bite/1</a></h3>
+<div class="spec">
+<p><tt>bite(Task::<a href="achlys.html#type-task">achlys:task()</a>) -&gt; ok</tt><br></p>
+</div><p>Adds the given task in the replicated task set.</p>
+<p><b>See also:</b> <a href="achlys_task_server.html#add_task-1">achlys_task_server:add_task/1</a>.</p>
 
 <h3 class="function"><a name="clusterize-0">clusterize/0</a></h3>
 <div class="spec">
 <p><tt>clusterize() -&gt; [atom()]</tt><br></p>
 </div><p>Attempts to discover and join other neighboring nodes.</p>
 
-<h3 class="function"><a name="get_aggregate-1">get_aggregate/1</a></h3>
+<h3 class="function"><a name="contagion-0">contagion/0</a></h3>
 <div class="spec">
-<p><tt>get_aggregate(Data::atom()) -&gt; list()</tt><br></p>
-</div><p>Returns the aggregates for the given variable
-  as seen by the current node.</p>
+<p><tt>contagion() -&gt; list()</tt><br></p>
+</div><p>Form Lasp cluster without attempting to ping neighbors beforehand.</p>
+
+<h3 class="function"><a name="get_all_tasks-0">get_all_tasks/0</a></h3>
+<div class="spec">
+<p><tt>get_all_tasks() -&gt; [<a href="achlys.html#type-task">achlys:task()</a>] | []</tt><br></p>
+</div><p>Returns current view of all tasks.</p>
+
+<h3 class="function"><a name="get_preys-0">get_preys/0</a></h3>
+<div class="spec">
+<p><tt>get_preys() -&gt; any()</tt></p>
+</div><p>Returns a list of known remote hostnames
+  that could be potential neighbors.</p>
+
+<h3 class="function"><a name="pandemia-0">pandemia/0</a></h3>
+<div class="spec">
+<p><tt>pandemia() -&gt; ok</tt><br></p>
+</div><p>Close disterl TCP connections with neighboring nodes.</p>
 
 <h3 class="function"><a name="start-0">start/0</a></h3>
 <div class="spec">
@@ -57,6 +96,18 @@
 <div class="spec">
 <p><tt>stop() -&gt; ok</tt><br></p>
 </div><p>Stop the Application</p>
+
+<h3 class="function"><a name="venom-0">venom/0</a></h3>
+<div class="spec">
+<p><tt>venom() -&gt; ok</tt><br></p>
+</div><p>Collect data based on sensors available on Pmod modules and store
+  aggregated values in corresponding Lasp variable.</p>
+
+<h3 class="function"><a name="venom-1">venom/1</a></h3>
+<div class="spec">
+<p><tt>venom(Worker::atom()) -&gt; ok</tt><br></p>
+</div><p>Collect data based on sensors available on Pmod modules and store
+  aggregated values in corresponding Lasp variable.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

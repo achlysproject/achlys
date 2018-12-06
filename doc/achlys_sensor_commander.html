@@ -10,13 +10,23 @@
 <hr>
 
 <h1>Module achlys_sensor_commander</h1>
-<ul class="index"><li><a href="#description">Description</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>.
+<ul class="index"><li><a href="#description">Description</a></li><li><a href="#types">Data Types</a></li><li><a href="#index">Function Index</a></li><li><a href="#functions">Function Details</a></li></ul>.
 
 <p><b>Behaviours:</b> <a href="gen_server.html"><tt>gen_server</tt></a>.</p>
 <p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys" target="_top">https://github.com/Laymer/achlys</a></tt>].</p>
 
 <h2><a name="description">Description</a></h2>
   
+<h2><a name="types">Data Types</a></h2>
+
+<h3 class="typedecl"><a name="type-task">task()</a></h3>
+<p><tt>task() = #{name =&gt; atom(), targets =&gt; <a href="#type-task_targets">task_targets()</a>, function =&gt; function()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-task_targets">task_targets()</a></h3>
+<p><tt>task_targets() = [node()] | all</tt></p>
+
+
 <h2><a name="index">Function Index</a></h2>
 <table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#run_nav-0">run_nav/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#start_link-0">start_link/0</a></td><td>
