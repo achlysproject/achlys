@@ -17,16 +17,20 @@
 -export([start/0]).
 -export([stop/0]).
 
+%% Task model API
+-export([get_all_tasks/0]).
+-export([bite/1]).
+
 %% API
 -export([clusterize/0]).
 -export([contagion/0]).
 -export([pandemia/0]).
 -export([get_preys/0]).
 
-%% Pmod_NAV related functions API
+%% PMOD-related functions API
+-export([bane/1]).
 -export([venom/0]).
 -export([venom/1]).
--export([bane/1]).
 
 %%====================================================================
 %% Type definitions
@@ -58,6 +62,18 @@ stop() ->
 %% API
 %% ===================================================================
 
+%% @doc Returns current view of all tasks.
+-spec get_all_tasks() -> [achlys:task()] | [].
+get_all_tasks() ->
+    {ok, Set} = lasp:query(?TASKS),
+    sets:to_list(Set).
+
+%% @doc Adds the given task in the replicated task set.
+%% @see achlys_task_server:add_task/1.
+-spec bite(Task :: achlys:task()) -> ok.
+bite(Task) ->
+    achlys_task_server:add_task(Task).
+
 %% @doc Attempts to discover and join other neighboring nodes.
 -spec clusterize() -> [atom()].
 clusterize() ->
@@ -68,6 +84,19 @@ clusterize() ->
         ,        R =/= node()
         ,        net_adm:ping(R) =:= pong] ,
     clusterize(Reachable).
+
+%% @doc Form Lasp cluster without attempting to ping neighbors beforehand.
+-spec contagion() -> list().
+contagion() ->
+    logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
+    [ lasp_peer_service:join(X) || X <- get_preys() ].
+
+%% @doc Close disterl TCP connections with neighboring nodes.
+-spec pandemia() -> ok.
+pandemia() ->
+    logger:log(notice , "Closing native Erlang connections ~n") ,
+    _ = [ net_kernel:disconnect(X) || X <- get_preys() ],
+    ok.
 
 %% @doc Returns the aggregates for the given variable
 %% as seen by the current node.
@@ -91,17 +120,6 @@ venom() ->
 venom(Worker) ->
     Worker:run().
     % achlys_pmod_nav_worker:run().
-
--spec contagion() -> list().
-contagion() ->
-    logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
-    [ lasp_peer_service:join(X) || X <- get_preys() ].
-
--spec pandemia() -> list().
-pandemia() ->
-    logger:log(notice , "Closing native Erlang connections ~n") ,
-    _ = [ net_kernel:disconnect(X) || X <- get_preys() ],
-    ok.
 
 %%====================================================================
 %% Clustering helper functions
