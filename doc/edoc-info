@@ -2,4 +2,4 @@
 {application,achlys}.
 {modules,[achlys,achlys_app,achlys_cleaner,achlys_config,
           achlys_pmod_nav_worker,achlys_sensor_commander,achlys_sup,
-          achlys_util]}.
+          achlys_task_server,achlys_task_worker,achlys_util]}.

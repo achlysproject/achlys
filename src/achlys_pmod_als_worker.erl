@@ -316,18 +316,6 @@ maybe_get_light() ->
             {Code , Val}
     end.
 
-%% @doc Returns the current pressure
-%% if a pmod_als module is active on slot SPI1
-% -spec maybe_get_press() -> {ok , [float()]} | pmod_als_status().
-% maybe_get_press() ->
-%     {Code , Val} = is_pmod_als_alive() ,
-%     case {Code , Val} of
-%         {ok , pmod_als} ->
-%             {ok , pmod_als:read(alt , [press_out])};
-%         _ ->
-%             {Code , Val}
-%     end.
-
 %% @doc Checks the SPI2 slot of the GRiSP board
 %% for presence of a Pmod_ALS module.
 -spec is_pmod_als_alive() -> pmod_als_status().
@@ -358,14 +346,3 @@ create_table(Name) ->
         Name
       end.
     % T.
--spec maybe_declare_crdt(atom(), atom()) -> atom().
-maybe_declare_crdt(Name, Type) ->
-    case achlys_util:query(Name, Type) of
-        [] ->
-            Bitstring = atom_to_binary(Name , utf8) ,
-            {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
-            Id;
-        _ ->
-            Name
-    end.
-    % declare_crdt(Name , Type) ->
