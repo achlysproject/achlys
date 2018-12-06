@@ -12,8 +12,11 @@
 
 -behaviour(gen_server).
 
+-include("achlys.hrl").
+
 %% API
 -export([start_link/0]).
+-export([add_task/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -23,13 +26,34 @@
          terminate/2 ,
          code_change/3]).
 
+%%%===================================================================
+%%% Macros
+%%%===================================================================
+
 -define(SERVER , ?MODULE).
 
--record(state , {}).
+%%%===================================================================
+%%% Records
+%%%===================================================================
+
+-record(state , {
+    identifier :: {bitstring(), atom()}
+}).
+
+%%%===================================================================
+%%% Types
+%%%===================================================================
+
+-type state() :: #state{}.
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%% @doc Adds the given task in the replicated task set.
+-spec add_task(achlys:task()) -> ok.
+add_task(Task) ->
+    gen_server:cast(?SERVER , {add_task, Task}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -58,9 +82,11 @@ start_link() ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
+    {ok , State :: state()} | {ok , State :: state() , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
+    logger:log(notice, "Initializing task server module"),
+    erlang:send_after(?ONE, ?SERVER, declare),
     {ok , #state{}}.
 
 %%--------------------------------------------------------------------
@@ -71,13 +97,13 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
-                  State :: #state{}) ->
-                     {reply , Reply :: term() , NewState :: #state{}} |
-                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
-                     {noreply , NewState :: #state{}} |
-                     {noreply , NewState :: #state{} , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
-                     {stop , Reason :: term() , NewState :: #state{}}).
+                  State :: state()) ->
+                     {reply , Reply :: term() , NewState :: state()} |
+                     {reply , Reply :: term() , NewState :: state() , timeout() | hibernate} |
+                     {noreply , NewState :: state()} |
+                     {noreply , NewState :: state() , timeout() | hibernate} |
+                     {stop , Reason :: term() , Reply :: term() , NewState :: state()} |
+                     {stop , Reason :: term() , NewState :: state()}).
 handle_call(_Request , _From , State) ->
     {reply , ok , State}.
 
@@ -88,10 +114,18 @@ handle_call(_Request , _From , State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_cast(Request :: term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+-spec(handle_cast(Request :: term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
+handle_cast({add_task, Task} , State) ->
+    #{name := Name
+    , targets := _Targets
+    , function := _Function} = Task,
+    logger:log(notice, "Adding Task with name : ~p ~n", [Name]),
+    {ok, {Id, _, _, _}} = lasp:update(State#state.identifier , {add , Task} , self()),
+    {noreply , State#state{identifier = Id}};
+
 handle_cast(_Request , State) ->
     {noreply , State}.
 
@@ -105,11 +139,18 @@ handle_cast(_Request , State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
-handle_info(_Info , State) ->
+-spec(handle_info(Info :: timeout() | term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
+handle_info(declare , State) ->
+    %% declare message is received 1 second after initialization function call
+    {ok , {Id , _ , _ , _}} = lasp:declare(?TASKS , state_awset),
+    logger:log(notice, "Task set has been declared with identifier : ~p ~n", [Id]),
+    {noreply , State#state{identifier = Id}};
+
+handle_info(Info , State) ->
+    logger:log(notice, "Unhandled message received by task server : ~p ~n", [Info]),
     {noreply , State}.
 
 %%--------------------------------------------------------------------
@@ -124,7 +165,7 @@ handle_info(_Info , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown , term()} | term()) ,
-                State :: #state{}) -> term()).
+                State :: state()) -> term()).
 terminate(_Reason , _State) ->
     ok.
 
@@ -136,9 +177,9 @@ terminate(_Reason , _State) ->
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
 %% @end
 %%--------------------------------------------------------------------
--spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
+-spec(code_change(OldVsn :: term() | {down , term()} , State :: state() ,
                   Extra :: term()) ->
-                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
+                     {ok , NewState :: state()} | {error , Reason :: term()}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 

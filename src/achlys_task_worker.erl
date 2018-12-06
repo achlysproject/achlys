@@ -12,6 +12,8 @@
 
 -behaviour(gen_server).
 
+-include("achlys.hrl").
+
 %% API
 -export([start_link/0]).
 
