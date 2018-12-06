@@ -5,6 +5,19 @@
 
 -include_lib("kernel/include/file.hrl").
 
+-export_type([task_targets/0]).
+-export_type([task/0]).
+
+%%====================================================================
+%% Types
+%%====================================================================
+
+-type task_targets() :: [node()] | all.
+
+-type task() :: #{name => atom(),
+                    targets => task_targets(),
+                    function => function()}.
+
 %%====================================================================
 %% Time Intervals (ms)
 %%====================================================================
@@ -23,8 +36,10 @@
 
 
 %%====================================================================
-%% Common Macross
+%% Common Macros
 %%====================================================================
+
+-define(TASKS , {<<"tasks">>, state_awset}).
 
 %% Thanks to https://github.com/erszcz
 %% Helper macro for declaring children of supervisor
@@ -65,13 +80,11 @@
     , type     => worker
     , modules  => [achlys_sensor_commander]
 }).
-% -define(CHILD(Restart , Shutdown , Type , {M,F,A}) ,
-%     #{id     => M
-%     , start    => {M , F , A}
-%     , restart  => Restart
-%     , shutdown => Shutdown
-%     , type     => Type
-%     , modules  => [M]
-% }).
 
-% -define(MFA(Name, Args),        {Name, start_link, Args}).
+-define(TASK_SERVER , #{id     => achlys_task_server
+    , start    => {achlys_task_server , start_link , []}
+    , restart  => permanent
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_task_server]
+}).
