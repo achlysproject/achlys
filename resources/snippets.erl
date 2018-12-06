@@ -36,6 +36,20 @@ lasp:update(AWPSSet, {add, one}, self()).
 lasp:query({<<"set">>,state_awset_ps}).
 
 ets:match(node()).
+
+% achlys.hrl :
+% -define(CHILD(Restart , Shutdown , Type , {M,F,A}) ,
+%     #{id     => M
+%     , start    => {M , F , A}
+%     , restart  => Restart
+%     , shutdown => Shutdown
+%     , type     => Type
+%     , modules  => [M]
+% }).
+
+% -define(MFA(Name, Args),        {Name, start_link, Args}).
+
+
 %% from riak_core :
 %% @doc Wraps an rpc:call/4 in a try/catch to handle the case where the
 %%      'rex' process is not running on the remote node. This is safe in
