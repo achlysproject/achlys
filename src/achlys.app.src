@@ -1,7 +1,7 @@
 { application , achlys , [
     {description , "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"} ,
-    {vsn , "0.1.5"} ,
+    {vsn , "0.1.6"} ,
 
     {registered , [achlys
         ,          achlys_app
@@ -11,6 +11,9 @@
         ,          achlys_cleaner
         ,          achlys_sensor_commander
         ,          achlys_pmod_nav_worker
+        ,          achlys_pmod_als_worker
+        ,          achlys_task_server
+        ,          achlys_task_worker
     ]} ,
 
     {mod , {achlys_app , []}} ,
@@ -33,6 +36,9 @@
         , achlys_cleaner
         , achlys_sensor_commander
         , achlys_pmod_nav_worker
+        , achlys_pmod_als_worker
+        , achlys_task_server
+        , achlys_task_worker
     ]} ,
 
     {maintainers , ["Igor Kopestenski"]} ,

@@ -16,6 +16,7 @@
 
 %% API
 -export([start_link/0]).
+-export([start_task/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -32,6 +33,11 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%% @doc Attempt to execute a given function if found in the task set.
+-spec start_task(atom()) -> ok.
+start_task(TaskName) ->
+    gen_server:cast(?SERVER , {start_task, TaskName}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -94,6 +100,15 @@ handle_call(_Request , _From , State) ->
     {noreply , NewState :: #state{}} |
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
+handle_cast({start_task, TaskName} , State) ->
+    %% TODO : basic approach for generic task execution can be done using :
+    %% List = achlys:get_all_tasks(),
+    %% T = hd([ X || X <- List, #{name := N} = X, N =:= TaskName ]),
+    %% #{function := Fun, targets := _Targets} = T,
+    %% % TODO : Check if part of destination set
+    %% Result = Fun(),
+    {noreply , State};
+
 handle_cast(_Request , State) ->
     {noreply , State}.
 
