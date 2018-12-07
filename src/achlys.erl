@@ -26,7 +26,7 @@
 -export([contagion/0]).
 -export([pandemia/0]).
 -export([get_preys/0]).
--export([get_bounded_preys/0]).
+% -export([get_bounded_preys/0]).
 -export([bidirectional_join/1]).
 
 %% PMOD-related functions API
@@ -103,9 +103,6 @@ contagion() ->
     [ bidirectional_join(R) || R <- L
         ,        R =/= node()
         ,        net_adm:ping(R) =:= pong].
-    % _ = [ lasp_peer_service:join(rpc:call(X,?MANAGER,myself,[]))
-    % || X <- L, net_adm:ping(X) =:= pong, X =/= node() ],
-    % [ rpc:call(X,lasp_peer_service,join,[Self]) || X <- L ].
 
 %% @doc Close disterl TCP connections with neighboring nodes.
 -spec pandemia() -> ok.
@@ -148,17 +145,18 @@ get_preys() ->
 
 %% @doc Returns a list of known remote hostnames
 %% that could be potential neighbors, limited to maximum active view size.
-get_bounded_preys() ->
-    L = lists:usort(binary_remotes_to_atoms(seek_neighbors())),
-    Len = length(L),
-    {ok, MaxActiveSize} = application:get_env(partisan, max_active_size),
-    case Len > MaxActiveSize of
-        true ->
-            {H, _T} = lists:split(MaxActiveSize, L),
-            H;
-        false ->
-            L
-    end.
+% get_bounded_preys() ->
+% TODO : attempt to reach up to MaxActiveSize possible neighbors from list
+%     L = lists:usort(binary_remotes_to_atoms(seek_neighbors())),
+%     Len = length(L),
+%     {ok, MaxActiveSize} = application:get_env(partisan, max_active_size),
+%     case Len > MaxActiveSize of
+%         true ->
+%             {H, _T} = lists:split(MaxActiveSize, L),
+%             H;
+%         false ->
+%             L
+%     end.
 
 
 %% @private

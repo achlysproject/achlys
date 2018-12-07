@@ -210,7 +210,7 @@ handle_info(temperature , State) ->
     case Res of
         {ok , [Temp]} when is_number(Temp) ->
             % true = ets:insert_new(State#state.measures , {?TIME , [Temp]});
-            true = ets:insert_new(temperature , {?TIME , [Temp]});
+            true = ets:insert_new(temperature , {?TIME , erlang:round(Temp)});
         _ ->
             logger:log(notice , "Could not fetch temperature : ~p ~n" , [Res])
     end ,
@@ -224,7 +224,7 @@ handle_info(pressure , State) ->
     case Res of
         {ok , [Press]} when is_number(Press) ->
             % true = ets:insert_new(State#state.measures , {?TIME , [Press]});
-            true = ets:insert_new(pressure , {?TIME , [Press]});
+            true = ets:insert_new(pressure , {?TIME , erlang:round(Press)});
         _ ->
             logger:log(notice , "Could not fetch pressure : ~p ~n" , [Res])
     end ,
@@ -286,6 +286,8 @@ handle_continue(_Continue , State) ->
 %%--------------------------------------------------------------------
 
 terminate(_Reason , _State) ->
+    ok = ets:tab2file(temperature, "temperature"),
+    ok = ets:tab2file(pressure, "pressure"),
     ok.
 
 %%--------------------------------------------------------------------
@@ -304,7 +306,8 @@ code_change(_OldVsn , State , _Extra) ->
 get_mean(Tab) ->
     Sum = ets:foldl(fun
                         (Elem , AccIn) ->
-                            {_ , [Temp]} = Elem ,
+                            % {_ , [Temp]} = Elem ,
+                            {_ , Temp} = Elem ,
                             Temp + AccIn
                     end , 0 , Tab) ,
     Len = ets:info(Tab , size) ,
