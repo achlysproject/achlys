@@ -51,6 +51,7 @@ ets:match(node()).
 
 % L = [achlys@my_grisp_board_2,achlys@my_grisp_board_3,achlys@my_grisp_board_1,achlys@my_grisp_board_6,achlys@my_grisp_board_5,achlys@my_grisp_board_4].
 % achlys:contagion().
+% achlys:clusterize().
 % achlys:members().
 % achlys:venom(),achlys:venom(achlys_pmod_als_worker).
 
