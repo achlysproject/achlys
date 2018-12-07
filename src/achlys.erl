@@ -26,11 +26,18 @@
 -export([contagion/0]).
 -export([pandemia/0]).
 -export([get_preys/0]).
+-export([get_bounded_preys/0]).
+-export([bidirectional_join/1]).
 
 %% PMOD-related functions API
 -export([bane/1]).
 -export([venom/0]).
 -export([venom/1]).
+
+%% Shortcuts
+-export([members/0]).
+-export([gc/0]).
+-export([flush/1]).
 
 %%====================================================================
 %% Type definitions
@@ -40,7 +47,9 @@
 %% Macros
 %%====================================================================
 
--define(MANAGER,    lasp_peer_service:manager()).
+% -define(MANAGER,    lasp_peer_service:manager()).
+-define(MANAGER,    partisan_hyparview_peer_service_manager).
+-define(LPS,    lasp_peer_service).
 
 %% ===================================================================
 %% Entry point functions
@@ -89,7 +98,14 @@ clusterize() ->
 -spec contagion() -> list().
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
-    [ lasp_peer_service:join(X) || X <- get_preys() ].
+    L = get_preys(),
+    Self = ?MANAGER:myself(),
+    [ bidirectional_join(R) || R <- L
+        ,        R =/= node()
+        ,        net_adm:ping(R) =:= pong].
+    % _ = [ lasp_peer_service:join(rpc:call(X,?MANAGER,myself,[]))
+    % || X <- L, net_adm:ping(X) =:= pong, X =/= node() ],
+    % [ rpc:call(X,lasp_peer_service,join,[Self]) || X <- L ].
 
 %% @doc Close disterl TCP connections with neighboring nodes.
 -spec pandemia() -> ok.
@@ -129,6 +145,21 @@ venom(Worker) ->
 %% that could be potential neighbors.
 get_preys() ->
     binary_remotes_to_atoms(seek_neighbors()).
+
+%% @doc Returns a list of known remote hostnames
+%% that could be potential neighbors, limited to maximum active view size.
+get_bounded_preys() ->
+    L = lists:usort(binary_remotes_to_atoms(seek_neighbors())),
+    Len = length(L),
+    {ok, MaxActiveSize} = application:get_env(partisan, max_active_size),
+    case Len > MaxActiveSize of
+        true ->
+            {H, _T} = lists:split(MaxActiveSize, L),
+            H;
+        false ->
+            L
+    end.
+
 
 %% @private
 binary_remotes_to_atoms([H | T]) ->
@@ -182,6 +213,25 @@ join(Host) ->
     end.
 
 %% @private
+bidirectional_join(Host) ->
+    try rpc:call(Host , lasp_peer_service:manager() , myself , []) of
+        #{channels := _Channels
+        , listen_addrs := _Addresses
+        , name := _Name
+        , parallelism := _Parallelism } = Node ->
+            ok = ?LPS:join(Node),
+            ok = rpc:call(Host,?LPS,join,[?MANAGER:myself()]),
+            {ok, Host}
+    catch
+        {badrpc, Reason} ->
+            logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
+            {error , Reason};
+        {error, Reason} ->
+            logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
+            {error , Reason}
+    end.
+
+%% @private
 clusterize([H | Remotes]) ->
     case join(H) of
         {ok , N} ->
@@ -193,3 +243,18 @@ clusterize([H | Remotes]) ->
 
 clusterize([]) ->
     [].
+
+%% @private
+members() ->
+    ?LPS:members().
+
+%% @private
+gc() ->
+    achlys_util:do_gc().
+
+%% @private
+flush(Name) ->
+    BS = atom_to_binary(Name , utf8),
+    lasp:update({BS,state_awset}
+        , {rmv_all, achlys_util:query({BS,state_awset})}
+        , self()).
