@@ -49,6 +49,23 @@ ets:match(node()).
 
 % -define(MFA(Name, Args),        {Name, start_link, Args}).
 
+% L = [achlys@LaymerMac,achlys2@LaymerMac,achlys3@LaymerMac].
+% L = [achlys@my_grisp_board_1,achlys@my_grisp_board_3], M = partisan_hyparview_peer_service_manager [rpc:call(X,lasp_peer_service,join,[partisan_hyparview_peer_service_manager:myself()]) || X <- L ].
+%
+% rpc:call(achlys@LaymerMac,lasp_peer_service,join,[partisan_hyparview_peer_service_manager:myself()]).
+% lasp_peer_service:members().
+% achlys:bane(temperature).
+%
+% Self = partisan_hyparview_peer_service_manager:myself(),L = [achlys@my_grisp_board_2,achlys@my_grisp_board_3],M = partisan_hyparview_peer_service_manager.
+% [lasp_peer_service:join(rpc:call(X,M,myself,[])) || X <- L],[rpc:call(X,lasp_peer_service,join,[Self]) || X <- L].
+%
+% lasp_peer_service:join(rpc:call(achlys@my_grisp_board_3,M,myself,[])),rpc:call(achlys@my_grisp_board_3,lasp_peer_service,join,[Self]).
+% lasp:update({<<"temperature">>,state_awset},{rmv, {<<"2">>,temperature,{119,20.175945378151262}}},self()).
+% achlys:venom(),achlys:venom(achlys_pmod_als_worker).
+% achlys:bane(temperature).
+% achlys:bane(light).
+% achlys_util:do_gc().
+%
 
 %% from riak_core :
 %% @doc Wraps an rpc:call/4 in a try/catch to handle the case where the
