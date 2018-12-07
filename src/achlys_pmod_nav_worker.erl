@@ -243,8 +243,10 @@ handle_info({mean, Val} , State) ->
     Len = ets:info(Val, size),
     _ = case Len >= A of
             true ->
-                Mean = get_mean(Val) ,
-                {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , T, Mean}} , self());
+                % Mean = get_mean(Val) ,
+                % {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , T, Mean}} , self());
+                {Sample, Mean} = get_mean(Val) ,
+                {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , Sample, erlang:round(Mean)}} , self());
             _ ->
                 logger:log(notice , "Could not compute mean with ~p values ~n" , [Len])
         end ,

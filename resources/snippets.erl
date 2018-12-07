@@ -49,6 +49,11 @@ ets:match(node()).
 
 % -define(MFA(Name, Args),        {Name, start_link, Args}).
 
+% L = [achlys@my_grisp_board_2,achlys@my_grisp_board_3,achlys@my_grisp_board_1,achlys@my_grisp_board_6,achlys@my_grisp_board_5,achlys@my_grisp_board_4].
+% achlys:contagion().
+% achlys:members().
+% achlys:venom(),achlys:venom(achlys_pmod_als_worker).
+
 % L = [achlys@LaymerMac,achlys2@LaymerMac,achlys3@LaymerMac].
 % L = [achlys@my_grisp_board_1,achlys@my_grisp_board_3], M = partisan_hyparview_peer_service_manager [rpc:call(X,lasp_peer_service,join,[partisan_hyparview_peer_service_manager:myself()]) || X <- L ].
 %
