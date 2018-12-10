@@ -25,6 +25,13 @@ Disclaimer : Achlys is currently under active development, hence a production-re
 A [Wiki](https://github.com/Laymer/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
 range of examples and tutorials in order to demonstrate the capabilities of Lasp on GRiSP at the Edge.
 
+The [GRiSP Wiki](https://github.com/grisp/grisp/wiki) also provides necessary steps in order to setup the required dependencies in order to run Achlys on the GRiSP boards. There are also useful resources that are interesting for general usage of GRiSP boards.
+
+Elixir is also supported on GRiSP, and there two very interesting articles by [@Theuns-Botha](https://github.com/Theuns-Botha) that provide detailed information on how to setup an Elixir development environment :
+
+- [Going bare metal with Elixir and GRiSP](https://medium.com/@toensbotes/going-bare-metal-with-elixir-and-grisp-8fa8066f3d39)
+- [IEx Remote Shell into your Elixir driven GRiSP Board](https://medium.com/@toensbotes/iex-remote-shell-into-your-elixir-driven-grisp-board-76faa8f2179e)
+
 ## EDoc preview
 
 The development process has not yet reached a level of maturity allowing for an actual release of the program.
