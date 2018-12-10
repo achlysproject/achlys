@@ -6,7 +6,7 @@ Achlys is being developed in the context of edge computing research within the H
 - Resilient storage across a cluster of IoT sensing devices
 - A general purpose task model allowing any function to be propagated and executed in the cluster
 
-Disclaimer : Achlys is currently under active development, hence a production-ready release is not yet available. 
+Disclaimer : Achlys is currently under active development, hence a production-ready release is not yet available.
 
 > Achlys is the goddess of deadly poison ... but fortunately there is an [AntidoteDB](https://www.antidotedb.eu/)
 
@@ -50,6 +50,7 @@ The design pattern will follow the "facade" concept as much as possible, hence t
 
 A [Mindly](http://www.mindlyapp.com) reasoning construct.
 Allows for easier visualization of problems and tasks, hence more efficient solving.
+The **API** branch of the map provides a description of some features and simple usage examples.
 For Achlys, it is currently an additional asset to structure software improvement ideas.
 
 ### NOTE : An online interactive version is available [here](https://laymer.github.io/achlys-map/)
