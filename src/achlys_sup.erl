@@ -27,8 +27,6 @@
 -spec start_link() ->
     {ok , pid()} | {error , {already_started , pid()} | {shutdown , term()} | term()}.
 start_link() ->
-    % {ok , NavConfig} = achlys_config:get(temperature) ,
-    % supervisor:start_link({local , ?SERVER} , ?MODULE , [NavConfig]).
     supervisor:start_link({local , ?SERVER} , ?MODULE , []).
 
 %%====================================================================
@@ -46,19 +44,6 @@ init([]) ->
         , ?CLEANER_WORKER
           % , ?CLEANER_WORKER]}}.
         , ?TASK_SERVER]}}.
-    % IsMap = is_map(Args) ,
-    % case IsMap of
-    %     true ->
-    %         {ok , {?SUPFLAGS(?THREE , ?TEN) , [
-    %               ?CHILD(achlys_pmod_nav_worker , worker , [Args])
-    %             , ?CHILD(achlys_cleaner , worker , [])]}};
-    %             %   ?CHILD({achlys_pmod_nav_worker , worker , [Args]}, transient, ?FIVE, worker)
-    %             % , ?CHILD({achlys_cleaner , worker , []), permanent, ?THREE, worker}
-    %             % ]}
-    %         % };
-    %     _ ->
-    %         ignore
-    % end.
 
 %%====================================================================
 %% Internal functions

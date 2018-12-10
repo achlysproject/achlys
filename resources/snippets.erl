@@ -39,6 +39,32 @@ ets:match(node()).
 
 
 %%====================================================================
+%% Snippets from achlys_sup module
+%%====================================================================
+
+% IsMap = is_map(Args) ,
+% case IsMap of
+%     true ->
+%         {ok , {?SUPFLAGS(?THREE , ?TEN) , [
+%               ?CHILD(achlys_pmod_nav_worker , worker , [Args])
+%             , ?CHILD(achlys_cleaner , worker , [])]}};
+%             %   ?CHILD({achlys_pmod_nav_worker , worker , [Args]}, transient, ?FIVE, worker)
+%             % , ?CHILD({achlys_cleaner , worker , []), permanent, ?THREE, worker}
+%             % ]}
+%         % };
+%     _ ->
+%         ignore
+% end.
+
+%%====================================================================
+%% Snippets from sys.config
+%%====================================================================
+
+% see https://github.com/lasp-lang/lasp/commit/a9422207e554e47495c7c488450a238274844eb9
+% NOTE : propagate_on_update not available in delta based mode?
+% {propagate_on_update, true}
+
+%%====================================================================
 %% Snippets from achlys module
 %%====================================================================
 
