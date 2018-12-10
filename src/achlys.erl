@@ -95,7 +95,7 @@ clusterize() ->
     clusterize(Reachable).
 
 %% @doc Form Lasp cluster without attempting to ping neighbors beforehand.
--spec contagion() -> list().
+-spec contagion() -> [{ error , atom() } | { ok , atom() } ].
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
     L = get_preys(),
@@ -143,22 +143,6 @@ venom(Worker) ->
 get_preys() ->
     binary_remotes_to_atoms(seek_neighbors()).
 
-%% @doc Returns a list of known remote hostnames
-%% that could be potential neighbors, limited to maximum active view size.
-% get_bounded_preys() ->
-% TODO : attempt to reach up to MaxActiveSize possible neighbors from list
-%     L = lists:usort(binary_remotes_to_atoms(seek_neighbors())),
-%     Len = length(L),
-%     {ok, MaxActiveSize} = application:get_env(partisan, max_active_size),
-%     case Len > MaxActiveSize of
-%         true ->
-%             {H, _T} = lists:split(MaxActiveSize, L),
-%             H;
-%         false ->
-%             L
-%     end.
-
-
 %% @private
 binary_remotes_to_atoms([H | T]) ->
     [binary_to_atom(H , utf8) | binary_remotes_to_atoms(T)];
@@ -176,22 +160,6 @@ seek_neighbors([{_Arg , _Val} | T]) ->
 seek_neighbors([]) ->
     [].
 
-% %% @private
-% join(Host) ->
-%     Manager = rpc:call(Host , partisan_peer_service , manager , []) ,
-%     case Manager of
-%         partisan_hyparview_peer_service_manager ->
-%             Node = rpc:call(Host , Manager , myself , []) ,
-%             ok = partisan_peer_service:join(Node) ,
-%             logger:log(info , "Joined ~p~n" , [Host]) ,
-%             {ok , Node};
-%         {badrpc , Reason} ->
-%             logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
-%             {error , Reason};
-%         {error , Reason} ->
-%             logger:log(error , "Unable to retrieve remote : ~p~n" , [Manager]) ,
-%             {error , Reason}
-%     end.
 %% @private
 join(Host) ->
     try rpc:call(Host , lasp_peer_service:manager() , myself , []) of

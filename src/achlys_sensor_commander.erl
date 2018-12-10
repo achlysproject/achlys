@@ -197,10 +197,10 @@ maybe_run_workers(Ks) when is_list(Ks) ->
 
 %% @private
 run_workers([pmod_nav|T], Sup) ->
-    supervisor:start_child(Sup, ?NAV_WORKER),
+    _ = supervisor:start_child(Sup, ?NAV_WORKER),
     run_workers(T, Sup);
 run_workers([pmod_als|T], Sup) ->
-    supervisor:start_child(Sup, ?ALS_WORKER),
+    _ = supervisor:start_child(Sup, ?ALS_WORKER),
     run_workers(T, Sup);
 run_workers([H|T], Sup) ->
     logger:log(notice, "Worker not yet implemented ~p ~n ", [H]),

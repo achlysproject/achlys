@@ -37,6 +37,107 @@ lasp:query({<<"set">>,state_awset_ps}).
 
 ets:match(node()).
 
+
+%%====================================================================
+%% Snippets from achlys module
+%%====================================================================
+
+%% WIP
+
+%% @doc Returns a list of known remote hostnames
+%% that could be potential neighbors, limited to maximum active view size.
+% get_bounded_preys() ->
+% TODO : attempt to reach up to MaxActiveSize possible neighbors from list
+%     L = lists:usort(binary_remotes_to_atoms(seek_neighbors())),
+%     Len = length(L),
+%     {ok, MaxActiveSize} = application:get_env(partisan, max_active_size),
+%     case Len > MaxActiveSize of
+%         true ->
+%             {H, _T} = lists:split(MaxActiveSize, L),
+%             H;
+%         false ->
+%             L
+%     end.
+
+
+% %% @private
+% join(Host) ->
+%     Manager = rpc:call(Host , partisan_peer_service , manager , []) ,
+%     case Manager of
+%         partisan_hyparview_peer_service_manager ->
+%             Node = rpc:call(Host , Manager , myself , []) ,
+%             ok = partisan_peer_service:join(Node) ,
+%             logger:log(info , "Joined ~p~n" , [Host]) ,
+%             {ok , Node};
+%         {badrpc , Reason} ->
+%             logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
+%             {error , Reason};
+%         {error , Reason} ->
+%             logger:log(error , "Unable to retrieve remote : ~p~n" , [Manager]) ,
+%             {error , Reason}
+%     end.
+
+%%====================================================================
+%% Snippets from achlys_util module
+%%====================================================================
+
+
+% foo(N, Bin) ->
+%    <<X:N,T/binary>> = Bin,
+%    {X,T}.
+% <<Packet:Size/bitstring>> = <<1:Size>>.
+
+%% NOTE : recon_alloc utility snippets :
+%%recon() ->
+%%    % L = recon_alloc:sbcs_to_mbcs(current),
+%%    [ io:format("sbcs_to_mbcs === ~p ~n", [X]) || X <- recon_alloc:sbcs_to_mbcs(current) ],
+%%    recon(avg).
+%%recon(avg) ->
+%%    [ io:format("average_block_sizes === ~p ~n", [X]) || X <- recon_alloc:average_block_sizes(current) ],
+%%    recon(usage);
+%%recon(usage) ->
+%%    io:format("memory === ~p ~n", [recon_alloc:memory(usage,current)]),
+%%    recon(cache);
+%%recon(cache) ->
+%%    recon_alloc:cache_hit_rates().
+%%
+%%maxrecon() ->
+%%    % L = recon_alloc:sbcs_to_mbcs(current),
+%%    [ io:format("sbcs_to_mbcs === ~p ~n", [X]) || X <- recon_alloc:sbcs_to_mbcs(current) ],
+%%    maxrecon(avg).
+%%maxrecon(avg) ->
+%%    [ io:format("average_block_sizes === ~p ~n", [X]) || X <- recon_alloc:average_block_sizes(current) ],
+%%    maxrecon(usage);
+%%maxrecon(usage) ->
+%%    io:format("memory === ~p ~n", [recon_alloc:memory(usage,current)]),
+%%    maxrecon(cache);
+%%maxrecon(cache) ->
+%%    recon_alloc:cache_hit_rates().
+
+%% Stress intensity
+%% achlys_util:stress_throughput().
+% stress_throughput() ->
+%     stress_throughput(achlys_config:get(packet_config)).
+% stress_throughput(#{stress_delay    := Interval,
+%                 operations_count     := Count,
+%                 packet_size          := Size}) ->
+%     ((Count * Size) * (Interval / (?MILLION))). %% returns float
+%     % (Count * Size) div ?MILLION.
+
+% T.
+% -spec maybe_declare_crdt(atom(), atom()) -> atom().
+% maybe_declare_crdt(Name, Type) ->
+%     case achlys_util:query(Name, Type) of
+%         [] ->
+%             Bitstring = atom_to_binary(Name , utf8) ,
+%             {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
+%             Id;
+%         _ ->
+%             Name
+%     end.
+% declare_crdt(Name , Type) ->
+
+
 % achlys.hrl :
 % -define(CHILD(Restart , Shutdown , Type , {M,F,A}) ,
 %     #{id     => M
