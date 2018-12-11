@@ -28,7 +28,7 @@
 %% API
 -export([start_link/0]).
 % TODO : add API function to clean ETS table T upon request
-% -export([flush_table/1]).
+-export([flush_table/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -52,6 +52,12 @@
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+%% @doc Delete all objects in a given ETS table.
+-spec flush_table(Table :: atom()) -> ok.
+flush_table(Table) ->
+    gen_server:cast(?SERVER , {flush_table, Table}).
+
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -116,6 +122,15 @@ handle_call(_Request , _From , State) ->
     % {noreply , NewState :: #state{}} |
     % {noreply , NewState :: #state{} , timeout() | hibernate} |
     % {stop , Reason :: term() , NewState :: #state{}}).
+handle_cast({flush_table, Table} , State) ->
+    _ = case ets:whereis(Table) of
+        undefined ->
+            logger:log(error , "Cannot flush undefined table ~p ~n" , [Table]);
+        Ref when is_reference(Ref) ->
+            logger:log(notice , "Flushing table ~p ~n" , [Table]) ,
+            true = ets:delete_all_objects(Table)
+    end ,
+    {noreply , State};
 handle_cast(_Request , State) ->
     {noreply , State}.
 

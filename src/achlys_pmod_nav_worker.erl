@@ -65,6 +65,7 @@
 
 -record(state , {
     measures :: map(),
+    aggregations :: map(),
     number :: binary()
 }).
 
@@ -122,7 +123,11 @@ init([]) ->
     {ok, Num} = achlys_config:get(number),
     MeasuresMap = mapz:deep_get([pmod_nav], Streams),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
-    {ok, #state{measures = MeasuresMap, number = Num}}.
+    L = [ {X, 1} || X <- maps:keys(MeasuresMap) ],
+    {ok, #state{
+        measures = MeasuresMap,
+        number = Num,
+        aggregations = maps:from_list(L)}}.
 
 %%--------------------------------------------------------------------
 
@@ -245,13 +250,23 @@ handle_info({mean, Val} , State) ->
             true ->
                 % Mean = get_mean(Val) ,
                 % {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , T, Mean}} , self());
-                {Sample, Mean} = get_mean(Val) ,
-                {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , Sample, erlang:round(Mean)}} , self());
+                {_Sample, Mean} = get_mean(Val) ,
+
+                ComputedSample = (maps:get(Val, State#state.aggregations) * A) ,
+                % logger:log(notice , "ETS size : ~p Computed : ~p  ~n" , [Sample,ComputedSample]) ,
+                {ok, {C2, _, _, _}} = lasp:update(
+                    C ,
+                    {add , {State#state.number , ComputedSample , erlang:round(Mean)}} ,
+                    self());
             _ ->
                 logger:log(notice , "Could not compute mean with ~p values ~n" , [Len])
         end ,
     erlang:send_after((P * A) , ?SERVER , {mean, Val}) ,
-    {noreply , State};
+    Increment = maps:update_with(Val,
+        fun(V) -> V + 1 end,
+        State#state.aggregations),
+    ok = achlys_cleaner:flush_table(T) ,
+    {noreply , State#state{aggregations = Increment}};
 
 %%--------------------------------------------------------------------
 
@@ -364,5 +379,7 @@ create_table(Name) ->
             , {heir , whereis(achlys_sup) , []}
         ]);
       _ ->
+        % TODO : check for existing table with ownership at achlys_sup PID
+        % and transfer if possible
         Name
       end.
