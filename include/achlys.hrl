@@ -88,3 +88,19 @@
     , type     => worker
     , modules  => [achlys_task_server]
 }).
+
+-define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_2_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_3_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_4_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_5_temperature">>, state_awset}
+                    , {<<"achlys@my_grisp_board_6_temperature">>, state_awset}]).
+
+-define(PRESS_LIST , [{<<"achlys@LaymerMac_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_1_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_2_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_3_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_4_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_5_pressure">>, state_awset}
+                    , {<<"achlys@my_grisp_board_6_pressure">>, state_awset}]).

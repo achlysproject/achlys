@@ -164,7 +164,11 @@ handle_cast(run , State) ->
 
     NewState = maps:map(fun
       (K, V1) when is_map(V1) ->
-        Id = achlys_util:declare_crdt(K , state_awset),
+          % TODO : implement cardinality-based solution for CRDT
+          % flushing after given upper bound is reached.
+          {SetId, _CardinalityId} = achlys_util:get_variable_identifier(K),
+          {ok, {Id,_,_,_}} = lasp:declare({SetId , state_awset}, state_awset),
+        % Id = achlys_util:declare_crdt(K , state_awset),
         % Id = maybe_declare_crdt(K , state_awset_ps),
 
         V2 = mapz:deep_put([crdt], Id , V1),
@@ -174,6 +178,7 @@ handle_cast(run , State) ->
         #{poll_interval := P
         , aggregation_trigger := A} = V3,
         erlang:send_after(((P * A) + ?THREE), ?SERVER, {mean, K}),
+        erlang:send_after(((P * A * A) + ?FIVE), ?SERVER, {flush, K}),
         V3
     end, I),
     erlang:send_after(?ONE , ?SERVER , poll) ,
@@ -251,12 +256,12 @@ handle_info({mean, Val} , State) ->
                 % Mean = get_mean(Val) ,
                 % {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , T, Mean}} , self());
                 {_Sample, Mean} = get_mean(Val) ,
-
                 ComputedSample = (maps:get(Val, State#state.aggregations) * A) ,
-                % logger:log(notice , "ETS size : ~p Computed : ~p  ~n" , [Sample,ComputedSample]) ,
+                % logger:log(debug , "ETS size : ~p Computed : ~p  ~n" , [Sample,ComputedSample]) ,
                 {ok, {C2, _, _, _}} = lasp:update(
                     C ,
-                    {add , {State#state.number , ComputedSample , erlang:round(Mean)}} ,
+                    % {add , {State#state.number , ComputedSample , erlang:round(Mean)}} ,
+                    {add , {ComputedSample , erlang:round(Mean)}} ,
                     self());
             _ ->
                 logger:log(notice , "Could not compute mean with ~p values ~n" , [Len])
@@ -267,6 +272,27 @@ handle_info({mean, Val} , State) ->
         State#state.aggregations),
     ok = achlys_cleaner:flush_table(T) ,
     {noreply , State#state{aggregations = Increment}};
+
+%%--------------------------------------------------------------------
+
+handle_info({flush, Val} , State) ->
+    #{crdt := C
+    , poll_interval := P
+    , aggregation_trigger := A} = mapz:deep_get([Val],State#state.measures),
+    {ok, Set} = lasp:query(C),
+    L = sets:to_list(Set),
+    Last = lists:last(lists:usort(L)),
+    ets:delete(node(), C),
+    {ok, {C2, _, _, _}} = lasp:update(
+        C ,
+        {rmv_all , L} ,
+        self()),
+    {ok, {C3, _, _, _}} = lasp:update(
+        C2 ,
+        {add , Last} ,
+        self()),
+    erlang:send_after((P * A * A) , ?SERVER , {flush, Val}) ,
+    {noreply , State};
 
 %%--------------------------------------------------------------------
 

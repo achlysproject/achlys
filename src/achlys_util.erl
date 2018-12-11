@@ -104,6 +104,20 @@ declare_awset(Name) ->
     application:set_env(achlys , awset , AWSet) ,
     AWSet.
 
+get_variable_identifier(Name) ->
+    {unicode:characters_to_binary([erlang:atom_to_binary(node(),utf8)
+        , "_"
+        , erlang:atom_to_binary(Name,utf8)] , utf8) ,
+        unicode:characters_to_binary([erlang:atom_to_binary(node(),utf8)
+            , "_"
+            , erlang:atom_to_binary(Name,utf8), "_size"] , utf8)}.
+
+get_pressure_identifier() ->
+    unicode:characters_to_binary([erlang:atom_to_binary(node(),utf8),"_press"],utf8).
+
+get_light_identifier() ->
+    unicode:characters_to_binary([erlang:atom_to_binary(node(),utf8),"_light"],utf8).
+
 do_ping(1) ->
     net_adm:ping(achlys@my_grisp_board_1);
 do_ping(2) ->

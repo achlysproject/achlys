@@ -31,6 +31,7 @@
 
 %% PMOD-related functions API
 -export([bane/1]).
+-export([bane_all_preys/1]).
 -export([venom/0]).
 -export([venom/1]).
 
@@ -114,12 +115,39 @@ pandemia() ->
 %% @doc Returns the aggregates for the given variable
 %% as seen by the current node.
 -spec bane(atom()) -> list().
+% bane(Data) when is_atom(Data) ->
 bane(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
     % Id = {atom_to_binary(Data, utf8), state_awset_ps},
     Id = {atom_to_binary(Data, utf8), state_awset},
+    % L = [ unicode:characters_to_binary([X
+    %     , "_"
+    %     , erlang:atom_to_binary(Data,utf8)] , utf8)
+    %     || X <- seek_neighbors() ],
     {ok, S} = lasp:query(Id),
     sets:to_list(S).
+
+%% @doc Returns the aggregates for the given variable
+%% as seen by the current node for all nodes.
+-spec bane_all_preys(atom()) -> list().
+bane_all_preys(temperature) ->
+    logger:log(notice , "Reading temperature CRDT ~n", []) ,
+    lists:flatten([ achlys_util:query(Id) || Id <- ?TEMP_LIST ]);
+bane_all_preys(pressure) ->
+    logger:log(notice , "Reading pressure CRDT ~n", []) ,
+    lists:flatten([ achlys_util:query(Id) || Id <- ?PRESS_LIST ]);
+bane_all_preys(Data) ->
+    logger:log(error , "Unknown value ~p ~n", [Data]) ,
+    [undefined].
+    % bane(L).
+% bane([H|T]) ->
+%     {ok, S} = lasp:query({H, state_awset}),
+%     L = sets:to_list(S),
+%     [ L | bane(T) ];
+% bane([]) ->
+%     [].
+
+
 
 %% @doc Collect data based on sensors available on Pmod modules and store
 %% aggregated values in corresponding Lasp variable.
