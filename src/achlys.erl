@@ -39,7 +39,7 @@
 -export([members/0]).
 -export([gc/0]).
 -export([flush/1]).
--export([join/1]).
+-export([join_host/1]).
 
 %%====================================================================
 %% Type definitions
@@ -255,5 +255,5 @@ flush(Name) ->
         , self()).
 
 %% @private
-join(Host) ->
+join_host(Host) ->
     lasp_peer_service:join(Host).

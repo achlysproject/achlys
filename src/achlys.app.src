@@ -1,7 +1,7 @@
 { application , achlys , [
     {description , "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"} ,
-    {vsn , "0.1.9"} ,
+    {vsn , "0.1.10"} ,
 
     {registered , [achlys
         ,          achlys_app
