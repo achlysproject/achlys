@@ -33,6 +33,7 @@ inet:i().
 
 lasp_peer_service:join(achlys@my_grisp_board_2).
 achlys:bane(temperature).
+achlys_util:get_temperatures().
 
 lasp_peer_service:members().
 lasp:query({<<"temperature">>, state_awset}).
