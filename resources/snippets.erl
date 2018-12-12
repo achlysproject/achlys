@@ -32,6 +32,14 @@ achlys:venom().
 inet:i().
 
 lasp_peer_service:join(achlys@my_grisp_board_2).
+lasp_peer_service:join(achlys@LaymerMac).
+lasp_peer_service:join(achlys@my_grisp_board_3),lasp_peer_service:join(achlys@my_grisp_board_1).
+lasp_peer_service:join(achlys@my_grisp_board_2),lasp_peer_service:join(achlys@my_grisp_board_4).
+lasp_peer_service:join(achlys@my_grisp_board_1),lasp_peer_service:join(achlys@my_grisp_board_4).
+lasp_peer_service:join(achlys@my_grisp_board_5).
+lasp_peer_service:join(achlys@my_grisp_board_6).
+achlys:members().
+
 achlys:bane(temperature).
 achlys_util:get_temperatures().
 
@@ -46,7 +54,10 @@ rp(lists:usort(achlys_util:query({<<"temperature">>,state_awset}))).
 {ok,S2}=lasp:query({<<"achlys@my_grisp_board_2_temperature">>,state_awset}),sets:to_list(S2).
 {ok,S3}=lasp:query({<<"achlys@my_grisp_board_1_temperature">>,state_awset}),sets:to_list(S3).
 {ok,S4}=lasp:query({<<"achlys@my_grisp_board_3_temperature">>,state_awset}),sets:to_list(S4).
-
+lasp:query({<<"achlys@my_grisp_board_2_temperature">>,state_awset}).
+lasp:query({<<"achlys@my_grisp_board_4_temperature">>,state_awset}).
+lasp:query({<<"achlys@my_grisp_board_5_temperature">>,state_awset}).
+lasp:query({<<"achlys@my_grisp_board_3_temperature">>,state_awset}).
 ets:match(node()).
 
 

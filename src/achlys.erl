@@ -277,5 +277,9 @@ j5() ->
     lasp_peer_service:join(achlys@my_grisp_board_5).
 
 %% @private
-j5() ->
-    lasp_peer_service:join(achlys@my_grisp_board_5).
+j6() ->
+    lasp_peer_service:join(achlys@my_grisp_board_6).
+
+%% @private
+jm() ->
+    lasp_peer_service:join(achlys@LaymerMac).
