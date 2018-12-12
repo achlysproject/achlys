@@ -57,8 +57,8 @@ The design pattern will follow the "facade" concept as much as possible, hence t
 
 A [Mindly](http://www.mindlyapp.com) reasoning construct.
 Allows for easier visualization of problems and tasks, hence more efficient solving.
-The **API** branch of the map provides a description of some features and simple usage examples.
-For Achlys, it is currently an additional asset to structure software improvement ideas.
+- The **API** branch of the map provides a description of some features and simple usage examples.
+- For Achlys, it is currently an additional asset to structure software improvement ideas.
 
 ### NOTE : An online interactive version is available [here](https://laymer.github.io/achlys-map/)
 
