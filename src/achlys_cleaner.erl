@@ -126,9 +126,9 @@ handle_cast({flush_table, Table} , State) ->
     _ = case ets:whereis(Table) of
         undefined ->
             logger:log(error , "Cannot flush undefined table ~p ~n" , [Table]);
-        Ref when is_reference(Ref) ->
+        Ref ->
             logger:log(notice , "Flushing table ~p ~n" , [Table]) ,
-            true = ets:delete_all_objects(Table)
+            true = ets:delete_all_objects(Ref)
     end ,
     {noreply , State};
 handle_cast(_Request , State) ->

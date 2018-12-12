@@ -38,6 +38,9 @@ atom_to_binary(temperature, utf8).
 lasp:update(AWPSSet, {add, one}, self()).
 lasp:query({<<"set">>,state_awset_ps}).
 rp(lists:usort(achlys_util:query({<<"temperature">>,state_awset}))).
+{ok,S2}=lasp:query({<<"achlys@my_grisp_board_2_temperature">>,state_awset}),sets:to_list(S2).
+{ok,S3}=lasp:query({<<"achlys@my_grisp_board_1_temperature">>,state_awset}),sets:to_list(S3).
+{ok,S4}=lasp:query({<<"achlys@my_grisp_board_3_temperature">>,state_awset}),sets:to_list(S4).
 
 ets:match(node()).
 

@@ -164,8 +164,6 @@ handle_cast(run , State) ->
 
     NewState = maps:map(fun
       (K, V1) when is_map(V1) ->
-          % TODO : implement cardinality-based solution for CRDT
-          % flushing after given upper bound is reached.
           {SetId, _CardinalityId} = achlys_util:get_variable_identifier(K),
           {ok, {Id,_,_,_}} = lasp:declare({SetId , state_awset}, state_awset),
         % Id = achlys_util:declare_crdt(K , state_awset),
@@ -178,7 +176,7 @@ handle_cast(run , State) ->
         #{poll_interval := P
         , aggregation_trigger := A} = V3,
         erlang:send_after(((P * A) + ?THREE), ?SERVER, {mean, K}),
-        erlang:send_after(((P * A * A) + ?FIVE), ?SERVER, {flush, K}),
+        % erlang:send_after(((P * A * A) + ?FIVE), ?SERVER, {flush, K}),
         V3
     end, I),
     erlang:send_after(?ONE , ?SERVER , poll) ,
