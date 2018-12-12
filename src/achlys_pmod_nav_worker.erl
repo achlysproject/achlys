@@ -225,7 +225,7 @@ handle_info(temperature , State) ->
     erlang:send_after(mapz:deep_get([temperature, poll_interval],State#state.measures)
     , ?SERVER
     , temperature) ,
-    {noreply , State};
+    {noreply , State, hibernate};
 
 handle_info(pressure , State) ->
     Res = maybe_get_press() ,
@@ -239,7 +239,7 @@ handle_info(pressure , State) ->
     erlang:send_after(mapz:deep_get([pressure, poll_interval],State#state.measures)
     , ?SERVER
     , pressure) ,
-    {noreply , State};
+    {noreply , State, hibernate};
 
 %%--------------------------------------------------------------------
 

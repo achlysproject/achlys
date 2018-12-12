@@ -24,6 +24,10 @@ nodes().
 node().
 ets:delete(node(),{<<"achlys@LaymerMac_pressure">>,state_awset}).
 achlys:clusterize().
+lasp_peer_service:join(achlys@my_grisp_board_2),lasp_peer_service:join(achlys@my_grisp_board_3).
+lasp_peer_service:join(achlys@my_grisp_board_1),lasp_peer_service:join(achlys@my_grisp_board_3).
+lasp_peer_service:join(achlys@my_grisp_board_2),lasp_peer_service:join(achlys@my_grisp_board_1).
+achlys:venom().
 
 inet:i().
 
