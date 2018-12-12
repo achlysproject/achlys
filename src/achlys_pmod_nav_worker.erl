@@ -164,10 +164,8 @@ handle_cast(run , State) ->
 
     NewState = maps:map(fun
       (K, V1) when is_map(V1) ->
-          {SetId, _CardinalityId} = achlys_util:get_variable_identifier(K),
-          {ok, {Id,_,_,_}} = lasp:declare({SetId , state_awset}, state_awset),
-        % Id = achlys_util:declare_crdt(K , state_awset),
-        % Id = maybe_declare_crdt(K , state_awset_ps),
+        {SetId, _CardinalityId} = achlys_util:get_variable_identifier(K),
+        {ok, {Id,_,_,_}} = lasp:declare({SetId , state_awset}, state_awset),
 
         V2 = mapz:deep_put([crdt], Id , V1),
         T = create_table(K),
@@ -217,7 +215,6 @@ handle_info(temperature , State) ->
     Res = maybe_get_temp() ,
     case Res of
         {ok , [Temp]} when is_number(Temp) ->
-            % true = ets:insert_new(State#state.measures , {?TIME , [Temp]});
             true = ets:insert_new(temperature , {?TIME , erlang:round(Temp)});
         _ ->
             logger:log(notice , "Could not fetch temperature : ~p ~n" , [Res])
@@ -231,7 +228,6 @@ handle_info(pressure , State) ->
     Res = maybe_get_press() ,
     case Res of
         {ok , [Press]} when is_number(Press) ->
-            % true = ets:insert_new(State#state.measures , {?TIME , [Press]});
             true = ets:insert_new(pressure , {?TIME , erlang:round(Press)});
         _ ->
             logger:log(notice , "Could not fetch pressure : ~p ~n" , [Res])
@@ -251,14 +247,10 @@ handle_info({mean, Val} , State) ->
     Len = ets:info(Val, size),
     _ = case Len >= A of
             true ->
-                % Mean = get_mean(Val) ,
-                % {ok, {C2, _, _, _}} = lasp:update(C , {add , {State#state.number , T, Mean}} , self());
                 {_Sample, Mean} = get_mean(Val) ,
                 ComputedSample = (maps:get(Val, State#state.aggregations) * A) ,
-                % logger:log(debug , "ETS size : ~p Computed : ~p  ~n" , [Sample,ComputedSample]) ,
                 {ok, {C2, _, _, _}} = lasp:update(
                     C ,
-                    % {add , {State#state.number , ComputedSample , erlang:round(Mean)}} ,
                     {add , {ComputedSample , erlang:round(Mean)}} ,
                     self());
             _ ->
@@ -345,7 +337,6 @@ code_change(_OldVsn , State , _Extra) ->
 get_mean(Tab) ->
     Sum = ets:foldl(fun
                         (Elem , AccIn) ->
-                            % {_ , [Temp]} = Elem ,
                             {_ , Temp} = Elem ,
                             Temp + AccIn
                     end , 0 , Tab) ,
@@ -391,8 +382,7 @@ is_pmod_nav_alive() ->
         _:_ ->
             {error , unknown}
     end.
-%   error:{badmatch, {device, ?PMOD_NAV_SLOT, pmod_nav, _Pid, _Ref}} ->
-%     {error, no_pmod_nav};
+
 create_table(Name) ->
     case ets:info(Name, size) of
       undefined ->

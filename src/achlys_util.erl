@@ -156,21 +156,17 @@ sample_function() ->
     fun F() -> io:format("Sample function ! ~n") end.
 
 get_temperatures() ->
-    {ok,S} = lasp:query({<<"achlys@LaymerMac_temperature">> , state_awset}) ,
     {ok,S1} = lasp:query({<<"achlys@my_grisp_board_1_temperature">> , state_awset}) ,
     {ok,S2} = lasp:query({<<"achlys@my_grisp_board_2_temperature">> , state_awset}) ,
     {ok,S3} = lasp:query({<<"achlys@my_grisp_board_3_temperature">> , state_awset}) ,
-    logger:log(notice, "Mac Temp : ~p ~n", [ sets:to_list(S) ]) ,
     logger:log(notice, "Board 1 Temp : ~p ~n", [ sets:to_list(S1) ]) ,
     logger:log(notice, "Board 2 Temp : ~p ~n", [ sets:to_list(S2) ]) ,
     logger:log(notice, "Board 3 Temp : ~p ~n", [ sets:to_list(S3) ]).
 
 get_pressures() ->
-    {ok,S} = lasp:query({<<"achlys@LaymerMac_pressure">> , state_awset}) ,
     {ok,S1} = lasp:query({<<"achlys@my_grisp_board_1_pressure">> , state_awset}) ,
     {ok,S2} = lasp:query({<<"achlys@my_grisp_board_2_pressure">> , state_awset}) ,
     {ok,S3} = lasp:query({<<"achlys@my_grisp_board_3_pressure">> , state_awset}) ,
-    logger:log(notice, "Mac Press : ~p ~n", [ sets:to_list(S) ]) ,
     logger:log(notice, "Board 1 Press : ~p ~n", [ sets:to_list(S1) ]) ,
     logger:log(notice, "Board 2 Press : ~p ~n", [ sets:to_list(S2) ]) ,
     logger:log(notice, "Board 3 Press : ~p ~n", [ sets:to_list(S3) ]).

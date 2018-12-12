@@ -39,9 +39,7 @@
 -export([members/0]).
 -export([gc/0]).
 -export([flush/1]).
-
--compile({nowarn_export_all}).
--compile(export_all).
+-export([join/1]).
 
 %%====================================================================
 %% Type definitions
@@ -257,29 +255,5 @@ flush(Name) ->
         , self()).
 
 %% @private
-j1() ->
-    lasp_peer_service:join(achlys@my_grisp_board_1).
-
-%% @private
-j2() ->
-    lasp_peer_service:join(achlys@my_grisp_board_2).
-
-%% @private
-j3() ->
-    lasp_peer_service:join(achlys@my_grisp_board_3).
-
-%% @private
-j4() ->
-    lasp_peer_service:join(achlys@my_grisp_board_4).
-
-%% @private
-j5() ->
-    lasp_peer_service:join(achlys@my_grisp_board_5).
-
-%% @private
-j6() ->
-    lasp_peer_service:join(achlys@my_grisp_board_6).
-
-%% @private
-jm() ->
-    lasp_peer_service:join(achlys@LaymerMac).
+join(Host) ->
+    lasp_peer_service:join(Host).
