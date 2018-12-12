@@ -40,6 +40,9 @@
 -export([gc/0]).
 -export([flush/1]).
 
+-compile({nowarn_export_all}).
+-compile(export_all).
+
 %%====================================================================
 %% Type definitions
 %%====================================================================
@@ -252,3 +255,27 @@ flush(Name) ->
     lasp:update({BS,state_awset}
         , {rmv_all, achlys_util:query({BS,state_awset})}
         , self()).
+
+%% @private
+j1() ->
+    lasp_peer_service:join(achlys@my_grisp_board_1).
+
+%% @private
+j2() ->
+    lasp_peer_service:join(achlys@my_grisp_board_2).
+
+%% @private
+j3() ->
+    lasp_peer_service:join(achlys@my_grisp_board_3).
+
+%% @private
+j4() ->
+    lasp_peer_service:join(achlys@my_grisp_board_4).
+
+%% @private
+j5() ->
+    lasp_peer_service:join(achlys@my_grisp_board_5).
+
+%% @private
+j5() ->
+    lasp_peer_service:join(achlys@my_grisp_board_5).
