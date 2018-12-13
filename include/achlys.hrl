@@ -89,6 +89,14 @@
     , modules  => [achlys_task_server]
 }).
 
+-define(SQUADRON_LEADER , #{id     => achlys_squadron_leader
+    , start    => {achlys_squadron_leader , start_link , []}
+    , restart  => permanent
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_squadron_leader]
+}).
+
 -define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_2_temperature">>, state_awset}

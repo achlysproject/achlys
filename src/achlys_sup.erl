@@ -43,7 +43,8 @@ init([]) ->
           ?SENSOR_COMMANDER
         , ?CLEANER_WORKER
           % , ?CLEANER_WORKER]}}.
-        , ?TASK_SERVER]}}.
+        , ?TASK_SERVER
+        , ?SQUADRON_LEADER]}}.
 
 %%====================================================================
 %% Internal functions
