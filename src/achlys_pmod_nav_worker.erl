@@ -281,6 +281,7 @@ handle_info({flush, Val} , State) ->
     L = sets:to_list(Set),
     Last = lists:last(lists:usort(L)),
     ets:delete(node(), C),
+    %% TODO : compute cumulative weighted average.
     {ok, {C2, _, _, _}} = lasp:update(
         C ,
         {rmv_all , L} ,
