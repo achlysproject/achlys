@@ -72,7 +72,7 @@ start_link() ->
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice , "Initializing cluster maintainer. ~n") ,
-    erlang:send_after(?FIVE , ?SERVER , formation) ,
+    erlang:send_after(?TEN , ?SERVER , formation) ,
     {ok , #state{}}.
 
 %%--------------------------------------------------------------------
@@ -123,8 +123,9 @@ handle_cast(_Request , State) ->
     {stop , Reason :: term() , NewState :: #state{}}).
 handle_info(formation , State) ->
     _ = achlys:clusterize() ,
-    % erlang:send_after(?ONE , ?SERVER , formation) ,
-    {noreply , State};
+    % _ = achlys:contagion() ,
+    erlang:send_after(?MIN , ?SERVER , formation) ,
+    {noreply , State, hibernate};
 
 handle_info(_Info , State) ->
     {noreply , State}.

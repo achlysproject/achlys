@@ -100,11 +100,12 @@ clusterize() ->
 -spec contagion() -> [{ error , atom() } | { ok , atom() } ].
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
-    L = get_preys(),
-    Self = ?MANAGER:myself(),
-    [ bidirectional_join(R) || R <- L
-        ,        R =/= node()
-        ,        net_adm:ping(R) =:= pong].
+    % L = get_preys(),
+    % Self = ?MANAGER:myself(),
+    N = seek_neighbors() ,
+    Remotes = binary_remotes_to_atoms(N) ,
+    [ bidirectional_join(R) || R <- Remotes
+        ,        R =/= node()].
 
 %% @doc Close disterl TCP connections with neighboring nodes.
 -spec pandemia() -> ok.
@@ -191,7 +192,7 @@ seek_neighbors([]) ->
 
 %% @private
 join(Host) ->
-    try rpc:call(Host , lasp_peer_service:manager() , myself , []) of
+    try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
         #{channels := _Channels
         , listen_addrs := _Addresses
         , name := _Name
@@ -209,22 +210,35 @@ join(Host) ->
 
 %% @private
 bidirectional_join(Host) ->
-    try rpc:call(Host , lasp_peer_service:manager() , myself , []) of
-        #{channels := _Channels
-        , listen_addrs := _Addresses
-        , name := _Name
-        , parallelism := _Parallelism } = Node ->
-            ok = ?LPS:join(Node),
-            ok = rpc:call(Host,?LPS,join,[?MANAGER:myself()]),
-            {ok, Host}
+    Node = #{channels := _Channels
+    , listen_addrs := _Addresses
+    , name := _Name
+    , parallelism := _Parallelism } = try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , [])
     catch
-        {badrpc, Reason} ->
+        error:{badrpc, nodedown} ->
+            logger:log(error , "Unable to RPC remote : Node down~n") ,
+            {error, nodedown};
+        error:{badrpc, Reason} ->
             logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
             {error , Reason};
-        {error, Reason} ->
+        _:Reason ->
             logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
             {error , Reason}
-    end.
+    end,
+    lasp_peer_service:join(Node) ,
+    ok = try rpc:call(Host,lasp_peer_service,join,[partisan_hyparview_peer_service_manager:myself()])
+    catch
+        error:{badrpc, nodedown} ->
+            logger:log(error , "Unable to RPC remote : Node down~n") ,
+            {error, nodedown};
+        error:{badrpc, RemoteReason} ->
+            logger:log(error , "Unable to RPC remote : ~p~n" , [RemoteReason]) ,
+            {error , RemoteReason};
+        _:RemoteReason ->
+            logger:log(error , "Unable to retrieve remote : ~p~n" , [RemoteReason]) ,
+            {error , RemoteReason}
+    end,
+    Node.
 
 %% @private
 clusterize([H | Remotes]) ->

@@ -19,7 +19,7 @@ ets:match(temperature,'$1').
 ets:match(pressure,'$1').
 
 erlang:memory().
-
+inet_db:add_rc("/Users/Laymer/EdgeComputing/New/achlys/grisp/grisp_base/files/erl_inetrc").
 nodes().
 node().
 ets:delete(node(),{<<"achlys@LaymerMac_pressure">>,state_awset}).
@@ -252,8 +252,14 @@ ets:match(node()).
 
 
 % lasp:declare({<<"set">>,state_awset_ps},state_awset_ps).
+% lasp:declare({<<"set">>,state_awset},state_awset).
 % lasp_peer_service:join(achlys@LaymerMac).
 % lasp:join(#{channels => [undefined],listen_addrs => [#{ip => {169,254,16,6},port => 17768}],name => achlys@my_grisp_board_6,parallelism => 1}).
 % net_adm:ping(achlys@LaymerMac).
 % lasp:update({<<"set">>,state_awset_ps},{add, test},self()).
+% lasp:update({<<"set">>,state_awset},{add, test},self()).
 % lasp:query({<<"set">>,state_awset_ps}).
+% lasp:query({<<"set">>,state_awset}).
+% lasp:query({<<"achlys@my_grisp_board_1_temperature">>,state_awset}).
+% dets:sync(achlys@my_grisp_board_1).
+% dets:sync(node()).

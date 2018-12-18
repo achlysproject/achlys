@@ -174,7 +174,7 @@ handle_cast(run , State) ->
         #{poll_interval := P
         , aggregation_trigger := A} = V3,
         erlang:send_after(((P * A) + ?THREE), ?SERVER, {mean, K}),
-        erlang:send_after(((P * A * A) + ?FIVE), ?SERVER, {flush, K}),
+        % erlang:send_after(((P * A * A) + ?FIVE), ?SERVER, {flush, K}),
         V3
     end, I),
     erlang:send_after(?ONE , ?SERVER , poll) ,

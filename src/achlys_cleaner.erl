@@ -89,6 +89,7 @@ start_link() ->
 init(_Args) ->
     {ok, I} = achlys_config:get(gc_interval),
     erlang:send_after(I , ?SERVER , gc) ,
+    erlang:send_after(5000 , ?SERVER , dets_sync) ,
     {ok , #state{ gc_interval = I }}.
 
 %%--------------------------------------------------------------------
@@ -143,6 +144,18 @@ handle_cast(_Request , State) ->
 handle_info(gc , State) ->
     ok = achlys_util:do_gc() ,
     erlang:send_after(State#state.gc_interval , ?SERVER , gc) ,
+    {noreply , State};
+%%--------------------------------------------------------------------
+handle_info(dets_sync , State) ->
+    N = node(),
+    _ = case dets:info(N) of
+        undefined ->
+            logger:log(info, "No DETS table ~p, syncing not necessary ~n", [N]);
+        _ ->
+            ok = dets:sync(N) ,
+            logger:log(info, "Synced DETS table ~p ~n", [N])
+    end, 
+    erlang:send_after(5000 , ?SERVER , dets_sync) ,
     {noreply , State};
 
 handle_info(_Info , State) ->
