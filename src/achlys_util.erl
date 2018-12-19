@@ -15,6 +15,34 @@
 -compile(export_all).
 
 %%====================================================================
+%% Task model functions
+%%====================================================================
+
+get_pmod_nav_temp_task() ->
+    F = fun
+        () ->
+            logger:log(notice, "Executing pmod_nav_temp_task "),
+            achlys:venom()
+            % achlys:venom(),
+            % {TempId, _} = achlys_util:get_variable_identifier(temperature),
+            % InvariantFun = fun
+            %     % (TempId) ->
+            %     () ->
+            %         logger:log(notice, "Enforcing func for Id : ~p", [TempId]),
+            %         % lasp:read(Id, {cardinality, 3}),
+            %         ok = achlys_pmod_als_worker:terminate(normal, #{})
+            %         % L = achlys_util:query(Id),
+            %         % io:format("Temperatures : ~p", [L])
+            % end,
+            % % spawn(F(TempId))
+            % lasp:invariant(TempId, {cardinality, 3}, InvariantFun)
+    end,
+    #{name => pmod_nav_temp_task
+    , targets => ?TARGET_ALL_NODES
+    , execution_type => ?SINGLE_EXECUTION_TASK
+    , function => F}.
+
+%%====================================================================
 %% Utility functions
 %%====================================================================
 
@@ -41,6 +69,22 @@ gc_info() ->
 
 read_temp() ->
     pmod_nav:read(acc , [out_temp]).
+
+
+create_table(Name) ->
+    case ets:info(Name, size) of
+      undefined ->
+        T = ets:new(Name , [
+            ordered_set
+            , public
+            , named_table
+            , {heir , whereis(achlys_sup) , []}
+        ]);
+      _ ->
+        % TODO : check for existing table with ownership at achlys_sup PID
+        % and transfer if possible
+        Name
+    end.
 
 %% @todo reduce interleavings between modules
 %% and perform function calls without shortcuts in @module
@@ -144,11 +188,12 @@ do_disconnect(5) ->
 do_disconnect(6) ->
     net_kernel:disconnect(achlys@my_grisp_board_6).
 
-sample_task() ->
+add_sample_task() ->
     F = sample_function(),
     #{
         name => sample_task,
-        targets => all,
+        targets => ?TARGET_ALL_NODES,
+        execution_type => ?PERMANENT_TASK,
         function => F
     }.
 

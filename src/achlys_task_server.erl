@@ -121,9 +121,13 @@ handle_call(_Request , _From , State) ->
 handle_cast({add_task, Task} , State) ->
     #{name := Name
     , targets := _Targets
+    , execution_type := _ExecType
     , function := _Function} = Task,
+
+    Hash = erlang:phash2(erlang:term_to_binary(Task)),
+    
     logger:log(notice, "Adding Task with name : ~p ~n", [Name]),
-    {ok, {Id, _, _, _}} = lasp:update(State#state.identifier , {add , Task} , self()),
+    {ok, {Id, _, _, _}} = lasp:update(State#state.identifier , {add , {Task, Hash}} , self()),
     {noreply , State#state{identifier = Id}};
 
 handle_cast(_Request , State) ->

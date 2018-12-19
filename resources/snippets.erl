@@ -2,6 +2,29 @@
 %% Code snippets useful for erlang shell calls.
 %%====================================================================
 
+Self = partisan_hyparview_peer_service_manager:myself().
+Self = partisan_hyparview_peer_service_manager:myself(),R2 = rpc:call(achlys@my_grisp_board_2,partisan_hyparview_peer_service_manager,myself,[]).
+Self = partisan_hyparview_peer_service_manager:myself(),R6 = rpc:call(achlys@my_grisp_board_6,partisan_hyparview_peer_service_manager,myself,[]).
+Self = partisan_hyparview_peer_service_manager:myself(),R5 = rpc:call(achlys@my_grisp_board_5,partisan_hyparview_peer_service_manager,myself,[]).
+Self = partisan_hyparview_peer_service_manager:myself(),R4 = rpc:call(achlys@my_grisp_board_4,partisan_hyparview_peer_service_manager,myself,[]).
+R5 = rpc:call(achlys@my_grisp_board_5,partisan_hyparview_peer_service_manager,myself,[]).
+R3 = rpc:call(achlys@my_grisp_board_3,partisan_hyparview_peer_service_manager,myself,[]).
+R1 = rpc:call(achlys@my_grisp_board_1,partisan_hyparview_peer_service_manager,myself,[]).
+R2 = rpc:call(achlys@my_grisp_board_2,partisan_hyparview_peer_service_manager,myself,[]).
+lasp_peer_service:join(R5).
+lasp_peer_service:join(R3).
+lasp_peer_service:join(R1).
+lasp_peer_service:join(R2),rpc:call(achlys@my_grisp_board_2,lasp_peer_service,join,[Self]).
+lasp_peer_service:join(R6),rpc:call(achlys@my_grisp_board_6,lasp_peer_service,join,[Self]).
+lasp_peer_service:join(R4),rpc:call(achlys@my_grisp_board_4,lasp_peer_service,join,[Self]).
+lasp_peer_service:join(R5),rpc:call(achlys@my_grisp_board_5,lasp_peer_service,join,[Self]).
+rpc:call(achlys@my_grisp_board_5,lasp_peer_service,join,[Self]).
+rpc:call(achlys@my_grisp_board_1,lasp_peer_service,join,[Self]).
+achlys:members().
+
+
+T = #{name => t1,targets => <<0>>,execution_type => <<0>>,function => fun() -> io:format("hi :) ~n") end}.
+T3 = #{name => t3,targets => <<0>>,execution_type => <<1>>,function => fun() -> pmod_nav:read(alt, [press_out]) end}.
 pmod_nav:read(acc , [out_temp]).
 pmod_nav:read(alt , [press_out]).
 pmod_als:read().
@@ -58,12 +81,46 @@ lasp:query({<<"achlys@my_grisp_board_2_temperature">>,state_awset}).
 lasp:query({<<"achlys@my_grisp_board_4_temperature">>,state_awset}).
 lasp:query({<<"achlys@my_grisp_board_5_temperature">>,state_awset}).
 lasp:query({<<"achlys@my_grisp_board_3_temperature">>,state_awset}).
+lasp:query({<<"achlys@my_grisp_board_1_temperature">>,state_awset}).
 ets:match(node()).
 
+rpc:call(achlys@my_grisp_board_6, achlys, bane_all_preys, [temperature]).
+rpc:call(achlys@my_grisp_board_6, rpc, call, [achlys@my_grisp_board_3, achlys, bane_all_preys, [temperature]]).
 
 %%====================================================================
 %% Snippets from achlys_sup module
 %%====================================================================
+
+% {ok , {?SUPFLAGS(?THREE , ?TEN) , [
+%     %   ?SENSOR_COMMANDER
+%     % , ?CLEANER_WORKER
+%     , ?TASK_SERVER]}}.
+% , ?SQUADRON_LEADER]}}.
+
+
+% case maps:next(WorkersList) of
+%     {K, true, NextIter} ->
+%         extract_child_specs(K),
+%         body;
+%     % {K, true, none} ->
+%     %     body;
+%     none ->
+%         []
+% end.
+
+%% @private
+% extract_child_specs(K) ->
+
+
+%% @private
+% -spec squadron_leader_specs() -> [supervisor:child_spec()] | [].
+% squadron_leader_specs() ->
+%     case achlys_config:get(clustering) of
+%         true ->
+%             [?SQUADRON_LEADER];
+%         _ ->
+%             []
+%     end.
 
 % IsMap = is_map(Args) ,
 % case IsMap of

@@ -168,7 +168,7 @@ handle_cast(run , State) ->
         {ok, {Id,_,_,_}} = lasp:declare({SetId , state_awset}, state_awset),
 
         V2 = mapz:deep_put([crdt], Id , V1),
-        T = create_table(K),
+        T = achlys_util:create_table(K),
 
         V3 = mapz:deep_put([table], T , V2),
         #{poll_interval := P
@@ -318,8 +318,9 @@ handle_continue(_Continue , State) ->
 %%--------------------------------------------------------------------
 
 terminate(_Reason , _State) ->
-    ok = ets:tab2file(temperature, "temperature"),
-    ok = ets:tab2file(pressure, "pressure"),
+    % ok = ets:tab2file(temperature, "temperature"),
+    % ok = ets:tab2file(pressure, "pressure"),
+    dets:sync(node()),
     ok.
 
 %%--------------------------------------------------------------------
@@ -384,17 +385,3 @@ is_pmod_nav_alive() ->
             {error , unknown}
     end.
 
-create_table(Name) ->
-    case ets:info(Name, size) of
-      undefined ->
-        T = ets:new(Name , [
-            ordered_set
-            , public
-            , named_table
-            , {heir , whereis(achlys_sup) , []}
-        ]);
-      _ ->
-        % TODO : check for existing table with ownership at achlys_sup PID
-        % and transfer if possible
-        Name
-      end.

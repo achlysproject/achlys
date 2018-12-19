@@ -36,11 +36,15 @@ available on the Pmod_NAV :</p>
 <h2><a name="types">Data Types</a></h2>
 
 <h3 class="typedecl"><a name="type-task">task()</a></h3>
-<p><tt>task() = #{name =&gt; atom(), targets =&gt; <a href="#type-task_targets">task_targets()</a>, function =&gt; function()}</tt></p>
+<p><tt>task() = #{name =&gt; atom(), targets =&gt; <a href="#type-task_targets">task_targets()</a>, execution_type =&gt; <a href="#type-task_execution_type">task_execution_type()</a>, function =&gt; function()}</tt></p>
+
+
+<h3 class="typedecl"><a name="type-task_execution_type">task_execution_type()</a></h3>
+<p><tt>task_execution_type() = bitstring()</tt></p>
 
 
 <h3 class="typedecl"><a name="type-task_targets">task_targets()</a></h3>
-<p><tt>task_targets() = [node()] | all</tt></p>
+<p><tt>task_targets() = [node()] | bitstring()</tt></p>
 
 
 <h2><a name="index">Function Index</a></h2>

@@ -157,7 +157,7 @@ handle_cast(run , State) ->
         % Id = maybe_declare_crdt(K , state_awset_ps),
 
         V2 = mapz:deep_put([crdt], Id , V1),
-        T = create_table(K),
+        T = achlys_util:create_table(K),
 
         V3 = mapz:deep_put([table], T , V2),
         #{poll_interval := P
@@ -336,16 +336,3 @@ is_pmod_als_alive() ->
     end.
 %   error:{badmatch, {device, ?PMOD_ALS_SLOT, pmod_als, _Pid, _Ref}} ->
 %     {error, no_pmod_als};
-create_table(Name) ->
-    case ets:info(Name, size) of
-      undefined ->
-        T = ets:new(Name , [
-            ordered_set
-            , public
-            , named_table
-            , {heir , whereis(achlys_sup) , []}
-        ]);
-      _ ->
-        Name
-      end.
-    % T.

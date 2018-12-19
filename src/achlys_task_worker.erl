@@ -11,6 +11,7 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -behaviour(gen_server).
+% -behaviour(gen_flow).
 
 -include("achlys.hrl").
 
@@ -26,9 +27,33 @@
          terminate/2 ,
          code_change/3]).
 
--define(SERVER , ?MODULE).
 
--record(state , {}).
+%% gen_flow callbacks
+% -export([read/1]).
+% -export([process/2]).
+
+
+%%====================================================================
+%% Macros
+%%====================================================================
+
+-define(SERVER , ?MODULE).
+% 65536 bytes of heap on 32-bit systems (4-byte words) i.e. 16384 words
+% -define(MAX_HEAP_SIZE , (erlang:system_info(wordsize) * 1024 * 16)).
+-define(MAX_HEAP_SIZE , 16384).
+
+%%====================================================================
+%% Records
+%%====================================================================
+
+-record(state , {
+    % tasks :: [achlys:task(), {pid(), ref()}, pos_integer()],
+    tasks :: dict:dict(term(), term())
+    , available_slots :: pos_integer()
+}).
+
+-type state() :: #state{}.
+% -record(state, {source}).
 
 %%%===================================================================
 %%% API
@@ -69,7 +94,13 @@ start_link() ->
     {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
-    {ok , #state{}}.
+    logger:log(info, "Initializing task worker module"),
+    _Tab = achlys_util:create_table(task_history),
+    erlang:send_after(?TEN, ?SERVER, periodical_check),
+    {ok , #state{
+        tasks = dict:new()
+        , available_slots = 5
+    }}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -126,6 +157,57 @@ handle_cast(_Request , State) ->
     {noreply , NewState :: #state{}} |
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
+handle_info(periodical_check , State) ->
+    Tasks = achlys_util:query(?TASKS),
+    logger:log(info, "Task list : ~p", [Tasks]),
+
+    L = [ {H, spawn_task(T)} || {T, H} <- Tasks
+        , permanent_execution(T, H) =:= true
+        , dict:is_key(H, State#state.tasks) =:= false ],
+
+    logger:log(info, "New tasks : ~p", [L]),
+
+    NewDict = lists:foldl(fun
+        (Elem, AccIn) ->
+            {H, Proc} = Elem,
+            dict:store(H, Proc, AccIn)
+    end, State#state.tasks, L),
+
+    logger:log(info, "New dict : ~p", [NewDict]),
+
+    erlang:send_after(?HMIN, ?SERVER, periodical_check),
+    {noreply , State#state{tasks = NewDict}, hibernate};
+
+%%--------------------------------------------------------------------
+handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
+    
+    logger:log(info, "Task finished : ~p", [Ref]),
+    
+    NewDict = dict:filter(fun
+        (K, V) ->
+            case V =/= {Pid, Ref} of
+                true ->
+                    true;
+                false ->
+                    case ets:insert_new(task_history, {K, V}) of
+                        true  ->
+                            false;
+                        false ->
+                            logger:log(warning, "ets:insert_new failed for entry : ~p", [{K, V}]),
+                            false
+                    end
+            end
+    end, State#state.tasks),
+
+    true = erlang:demonitor(Ref, [flush]),
+
+    logger:log(info, "Task demonitored : ~p", [Ref]),
+    logger:log(info, "New dict : ~p", [NewDict]),
+    logger:log(info, "New Task history : ~p", [ets:match(task_history, '$1')]),
+    
+    {noreply , State#state{tasks = NewDict}};
+
+%%--------------------------------------------------------------------
 handle_info(_Info , State) ->
     {noreply , State}.
 
@@ -162,3 +244,39 @@ code_change(_OldVsn , State , _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @private
+spawn_task(Task) -> 
+    logger:log(info, "Spawning task : ~p", [Task]),
+    F = get_task_function(Task),
+    logger:log(info, "Func : ~p", [F]),
+    
+    {Pid, Ref} = erlang:spawn_opt(F, [monitor
+        , {max_heap_size, #{size => 16384
+            , kill => true
+            , error_logger => false}}
+        , {message_queue_data, off_heap}
+        , {fullsweep_after, 0}]),
+    
+    logger:log(info, "Spawned task ~p ", [Ref]),
+    {Pid, Ref}.
+
+%%--------------------------------------------------------------------
+%% @private
+get_task_function(Task) ->
+    #{function := F} = Task,
+    F.
+
+%%--------------------------------------------------------------------
+%% @private
+permanent_execution(T, H) ->
+    #{execution_type := ExecType} = T,
+    case ExecType of
+        ?PERMANENT_TASK ->
+            true;
+        ?SINGLE_EXECUTION_TASK ->
+            not ets:member(task_history, H);
+        _ ->
+            false
+    end.

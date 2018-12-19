@@ -38,14 +38,25 @@ start_link() ->
 -spec init(term()) ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
-    {ok , {?SUPFLAGS(?THREE , ?TEN) , [
-          % ?NAV_WORKER
-          ?SENSOR_COMMANDER
-        , ?CLEANER_WORKER
-          % , ?CLEANER_WORKER]}}.
-        , ?TASK_SERVER
-        , ?SQUADRON_LEADER]}}.
+    
+    {ok, WorkersMap} = achlys_config:get(workers),
+
+    WorkersSpecs = case erlang:is_map(WorkersMap) of
+        true ->
+            workers_specs(maps:to_list(WorkersMap));
+        _ ->
+            []
+    end,
+
+    ChildSpecs = [?TASK_SERVER, ?TASK_WORKER],
+
+    {ok , {?SUPFLAGS(?THREE , ?TEN) , lists:flatten(WorkersSpecs ++ ChildSpecs)}}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+%% @private
+-spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> [supervisor:child_spec()] | [].
+workers_specs(WorkersList) ->
+    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList, maps:is_key(K, ?WORKERS)].

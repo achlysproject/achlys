@@ -6,17 +6,8 @@
 -include_lib("kernel/include/file.hrl").
 
 -export_type([task_targets/0]).
+-export_type([task_execution_type/0]).
 -export_type([task/0]).
-
-%%====================================================================
-%% Types
-%%====================================================================
-
--type task_targets() :: [node()] | all.
-
--type task() :: #{name => atom(),
-                    targets => task_targets(),
-                    function => function()}.
 
 %%====================================================================
 %% Time Intervals (ms)
@@ -40,6 +31,10 @@
 %%====================================================================
 
 -define(TASKS , {<<"tasks">>, state_awset}).
+
+-define(TARGET_ALL_NODES, <<0>>).
+-define(PERMANENT_TASK, <<0>>).
+-define(SINGLE_EXECUTION_TASK, <<1>>).
 
 %% Thanks to https://github.com/erszcz
 %% Helper macro for declaring children of supervisor
@@ -89,6 +84,14 @@
     , modules  => [achlys_task_server]
 }).
 
+-define(TASK_WORKER , #{id     => achlys_task_worker
+    , start    => {achlys_task_worker , start_link , []}
+    , restart  => permanent
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_task_worker]
+}).
+
 -define(SQUADRON_LEADER , #{id     => achlys_squadron_leader
     , start    => {achlys_squadron_leader , start_link , []}
     , restart  => permanent
@@ -96,6 +99,11 @@
     , type     => worker
     , modules  => [achlys_squadron_leader]
 }).
+
+-define(WORKERS, #{clustering => ?SQUADRON_LEADER
+    , cleaning => ?CLEANER_WORKER
+    , sensing => ?SENSOR_COMMANDER
+}). 
 
 -define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
@@ -112,3 +120,19 @@
                     , {<<"achlys@my_grisp_board_4_pressure">>, state_awset}
                     , {<<"achlys@my_grisp_board_5_pressure">>, state_awset}
                     , {<<"achlys@my_grisp_board_6_pressure">>, state_awset}]).
+
+
+%%====================================================================
+%% Types
+%%====================================================================
+
+% -type task_targets() :: [node()] | ?TARGET_ALL_NODES.
+-type task_targets() :: [node()] | bitstring().
+
+% -type task_execution_type() :: ?PERMANENT_TASK | ?SINGLE_EXECUTION_TASK.
+-type task_execution_type() :: bitstring().
+
+-type task() :: #{name => atom(),
+                    targets => task_targets(),
+                    execution_type => task_execution_type(),
+                    function => function()}.
