@@ -4,7 +4,7 @@
 %
 %% Edge wireless laptop node :
 %% Replace <hostname> with the value returned by the "hostname -s" command.
-{host, {169,254,187,90}, ["LaymerMac"]}.
+{host, {169,254,187,90}, ["<hostname>"]}.
 
 %--- GRiSP boards --------------------------------------------------------------
 
