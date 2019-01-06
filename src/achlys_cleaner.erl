@@ -89,7 +89,7 @@ start_link() ->
 init(_Args) ->
     {ok, I} = achlys_config:get(gc_interval),
     erlang:send_after(I , ?SERVER , gc) ,
-    erlang:send_after(5000 , ?SERVER , dets_sync) ,
+    % erlang:send_after(5000 , ?SERVER , dets_sync) ,
     {ok , #state{ gc_interval = I }}.
 
 %%--------------------------------------------------------------------
@@ -154,7 +154,7 @@ handle_info(dets_sync , State) ->
         _ ->
             ok = dets:sync(N) ,
             logger:log(info, "Synced DETS table ~p ~n", [N])
-    end, 
+    end,
     erlang:send_after(5000 , ?SERVER , dets_sync) ,
     {noreply , State};
 
