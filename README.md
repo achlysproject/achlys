@@ -1,5 +1,9 @@
 # Achlys
-The Achlys framework is a tool designed to help application developers build Erlang/OTP programs using the [Lasp](https://lasp-lang.readme.io) libraries and running on [GRiSP](https://grisp.org) embedded systems in a wireless sensor network configuration. A more detailed description is available in this [document](https://github.com/Laymer/achlys-description/blob/master/Achlys.pdf).
+The Achlys framework is a tool designed to help application developers build Erlang/OTP programs using the [Lasp](https://lasp-lang.readme.io) libraries and running on [GRiSP](https://grisp.org) embedded systems in a wireless sensor network configuration. A more detailed description is available in this [document](https://github.com/Laymer/achlys-description/blob/master/Achlys.pdf) or by scanning the QR Code below :
+
+<p align="center">
+  <img src="resources/qr.png" width="20%" height="20%" alt="me"/>
+</p>
 
 Achlys is being developed in the context of edge computing research within the H2020 [LightKone](https://lightkone.eu) project. The 2 main objectives of the framework are to provide :
 
