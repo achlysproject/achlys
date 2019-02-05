@@ -41,6 +41,34 @@
 -export([flush/1]).
 -export([join_host/1]).
 
+
+
+%%====================================================================
+%% TODO: Binary encoding of values propagated through CRDTs instead
+%% of propagating tuples directly in the cluster
+%%
+%% 32 bits :
+%%
+%% first 8 bits :
+%% [_][_] [_][_]  [_][_] [_][_]
+%%                |--------------> 4 bits for node ID : [0][0] [0][0]
+%%                |--------------> 4 bits for node ID : [0][0] [0][1]
+%%                                                          ...
+%%                |--------------> 4 bits for node ID : [1][1] [1][1]
+%%        |----|---------> 2 bits for value type : [0][0] => temperature
+%%        |----|---------> 2 bits for value type : [0][1] => pressure
+%%        |----|---------> 2 bits for value type : [1][0] => light
+%%        |----|---------> 2 bits for value type : [1][1] => humidity
+%%
+%% 8-16 bits :
+%% [_][_] [_][_]  [_][_] [_][_]
+%%        |-------------> 8 bits for aggregations count : 0 to 255
+%%
+%% 14-32 bits :
+%% [_][_] [_][_]  [_][_] [_][_]  [_][_] [_][_]  [_][_]
+%% |-------------> 14 bits for aggregation value : 0 to 262 143
+%%====================================================================
+
 %%====================================================================
 %% Type definitions
 %%====================================================================
