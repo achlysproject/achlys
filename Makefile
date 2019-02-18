@@ -12,7 +12,7 @@ PDFDIR			?=	$(BASE_DIR)/doc/internal
 REBAR_APPEND	?= {extra_src_dirs, [\"$(GRISP_TEST_SRC_DIR)\"]}.
 
 .PHONY: compile shell testshell deploy \
-	clean buildclean grispclean cacheclean ⁠fullclean testsrc rel addemu rmvemu
+	wipe clean buildclean grispclean cacheclean ⁠fullclean testsrc rel addemu rmvemu
 	# cleaning targets :
 	# command-line utils
 
@@ -29,6 +29,9 @@ compile:
 ##
 ## Cleaning targets
 ##
+
+wipe:
+	mkdir $(BASE_DIR)/empty && rsync -r --delete $(BASE_DIR)/empty/ $(BASE_DIR)/_build/ && rmdir $(BASE_DIR)/_build/
 
 clean: buildclean relclean
 	$(REBAR) clean
@@ -53,6 +56,9 @@ relclean:
 #
 # Test targets
 #
+
+setaddr:
+	networksetup -setmanual "Wi-Fi" 169.254.187.90 255.255.0.0 169.254.187.90
 
 shell: addemu
 	$(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
