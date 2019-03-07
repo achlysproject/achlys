@@ -22,8 +22,12 @@ get(Key) ->
     application:get_env(achlys , Key).
 
 %% @equiv application:get_env(achlys, Key, Default)
--spec get(atom() , term()) -> {ok , term()}.
+-spec get(atom() , term()) -> term().
 get(Key , Default) ->
+    %% NOTE : get/2 was initially wrongly success typed with {ok, term()}
+    %% but it will obviously always return the retrieved value or the default
+    %% hence it never fails, even if the process does not exist.
+    %% The typing is simply any term
     application:get_env(achlys , Key , Default).
 
 %% @equiv application:set_env(achlys, Par, Val)

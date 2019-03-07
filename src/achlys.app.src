@@ -20,7 +20,7 @@
     {mod , {achlys_app , []}} ,
     {applications , [kernel
         ,            stdlib
-        ,            sasl
+        % ,            sasl
         ,            grisp
         % ,            lager
         ,            partisan

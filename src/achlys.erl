@@ -7,6 +7,47 @@
 %%% @end
 %%% Created : 06. Nov 2018 20:38
 %%%-------------------------------------------------------------------
+%%% joeerl Creator of Erlang
+%%% Dec '17
+%%%
+%%% You have to remember that any SQL database will be a bottleneck since
+%%% there is an impedance mismatch between the way dayt is represented in a
+%%% daybase and the way it is represented in the beam VM.
+%%%
+%%% Databases are basically rectangular tables of cells, where the cells
+%%% contain very simple types like strings and integers - every time you access a
+%%% row of an external database this list of cells has to be converted to
+%%% beam internal data structures - this conversion is extremely expensive.
+%%%
+%%% The best way to persist data is in a process - then no conversion is needed,
+%%% but this is not fault tolerant - so you need to keep a trail of updates
+%%% to the data and store this on disk.
+%%%
+%%% Often you don’t need a database for example you might like to have a system
+%%% where you store all the user data as in the file system with “one file per user”
+%%% this will scale very nicely - just move the files to a new machine
+%%% if you need more capacity.
+%%%
+%%% Erlang has two primitives term_to_binary and the inverse binary_to_term that
+%%% serialise any term and reconstruct it - so storing complex terms on disk
+%%% is really easy.
+%%%
+%%% I have mixed feelings about databases, they are great for aggregate operations
+%%% (for example, find all users that have these attributes) but terrible for
+%%% operations on individual users (where a single file per user is far better).
+%%%
+%%% If I were designing a new system I’d go for ‘one file per user’ as much as
+%%% possible and try to limit databases for operations over all users.
+%%%
+%%% If you look at how many programs are designed you’ll see they follow
+%%% this principle. Apple stores all images in the file system (hidden a bit)
+%%% and has a database with metadata about the files. This is good since
+%%% the database is small
+%%% and many operations can be performed with minimal use of the database.
+%%% What they do not do is put all the data in a database - there are good
+%%% reasons for this.
+%%%-------------------------------------------------------------------
+
 -module(achlys).
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
@@ -41,6 +82,8 @@
 -export([flush/1]).
 -export([join_host/1]).
 
+-export([bench/0]).
+-export([get_bench/0]).
 
 
 %%====================================================================
@@ -177,8 +220,12 @@ bane_all_preys(Data) ->
 % bane([]) ->
 %     [].
 
+bench() ->
+    achlys_pmod_nav_worker:bench_awset().
 
-
+get_bench() ->
+    {ok, S} = lasp:query({<<"bench">>,state_awset}),
+    sets:to_list(S).
 %% @doc Collect data based on sensors available on Pmod modules and store
 %% aggregated values in corresponding Lasp variable.
 -spec venom() -> ok.

@@ -11,7 +11,7 @@ PDFDIR			?=	$(BASE_DIR)/doc/internal
 
 REBAR_APPEND	?= {extra_src_dirs, [\"$(GRISP_TEST_SRC_DIR)\"]}.
 
-.PHONY: compile shell testshell deploy \
+.PHONY: compile shell testshell deploy setaddr \
 	wipe clean buildclean grispclean cacheclean ⁠fullclean testsrc rel addemu rmvemu
 	# cleaning targets :
 	# command-line utils

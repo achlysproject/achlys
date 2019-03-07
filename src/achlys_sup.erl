@@ -38,7 +38,7 @@ start_link() ->
 -spec init(term()) ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
-    
+
     {ok, WorkersMap} = achlys_config:get(workers),
 
     WorkersSpecs = case erlang:is_map(WorkersMap) of
@@ -48,9 +48,9 @@ init([]) ->
             []
     end,
 
-    ChildSpecs = [?TASK_SERVER, ?TASK_WORKER],
+    ChildSpecs = [?PMOD_WORKER_SUPERVISOR, ?TASK_SERVER, ?TASK_WORKER],
 
-    {ok , {?SUPFLAGS(?THREE , ?TEN) , lists:flatten(WorkersSpecs ++ ChildSpecs)}}.
+    {ok , {?SUPFLAGS(?THREE , ?TEN) , lists:flatten(ChildSpecs ++ WorkersSpecs)}}.
 
 %%====================================================================
 %% Internal functions
