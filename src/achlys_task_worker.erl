@@ -132,6 +132,10 @@ handle_call(_Request , _From , State) ->
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
 handle_cast({start_task, TaskName} , State) ->
+    % [{#{execution_type => permanent,
+    % function => #Fun<achlys_util.0.125162635>,name => rb,
+    % targets => all},
+    % 91831205}]
     %% TODO : basic approach for generic task execution can be done using :
     %% List = achlys:get_all_tasks(),
     %% T = hd([ X || X <- List, #{name := N} = X, N =:= TaskName ]),
@@ -180,9 +184,9 @@ handle_info(periodical_check , State) ->
 
 %%--------------------------------------------------------------------
 handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
-    
+
     logger:log(info, "Task finished : ~p", [Ref]),
-    
+
     NewDict = dict:filter(fun
         (K, V) ->
             case V =/= {Pid, Ref} of
@@ -204,7 +208,7 @@ handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
     logger:log(info, "Task demonitored : ~p", [Ref]),
     logger:log(info, "New dict : ~p", [NewDict]),
     logger:log(info, "New Task history : ~p", [ets:match(task_history, '$1')]),
-    
+
     {noreply , State#state{tasks = NewDict}};
 
 %%--------------------------------------------------------------------
@@ -247,18 +251,18 @@ code_change(_OldVsn , State , _Extra) ->
 
 %%--------------------------------------------------------------------
 %% @private
-spawn_task(Task) -> 
+spawn_task(Task) ->
     logger:log(info, "Spawning task : ~p", [Task]),
     F = get_task_function(Task),
     logger:log(info, "Func : ~p", [F]),
-    
+
     {Pid, Ref} = erlang:spawn_opt(F, [monitor
         , {max_heap_size, #{size => 16384
             , kill => true
             , error_logger => false}}
         , {message_queue_data, off_heap}
         , {fullsweep_after, 0}]),
-    
+
     logger:log(info, "Spawned task ~p ", [Ref]),
     {Pid, Ref}.
 

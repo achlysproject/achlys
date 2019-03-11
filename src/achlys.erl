@@ -20,6 +20,7 @@
 %% Task model API
 -export([get_all_tasks/0]).
 -export([bite/1]).
+-export([declare/4]).
 
 %% API
 -export([clusterize/0]).
@@ -41,6 +42,8 @@
 -export([flush/1]).
 -export([join_host/1]).
 
+-export([rainbow/0]).
+
 %%====================================================================
 %% Type definitions
 %%====================================================================
@@ -50,7 +53,8 @@
 %%====================================================================
 
 % -define(MANAGER,    lasp_peer_service:manager()).
--define(MANAGER,    partisan_hyparview_peer_service_manager).
+% -define(MANAGER,    partisan_hyparview_peer_service_manager).
+-define(MANAGER,    partisan_default_peer_service_manager).
 -define(LPS,    lasp_peer_service).
 
 %% ===================================================================
@@ -78,6 +82,36 @@ stop() ->
 get_all_tasks() ->
     {ok, Set} = lasp:query(?TASKS),
     sets:to_list(Set).
+
+%% @doc Shortcut function exposing the utility function that can be
+%% used to pass more readable arguments to create a task model variable
+%% instead of binary strings. The ExecType argument can currently not
+%% provide a transient mode, a task is executed either once or permanently.
+%% Removing the task from the CRDT does not prevent nodes to keep executing it.
+%% But similar behavior can be created with a single execution task that
+%% specifies a function with several loops. However this does not allow the
+%% worker to have full control over the load, since backpressure can be applied
+%% by spawning a process that executes a permanent task at a controlled
+%% frequency that can be based on any stress parameter. Meanwhile a single
+%% execution task could possibly overload the worker, as iterations are
+%% embedded inside a single process.
+%%
+%% When Grow-only Counters and Sets are used, the transient can be achieved
+%% using Lasp's monotonic read function to have a distributed treshold.
+%%
+%%
+-spec declare(Name::atom()
+    , Targets::[node()] | all
+    , ExecType::single | permanent
+    , Func::function()) -> task() | erlang:exception().
+declare(Name, Targets, ExecType, Func) ->
+    achlys_util:declare(Name, Targets, ExecType, Func).
+    % {ok, Set} = lasp:query(?TASKS),
+    % sets:to_list(Set).
+
+-spec rainbow() -> erlang:function().
+rainbow() ->
+    achlys_util:rainbow().
 
 %% @doc Adds the given task in the replicated task set.
 %% @see achlys_task_server:add_task/1.
@@ -192,7 +226,8 @@ seek_neighbors([]) ->
 
 %% @private
 join(Host) ->
-    try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
+    % try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
+    try rpc:call(Host , partisan_default_peer_service_manager , myself , []) of
         #{channels := _Channels
         , listen_addrs := _Addresses
         , name := _Name

@@ -18,6 +18,152 @@
 %% Task model functions
 %%====================================================================
 
+%% @doc Returns the task model variable based on the given arguments
+%% in the form of a map.
+% -spec declare(atom()
+%     , achlys:task_targets()
+%     , achlys:task_execution_type()
+%     , function())) -> {ok , achlys:task()} | {error, atom()}.
+% -spec pop({fifo, In::list(), Out::list()}) -> {term(), {fifo, list(), list()}}.
+% -spec pop({fifo, In::list(), Out::list()}) -> {term(), {fifo, list(), list()}}.
+%% Actual types to be found in resulting task variable :
+% , Targets::task_targets()
+% , ExecType::task_execution_type()
+% , Func::function()) -> {ok, task()} | {error, atom()}.
+% , Func::function()) -> task() | erlang:exception().
+% true when is_list(Targets) ->
+%     form_map(Name, Targets, ExecType, Func);
+% _ ->
+%     logger:log(critical, "Could not form task ~n"),
+%     {error, form_map}
+% , Func::function()) -> task() | {error, form_map}.
+
+
+
+-spec rainbow() -> erlang:function().
+rainbow() ->
+    Func = fun() ->
+        Random = fun() ->
+            {rand:uniform(2) - 1, rand:uniform(2) -1, rand:uniform(2) - 1}
+        end,
+        _ = [grisp_led:pattern(L, [{100, Random}]) || L <- [1,2]]
+    end,
+    Func.
+
+-spec declare(Name::atom()
+    , Targets::[node()] | all
+    , ExecType::single | permanent
+    , Func::function()) -> task() | erlang:exception().
+declare(Name, Targets, ExecType, Func) ->
+    try lists:member(ExecType, [single, permanent]) of
+        true when Targets =:= all orelse is_list(Targets) ->
+            form_map(Name, Targets, ExecType, Func)
+    catch
+        Exception:Reason -> {caught, Exception, Reason}
+    end.
+
+form_map(Name, Targets, ExecType, Func) ->
+        #{name => Name
+        , targets => task_flag(Targets)
+        , execution_type => task_flag(ExecType)
+        , function => Func}.
+
+task_flag(all) ->
+    <<0>>;
+task_flag(permanent) ->
+    <<0>>;
+task_flag(single) ->
+    <<1>>;
+task_flag(Args) ->
+    Args.
+% end
+%     try
+%         lists:member(ExecType, [single, permanent]) andalso
+%     of
+%         true ->
+%             form_map(Name, Targets, ExecType, Func);
+%     catch
+%         Exception:Reason -> {caught, Exception, Reason}
+%     end.
+% declare(Name, Targets, ExecType, Func) ->
+%     try
+%         lists:member(ExecType, [single, permanent])
+%     of
+%         true ->
+%             form_map(Name, Targets, ExecType, Func);
+%     catch
+%         Exception:Reason -> {caught, Exception, Reason}
+%     end.
+% declare(Name, Targets, ExecType, Func) ->
+%     form_map(Name, Targets, ExecType, Func) ->
+%         form_map(Name, Targets, ExecType, Func).
+%
+%
+% declare(Name, Targets, ExecType, Func) when is_list(Targets) ; ExecType =:= permanent ->
+% declare(Name, Targets, ExecType, Func) when Targets =:= all ; ExecType =:= single ->
+% declare(Name, Targets, ExecType, Func) when Targets =:= all ; ExecType =:= permanent ->
+% declare(Name, Targets, ExecType, Func) when is_list(Targets) ; ExecType =:= single ->
+%     try
+%         logger:log(notice, "Executing try statement "),
+%         #{name => Name
+%         , targets => Targets
+%         , execution_type => ExecType
+%         , function => Func}
+%     catch
+%         Exception:Reason -> {caught, Exception, Reason}
+%     end;
+% declare(Name, Targets, ExecType, Func) when is_list(Targets) ; ExecType =:= permanent ->
+%     try
+%         logger:log(notice, "Executing try statement "),
+%         #{name => Name
+%         , targets => Targets
+%         , execution_type => ExecType
+%         , function => Func}
+%     catch
+%         Exception:Reason -> {caught, Exception, Reason}
+%     end;
+% declare(Name, Targets, ExecType, Func) when Targets =:= all ; ExecType =:= single ->
+%     try
+%         logger:log(notice, "Executing try statement "),
+%         #{name => Name
+%         , targets => Targets
+%         , execution_type => ExecType
+%         , function => Func}
+%     catch
+%             Exception:Reason -> {caught, Exception, Reason}
+%     end.
+% declare(Name, Targets, ExecType, Func) when Targets =:= all ; ExecType =:= single ->
+%     try
+%         logger:log(notice, "Executing try statement "),
+%         #{name => Name
+%         , targets => Targets
+%         , execution_type => ExecType
+%         , function => Func}
+%     catch
+%             Exception:Reason -> {caught, Exception, Reason}
+%     end.
+
+% talk(),
+% _Knight = "None shall Pass!",
+% _Doubles = [N*2 || N <- lists:seq(1,100)],
+% throw(up),
+% _WillReturnThis = tequila
+% of
+%     tequila -> "hey this worked!"
+    % M = #{name => Name
+    % , targets => Targets
+    % , execution_type => ExecType
+    % , function => Func}.
+
+ledtask() ->
+    Func = fun
+        () ->
+            logger:log(notice, "Executing ledtask "),
+            grisp_led:color(1, blue),
+            grisp_led:color(1, red),
+            grisp_led:color(1, blue)
+    end.
+
 get_pmod_nav_temp_task() ->
     F = fun
         () ->

@@ -30,7 +30,8 @@
 %% Common Macros
 %%====================================================================
 
--define(TASKS , {<<"tasks">>, state_awset}).
+% -define(TASKS , {<<"tasks">>, state_awset}).
+-define(TASKS , {<<"tasks">>, state_gset}).
 
 -define(TARGET_ALL_NODES, <<0>>).
 -define(PERMANENT_TASK, <<0>>).
@@ -103,7 +104,7 @@
 -define(WORKERS, #{clustering => ?SQUADRON_LEADER
     , cleaning => ?CLEANER_WORKER
     , sensing => ?SENSOR_COMMANDER
-}). 
+}).
 
 -define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}

@@ -12,8 +12,10 @@ PDFDIR			?=	$(BASE_DIR)/doc/internal
 REBAR_APPEND	?= {extra_src_dirs, [\"$(GRISP_TEST_SRC_DIR)\"]}.
 
 .PHONY: compile shell testshell deploy \
-	clean buildclean grispclean cacheclean ⁠fullclean testsrc rel addemu rmvemu
+	testsrc rel addemu rmvemu \
 	# cleaning targets :
+	clean buildclean grispclean cacheclean ⁠fullclean  \
+	libclean hexclean pluginsclean
 	# command-line utils
 
 
@@ -30,23 +32,31 @@ compile:
 ## Cleaning targets
 ##
 
-clean: buildclean relclean
+# clean: buildclean hexclean cacheclean
+# 	$(REBAR) clean
+clean: buildclean libclean pluginsclean
 	$(REBAR) clean
 
 ⁠fullclean: buildclean grispclean cacheclean relclean
 	$(REBAR) clean
 
 buildclean:
-	rm -rdf $(BASE_DIR)/_build/*/lib/*/ebin/*
+	rm -rdf $(BASE_DIR)/_build/*
 
 grispclean:
 	rm -rdf $(BASE_DIR)/_grisp
 
+cacheclean:
+	rm -rdf $(CACHE_DIR)/lib/rebar/ebin/*
+
+libclean:
+	rm -rdf $(CACHE_DIR)/lib/rebar/ebin/*
+
+pluginsclean:
+	rm -rdf $(CACHE_DIR)/plugins/*/ebin/*
+
 hexclean:
 	rm -rdf $(CACHE_DIR)/hex/hexpm/packages/*
-
-cacheclean:
-	rm -rdf $(CACHE_DIR)/lib/*/ebin/*
 
 relclean:
 	rm -rdf $(BASE_DIR)/_build/*/rel

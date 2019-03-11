@@ -72,7 +72,8 @@ start_link() ->
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice , "Initializing cluster maintainer. ~n") ,
-    erlang:send_after(?TEN , ?SERVER , formation) ,
+    schedule_ping(),
+    % erlang:send_after(?TEN , ?SERVER , formation) ,
     {ok , #state{}}.
 
 %%--------------------------------------------------------------------
@@ -125,7 +126,15 @@ handle_info(formation , State) ->
     _ = achlys:clusterize() ,
     % _ = achlys:contagion() ,
     erlang:send_after(?MIN , ?SERVER , formation) ,
-    {noreply , State, hibernate};
+    % {noreply , State, hibernate};
+    {noreply , State};
+
+handle_info(ping , State) ->
+    L = pinger() ,
+    % _ = achlys:contagion() ,
+    erlang:send_after(15000 , ?SERVER , ping) ,
+    % {noreply , State, hibernate};
+    {noreply , State};
 
 handle_info(_Info , State) ->
     {noreply , State}.
@@ -163,3 +172,36 @@ code_change(_OldVsn , State , _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%%  Cluster pinger
+%% @spec pinger() -> {ok , Reached :: [node()]} | {error , Reason :: term()})
+%% @end
+%%--------------------------------------------------------------------
+-spec(pinger() ->
+    {ok , Reached :: [node()]} | {error , Reason :: term()}).
+pinger() ->
+    Self = node(),
+    L = achlys_config:get(boards, []),
+    Reached = [ N || N <- L
+                    , net_adm:ping(N) =:= pong
+                    , N =/= Self ],
+    pinger(Reached).
+-spec(pinger([node()]) ->
+    {ok , Reached :: [node()]} | {error , Reason :: term()}).
+pinger(Reached) ->
+    L = [ N || N <- Reached, lasp_peer_service:join(N) =:= ok ],
+    case length(L) < Reached of
+        true ->
+            logger:log(critical, "Reachable : ~p ~n", [Reached]),
+            logger:log(critical, "Joined : ~p ~n", [L]),
+            Reached -- L;
+        _ ->
+            L
+    end.
+
+schedule_ping() ->
+    % erlang:send_after(15000 , ?SERVER , ping).
+    erlang:send_after(15000 , ?SERVER , formation).
