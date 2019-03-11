@@ -88,6 +88,83 @@ rpc:call(achlys@my_grisp_board_6, achlys, bane_all_preys, [temperature]).
 rpc:call(achlys@my_grisp_board_6, rpc, call, [achlys@my_grisp_board_3, achlys, bane_all_preys, [temperature]]).
 
 %%====================================================================
+%% GrispLasp function with Elixir Numerix module and extension of Lasp
+%% Union with UnionFold function
+%%====================================================================
+meteorological_statistics(SampleCount, SampleInterval, Trigger) ->
+    % Must check if module is available
+    {pmod_nav, Pid, _Ref} = node_util:get_nav(),
+    % meteo = shell:rd(meteo, {press = [], temp = []}),
+    % State = #{press => [], temp => [], time => []},
+    State = maps:new(),
+    State1 = maps:put(press, [], State),
+    State2 = maps:put(temp, [], State1),
+    State3 = maps:put(time, [], State2),
+
+    FoldFun = fun
+        (Elem, AccIn) when is_integer(Elem) andalso is_map(AccIn) ->
+            timer:sleep(SampleInterval),
+            T = node_stream_worker:maybe_get_time(),
+            % T = calendar:local_time(),
+            [Pr, Tmp] = gen_server:call(Pid, {read, alt, [press_out, temp_out], #{}}),
+            % [Pr, Tmp] = [1000.234, 29.55555],
+            #{press => maps:get(press, AccIn) ++ [Pr],
+            temp => maps:get(temp, AccIn) ++ [Tmp],
+            time => maps:get(time, AccIn) ++ [T]}
+    end,
+
+    M = lists:foldl(FoldFun, State3, lists:seq(1, SampleCount)),
+    [Pressures, Temperatures, Epochs] = maps:values(M),
+
+    Result = #{measures => lists:zip3(Epochs, Pressures, Temperatures),
+        pmean => 'Elixir.Numerix.Statistics':mean(Pressures),
+        pvar => 'Elixir.Numerix.Statistics':variance(Pressures),
+        tmean => 'Elixir.Numerix.Statistics':mean(Temperatures),
+        tvar => 'Elixir.Numerix.Statistics':variance(Temperatures),
+        cov => 'Elixir.Numerix.Statistics':covariance(Pressures, Temperatures)},
+    % {ok, {Id, _, _, _}} = hd(node_util:declare_crdts([meteostats])),
+    % {ok, {NewId, NewT, NewM, NewV}} = lasp:update(Id, {add, {node(), Result}}, self()),
+    {ok, {Id, _, _, _}} = hd(node_util:declare_crdts([node()])),
+    % {ok, {ExecId, _, _, _}} = hd(node_util:declare_crdts([executors])),
+    % {ok, {ChunksId, _, _, _}} = lasp:declare({"<<chunks>>", state_gcounter}, state_gcounter),
+    {ok, {ExecId, _, _, _}} = lasp:declare({"<<executors>>", state_gset}, state_gset),
+    % {ok, {ExecId, _, _, _}} = lasp:declare({"<<executors>>", state_gset}, state_gset).
+    {ok, {NewId, NewT, NewM, NewV}} = lasp:update(Id, {add, Result}, self()),
+
+    % {ok, {NewId, NewT, NewM, NewV}} = lasp:update({<<"test">>, state_gset}, {add, "hello"}, self()),
+    % lasp:update({<<"executors">>}, {add, NewId}, self()),
+    % {ok, {_, _, _, _}} = lasp:update(ExecId, {add, NewId}, self()),
+    lasp:update(ExecId, {add, NewId}, self()),
+    % lasp:update({"<<chunks>>", state_gcounter}, increment, self()),
+    % node_app:add_task_meteo().
+    % {ok, Set} = lasp:query({<<"node@GrispAdhoc">>, state_gset}).
+    % sets:to_list(Set).
+    spawn(fun() ->
+        lasp:read(ExecId, {cardinality, Trigger}),
+        % ExecId = node_util:atom_to_lasp_identifier(executors,state_gset),
+        % NOTE : lasp:read() WILL block current process regardless
+        % if the minimim value has been reached, must ALWAYS be spawned in subprocess
+        {ok, Set} = lasp:query(ExecId),
+        % {ok, Set} = lasp:query({"<<executors>>", state_gset}),
+        L = sets:to_list(Set),
+        % io:format("Values = ~p ~n", L),
+        [ io:format("Set = ~p ~n", [X]) || X <- L],
+        [H|T] = L,
+        UnionFold = fun
+            (SetName, AccIn) ->
+                {UID, Num} = AccIn,
+                % Right = node_util:atom_to_lasp_identifier(SetName,state_orset),
+                UNum = list_to_bitstring("union" ++ integer_to_list(Num)),
+                {ok, {UnionId, _, _, _}} = lasp:declare({UNum, state_orset}, state_orset),
+                lasp:union(UID, SetName, UnionId),
+                {UnionId, Num + 1}
+        end,
+        lists:foldl(UnionFold, {H, 1}, T)
+    end),
+
+{ok, {NewId, NewT, NewM, NewV}}.
+
+%%====================================================================
 %% Snippets from achlys_sup module
 %%====================================================================
 
@@ -306,7 +383,7 @@ rpc:call(achlys@my_grisp_board_6, rpc, call, [achlys@my_grisp_board_3, achlys, b
 % end,
 % erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
 % maybe_run_workers(Streams),
-%% 
+%%
 
 % lasp:declare({<<"set">>,state_awset_ps},state_awset_ps).
 % lasp:declare({<<"set">>,state_awset},state_awset).

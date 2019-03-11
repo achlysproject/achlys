@@ -43,6 +43,8 @@
 -export([join_host/1]).
 
 -export([rainbow/0]).
+-export([irrigate/0]).
+-export([mintemp/0]).
 
 %%====================================================================
 %% Type definitions
@@ -112,6 +114,47 @@ declare(Name, Targets, ExecType, Func) ->
 -spec rainbow() -> erlang:function().
 rainbow() ->
     achlys_util:rainbow().
+
+-spec irrigate() -> erlang:function().
+irrigate() ->
+    ok.
+
+-spec mintemp() -> erlang:function().
+mintemp() ->
+    F = fun() ->
+        Id = {<<"temp">>, state_gset},
+        {ok, {_, _, _, _}} = lasp:declare(Id, state_gset),
+        % lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
+        L = lists:foldl(fun
+            (Elem, AccIn) ->
+                timer:sleep(10000),
+                Temp = pmod_nav:read(acc, [out_temp]),
+                Temp ++ AccIn
+        end, [], lists:seq(1,5)),
+        SList = lists:usort(L),
+
+        Min = hd(SList),
+        Name = node(),
+
+        lasp:update(Id, {add, {Min, Name}}, self()),
+
+        spawn(fun
+            () ->
+                lasp:read(Id, {cardinality, 2}),
+                {ok, S} = lasp:query(Id),
+                Fetched = sets:to_list(S),
+                {Minimum, Node} = hd(lists:usort(Fetched)),
+                Self = node(),
+                case Node =:= Self of
+                    true ->
+                        grisp_led:color(1, blue),
+                        grisp_led:color(2, blue);
+                    _ ->
+                        grisp_led:color(1, red),
+                        grisp_led:color(2, red)
+                end
+        end)
+    end.
 
 %% @doc Adds the given task in the replicated task set.
 %% @see achlys_task_server:add_task/1.
