@@ -101,6 +101,14 @@
     , modules  => [achlys_squadron_leader]
 }).
 
+-define(LOAD_GENERATOR , #{id     => achlys_load_generator
+    , start    => {achlys_load_generator , start_link , []}
+    , restart  => permanent
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_load_generator]
+}).
+
 -define(WORKERS, #{clustering => ?SQUADRON_LEADER
     , cleaning => ?CLEANER_WORKER
     , sensing => ?SENSOR_COMMANDER

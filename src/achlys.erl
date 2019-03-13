@@ -43,7 +43,7 @@
 -export([join_host/1]).
 
 -export([rainbow/0]).
--export([irrigate/0]).
+-export([light/0]).
 -export([mintemp/0]).
 
 %%====================================================================
@@ -115,8 +115,8 @@ declare(Name, Targets, ExecType, Func) ->
 rainbow() ->
     achlys_util:rainbow().
 
--spec irrigate() -> erlang:function().
-irrigate() ->
+-spec light() -> erlang:function().
+light() ->
     ok.
 
 -spec mintemp() -> erlang:function().
@@ -127,7 +127,7 @@ mintemp() ->
         % lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
         L = lists:foldl(fun
             (Elem, AccIn) ->
-                timer:sleep(10000),
+                timer:sleep(5000),
                 Temp = pmod_nav:read(acc, [out_temp]),
                 Temp ++ AccIn
         end, [], lists:seq(1,5)),
@@ -140,7 +140,7 @@ mintemp() ->
 
         spawn(fun
             () ->
-                lasp:read(Id, {cardinality, 2}),
+                lasp:read(Id, {cardinality, 5}),
                 {ok, S} = lasp:query(Id),
                 Fetched = sets:to_list(S),
                 {Minimum, Node} = hd(lists:usort(Fetched)),
