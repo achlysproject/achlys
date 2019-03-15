@@ -118,28 +118,23 @@ rainbow() ->
 -spec light() -> erlang:function().
 light() ->
     ok.
+% lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
 
 -spec mintemp() -> erlang:function().
 mintemp() ->
     F = fun() ->
         Id = {<<"temp">>, state_gset},
         {ok, {_, _, _, _}} = lasp:declare(Id, state_gset),
-        % lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
         L = lists:foldl(fun
-            (Elem, AccIn) ->
-                timer:sleep(5000),
+            (Elem, AccIn) -> timer:sleep(5000),
                 Temp = pmod_nav:read(acc, [out_temp]),
                 Temp ++ AccIn
         end, [], lists:seq(1,5)),
         SList = lists:usort(L),
-
         Min = hd(SList),
         Name = node(),
-
         lasp:update(Id, {add, {Min, Name}}, self()),
-
-        spawn(fun
-            () ->
+        spawn(fun() ->
                 lasp:read(Id, {cardinality, 5}),
                 {ok, S} = lasp:query(Id),
                 Fetched = sets:to_list(S),
@@ -147,11 +142,9 @@ mintemp() ->
                 Self = node(),
                 case Node =:= Self of
                     true ->
-                        grisp_led:color(1, blue),
-                        grisp_led:color(2, blue);
+                        [ grisp_led:color(X, blue) || X <- [1,2] ],
                     _ ->
-                        grisp_led:color(1, red),
-                        grisp_led:color(2, red)
+                        [ grisp_led:color(X, red) || X <- [1,2] ]
                 end
         end)
     end.
