@@ -52,7 +52,7 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -include("achlys.hrl").
--include_lib("partisan/include/partisan.hrl").
+% -include_lib("partisan/include/partisan.hrl").
 
 %% Application control
 -export([start/0]).
