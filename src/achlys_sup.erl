@@ -16,6 +16,9 @@
 %% Supervisor callbacks
 -export([init/1]).
 
+%% Internal export:
+-export(['$handle_undefined_function'/2]).
+
 -define(SERVER , ?MODULE).
 
 %%====================================================================
@@ -25,7 +28,10 @@
 % {ok, Pid :: pid()} | ignore | {error, Reason :: term()}.
 %% @doc Start achlys top level supervisor.
 -spec start_link() ->
-    {ok , pid()} | {error , {already_started , pid()} | {shutdown , term()} | term()}.
+    {ok , pid()}
+    | {error , {already_started , pid()}
+    | {shutdown , term()}
+    | term()}.
 start_link() ->
     supervisor:start_link({local , ?SERVER} , ?MODULE , []).
 
@@ -50,13 +56,36 @@ init([]) ->
 
     ChildSpecs = [?PMOD_WORKER_SUPERVISOR, ?TASK_SERVER, ?TASK_WORKER],
 
-    {ok , {?SUPFLAGS(?THREE , ?TEN) , lists:flatten(ChildSpecs ++ WorkersSpecs)}}.
+    {ok , {
+        ?SUPFLAGS(?THREE , ?TEN)
+        , lists:flatten(ChildSpecs ++ WorkersSpecs)}}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
 
 %% @private
--spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> [supervisor:child_spec()] | [].
+-spec workers_specs(WorkersList :: [{atom(), boolean()}]) ->
+    [supervisor:child_spec()] | [].
 workers_specs(WorkersList) ->
-    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList, maps:is_key(K, ?WORKERS)].
+    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList
+                            , maps:is_key(K, ?WORKERS)].
+
+'$handle_undefined_function'(Func, [Arg]) ->
+    case lists:member(Func, [delete_child
+                            , get_childspec
+                            , restart_child
+                            , start_child
+                            , terminate_child]) of
+        true ->
+            erlang:apply(supervisor, Func, [?SERVER, Arg]);
+        _ ->
+            error_handler:raise_undef_exception(?MODULE, Func, [Arg])
+    end;
+
+'$handle_undefined_function'(Func, []) when Func == count_children orelse
+                                            Func == which_children     ->
+    erlang:apply(supervisor, Func, [?SERVER]);
+
+'$handle_undefined_function'(Func, Args) ->
+    error_handler:raise_undef_exception(?MODULE, Func, Args).

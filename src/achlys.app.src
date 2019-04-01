@@ -21,10 +21,10 @@
     {applications , [kernel
         ,            stdlib
         % ,            sasl
-        ,            grisp
+        % ,            grisp
         % ,            lager
-        ,            partisan
-        ,            lasp
+        % ,            partisan
+        % ,            lasp
     ]} ,
 
     {env , []} ,
@@ -47,7 +47,8 @@
     {licenses , ["Apache 2.0"]} ,
 
     {links , [
-          {"Github" , "https://github.com/Laymer/achlys"}
+          {"Achlys" , "https://ikopest.me"}
+        , {"Github" , "https://github.com/Laymer/achlys"}
         , {"GRiSP" , "https://www.grisp.org"}
         , {"Lasp" , "https://lasp-lang.readme.io"}
         , {"Partisan" , "https://partisan.cloud"}
