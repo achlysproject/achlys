@@ -7,7 +7,7 @@
 %%% @end
 %%% Created : 06. Nov 2018 20:38
 %%%-------------------------------------------------------------------
-%%% joeerl Creator of Erlang
+%%% Joe Armstrong, Co-Creator of Erlang
 %%% Dec '17
 %%%
 %%% You have to remember that any SQL database will be a bottleneck since

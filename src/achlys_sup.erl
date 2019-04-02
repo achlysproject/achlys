@@ -45,31 +45,14 @@ start_link() ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
 
-    {ok, WorkersMap} = achlys_config:get(workers),
-
-    WorkersSpecs = case erlang:is_map(WorkersMap) of
-        true ->
-            workers_specs(maps:to_list(WorkersMap));
-        _ ->
-            []
-    end,
-
-    ChildSpecs = [?PMOD_WORKER_SUPERVISOR, ?TASK_SERVER, ?TASK_WORKER],
+    ChildSpecs = [?TASK_SERVER, ?TASK_WORKER, ?PMOD_WORKER_SUPERVISOR],
 
     {ok , {
-        ?SUPFLAGS(?THREE , ?TEN)
-        , lists:flatten(ChildSpecs ++ WorkersSpecs)}}.
+        ?SUPFLAGS(?THREE , ?TEN), lists:flatten(ChildSpecs)}}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
-
-%% @private
--spec workers_specs(WorkersList :: [{atom(), boolean()}]) ->
-    [supervisor:child_spec()] | [].
-workers_specs(WorkersList) ->
-    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList
-                            , maps:is_key(K, ?WORKERS)].
 
 '$handle_undefined_function'(Func, [Arg]) ->
     case lists:member(Func, [delete_child

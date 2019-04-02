@@ -38,10 +38,12 @@
   as seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#bane_all_preys-1">bane_all_preys/1</a></td><td>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</td></tr>
+<tr><td valign="top"><a href="#bench-0">bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#bite-1">bite/1</a></td><td>Adds the given task in the replicated task set.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#contagion-0">contagion/0</a></td><td>Form Lasp cluster without attempting to ping neighbors beforehand.</td></tr>
 <tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
+<tr><td valign="top"><a href="#get_bench-0">get_bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
   that could be potential neighbors.</td></tr>
 <tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
@@ -67,6 +69,11 @@
 </div><p>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</p>
 
+<h3 class="function"><a name="bench-0">bench/0</a></h3>
+<div class="spec">
+<p><tt>bench() -&gt; any()</tt></p>
+</div>
+
 <h3 class="function"><a name="bite-1">bite/1</a></h3>
 <div class="spec">
 <p><tt>bite(Task::<a href="achlys.html#type-task">achlys:task()</a>) -&gt; ok</tt><br></p>
@@ -88,6 +95,11 @@
 <p><tt>get_all_tasks() -&gt; [<a href="achlys.html#type-task">achlys:task()</a>] | []</tt><br></p>
 </div><p>Returns current view of all tasks.</p>
 
+<h3 class="function"><a name="get_bench-0">get_bench/0</a></h3>
+<div class="spec">
+<p><tt>get_bench() -&gt; any()</tt></p>
+</div>
+
 <h3 class="function"><a name="get_preys-0">get_preys/0</a></h3>
 <div class="spec">
 <p><tt>get_preys() -&gt; any()</tt></p>
@@ -103,6 +115,30 @@
 <div class="spec">
 <p><tt>start() -&gt; ok</tt><br></p>
 </div><p>Start the application.</p>
+<p><b><font color="red">To do</font></b><ul><li><font color="red"><p> Binary encoding of values propagated through CRDTs instead  
+of propagating tuples directly in the cluster</p>
+ 
+  <p>32 bits :</p>
+ 
+  <p>first 8 bits :  
+[_][_] [_][_]  [_][_] [_][_]                 
+|--------------&gt; 4 bits for node ID : [0][0] [0][0]                 
+|--------------&gt; 4 bits for node ID : [0][0] [0][1]                                                           
+...                 
+|--------------&gt; 4 bits for node ID : [1][1] [1][1]         
+|----|---------&gt; 2 bits for value type : [0][0] =&gt; temperature         
+|----|---------&gt; 2 bits for value type : [0][1] =&gt; pressure         
+|----|---------&gt; 2 bits for value type : [1][0] =&gt; light         
+|----|---------&gt; 2 bits for value type : [1][1] =&gt; humidity</p>
+ 
+  <p>8-16 bits :  
+[_][_] [_][_]  [_][_] [_][_]         
+|-------------&gt; 8 bits for aggregations count : 0 to 255</p>
+ 
+  14-32 bits :
+  [_][_] [_][_]  [_][_] [_][_]  [_][_] [_][_]  [_][_]
+  |-------------&gt; 14 bits for aggregation value : 0 to 262 143
+ ====================================================================</font></li></ul></p>
 
 <h3 class="function"><a name="stop-0">stop/0</a></h3>
 <div class="spec">

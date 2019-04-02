@@ -168,7 +168,7 @@ handle_info(dets_sync , State) ->
             ok = dets:sync(N) ,
             logger:log(info, "Synced DETS table ~p ~n", [N])
     end,
-    erlang:send_after(5000 , ?SERVER , dets_sync) ,
+    erlang:send_after(3000 , ?SERVER , dets_sync) ,
     {noreply , State};
 
 handle_info(_Info , State) ->

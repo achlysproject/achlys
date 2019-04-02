@@ -54,7 +54,7 @@ start_link() ->
     gen_server:start_link({local , ?SERVER} , ?MODULE , [] , []).
 
 run_nav() ->
-    Sup = whereis(achlys_sup),
+    Sup = whereis(achlys_pmod_worker_sup),
     supervisor:start_child(Sup, ?NAV_WORKER).
 
 %%%===================================================================
@@ -191,9 +191,10 @@ check_streams(Streams) ->
 %% @private
 % maybe_run_workers([Ks]) ->
 maybe_run_workers(Ks) when is_list(Ks) ->
-    RunningDevices = [ X || {device, _Slot, X, _Pid, _Ref} <- grisp_devices:list()
+    RunningDevices = [ X || 
+        {device, _Slot, X, _Pid, _Ref} <- grisp_devices:list()
         , lists:member(X, Ks) ],
-    run_workers(RunningDevices, whereis(achlys_sup)).
+    run_workers(RunningDevices, whereis(achlys_pmod_worker_sup)).
 
 %% @private
 run_workers([pmod_nav|T], Sup) ->
