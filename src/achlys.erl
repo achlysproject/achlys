@@ -61,6 +61,10 @@
 %% Task model API
 -export([get_all_tasks/0]).
 -export([bite/1]).
+-export([declare/4]).
+-export([rainbow/0]).
+-export([light/0]).
+-export([mintemp/0]).
 
 %% API
 -export([clusterize/0]).
@@ -180,8 +184,11 @@ rainbow() ->
 
 -spec light() -> erlang:function().
 light() ->
-    ok.
-% lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
+    F = fun() ->
+            AmbLight = pmod_als:percentage(),
+            logger:log(notice , "AL Level : ~p % ~n", [AmbLight]),
+            AmbLight
+    end.
 
 -spec mintemp() -> erlang:function().
 mintemp() ->
@@ -205,7 +212,7 @@ mintemp() ->
                 Self = node(),
                 case Node =:= Self of
                     true ->
-                        [ grisp_led:color(X, blue) || X <- [1,2] ],
+                        [ grisp_led:color(X, blue) || X <- [1,2] ];
                     _ ->
                         [ grisp_led:color(X, red) || X <- [1,2] ]
                 end
