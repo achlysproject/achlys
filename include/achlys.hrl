@@ -30,7 +30,7 @@
 %% Common Macros
 %%====================================================================
 
--define(TASKS , {<<"tasks">>, state_awset}).
+-define(TASKS , {<<"tasks">>, state_gset}).
 
 -define(TARGET_ALL_NODES, <<0>>).
 -define(PERMANENT_TASK, <<0>>).
