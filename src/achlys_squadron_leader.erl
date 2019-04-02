@@ -12,8 +12,6 @@
 
 -behaviour(gen_server).
 
--include("achlys.hrl").
-
 %% API
 -export([start_link/0]).
 
@@ -35,7 +33,13 @@
 %% Records
 %%====================================================================
 
--record(state , {}).
+-record(state , {
+    % initial_formation_delay :: pos_integer() ,
+    formation_check_interval :: pos_integer(),
+    boards :: list()
+}).
+
+-type state() :: #state{}.
 
 %%%===================================================================
 %%% API
@@ -68,12 +72,19 @@ start_link() ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
+    {ok , State :: state()} | {ok , State :: state() , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice , "Initializing cluster maintainer. ~n") ,
-    erlang:send_after(?TEN , ?SERVER , formation) ,
-    {ok , #state{}}.
+    Trigger = achlys_config:get(initial_formation_delay, 30000) ,
+    Interval = achlys_config:get(formation_check_interval, 60000) ,
+    Boards = achlys_config:get(boards, []) ,
+    schedule_formation(Trigger) ,
+    {ok , #state{
+        % initial_formation_delay = Trigger ,
+        formation_check_interval = Interval,
+        boards = Boards
+    }}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -83,13 +94,13 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
-                  State :: #state{}) ->
-                     {reply , Reply :: term() , NewState :: #state{}} |
-                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
-                     {noreply , NewState :: #state{}} |
-                     {noreply , NewState :: #state{} , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
-                     {stop , Reason :: term() , NewState :: #state{}}).
+                  State :: state()) ->
+                     {reply , Reply :: term() , NewState :: state()} |
+                     {reply , Reply :: term() , NewState :: state() , timeout() | hibernate} |
+                     {noreply , NewState :: state()} |
+                     {noreply , NewState :: state() , timeout() | hibernate} |
+                     {stop , Reason :: term() , Reply :: term() , NewState :: state()} |
+                     {stop , Reason :: term() , NewState :: state()}).
 handle_call(_Request , _From , State) ->
     {reply , ok , State}.
 
@@ -100,10 +111,10 @@ handle_call(_Request , _From , State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_cast(Request :: term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+-spec(handle_cast(Request :: term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
 handle_cast(_Request , State) ->
     {noreply , State}.
 
@@ -117,14 +128,21 @@ handle_cast(_Request , State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+-spec(handle_info(Info :: timeout() | term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
 handle_info(formation , State) ->
-    _ = achlys:clusterize() ,
+    % _ = achlys:clusterize() ,
     % _ = achlys:contagion() ,
-    erlang:send_after(?MIN , ?SERVER , formation) ,
+    % maybe_clusterize(),
+    maybe_concurrent_clusterize(State#state.boards),
+    _ = schedule_formation(State#state.formation_check_interval) ,
+    % erlang:send_after(?MIN , ?SERVER , formation) ,
+    {noreply , State, hibernate};
+handle_info({disconnect_disterl, Node} , State) ->
+    true = net_kernel:disconnect(Node),
+    logger:log(notice, "Disterl connection closed for node : ~p ~n ", [Node]),
     {noreply , State, hibernate};
 
 handle_info(_Info , State) ->
@@ -142,7 +160,7 @@ handle_info(_Info , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown , term()} | term()) ,
-                State :: #state{}) -> term()).
+                State :: state()) -> term()).
 terminate(_Reason , _State) ->
     ok.
 
@@ -154,12 +172,54 @@ terminate(_Reason , _State) ->
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
 %% @end
 %%--------------------------------------------------------------------
--spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
+-spec(code_change(OldVsn :: term() | {down , term()} , State :: state() ,
                   Extra :: term()) ->
-                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
+                     {ok , NewState :: state()} | {error , Reason :: term()}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+%% private
+schedule_formation(Interval) ->
+    erlang:send_after(Interval , ?SERVER , formation).
+
+maybe_clusterize(Boards) ->
+    Reached = [ lasp_peer_service:join(X) || X <- Boards] ,
+    logger:log(notice, "Formation result : ~p ~n ", [Reached]).
+
+maybe_concurrent_clusterize(Boards) ->
+    % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
+    Reached = [ spawn(fun() -> maybe_reach(X) end) || X <-  Boards ] ,
+    logger:log(notice, "Formation result : ~p ~n ", [lasp_peer_service:members()]),
+    logger:log(notice, "Formation PIDs : ~p ~n ", [Reached]).
+
+maybe_reach(Node) ->
+    % lists:mapfoldl(fun(X, Reached) ->
+    %     case expression of
+    %         pattern when guard ->
+    %             body
+    %     end
+    %     % {2*X, X+Reached} end,
+    %     0, [1,2,3,4,5]).
+    case net_kernel:hidden_connect_node(Node) of
+        true ->
+            ok = lasp_peer_service:join(Node),
+            true = schedule_disterl_disconnect(Node),
+            {true, Node};
+        false ->
+            logger:log(notice, "net_kernel:hidden_connect_node(Node) failed for ~p ~n ", [Node]),
+            {false, Node};
+        ignored ->
+            logger:log(notice, "net_kernel:hidden_connect_node(Node) ignored for ~p ~n ", [Node]),
+            {false, Node};
+        _ ->
+            logger:log(notice, "net_kernel:hidden_connect_node(Node) undef for ~p ~n ", [Node]),
+            {false, Node}
+    end.
+
+schedule_disterl_disconnect(Node) ->
+    % true = net_kernel:disconnect(Node).
+    erlang:send_after(60000 , ?SERVER , {disconnect_disterl, Node}).

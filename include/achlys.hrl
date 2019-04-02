@@ -30,7 +30,7 @@
 %% Common Macros
 %%====================================================================
 
--define(TASKS , {<<"tasks">>, state_awset}).
+-define(TASKS , {<<"tasks">>, state_gset}).
 
 -define(TARGET_ALL_NODES, <<0>>).
 -define(PERMANENT_TASK, <<0>>).
@@ -100,10 +100,27 @@
     , modules  => [achlys_squadron_leader]
 }).
 
+-define(SQUADRON_WORKER , #{id     => achlys_squadron_worker
+    , start    => {achlys_squadron_worker , start_link , []}
+    , restart  => temporary
+    , shutdown => 5000
+    , type     => worker
+    , modules  => [achlys_squadron_worker]
+}).
+
+-define(PMOD_WORKER_SUPERVISOR , #{id     => achlys_pmod_worker_sup
+    , start    => {achlys_pmod_worker_sup , start_link , []}
+    , restart  => permanent
+    , shutdown => 5000
+    , type     => supervisor
+    , modules  => [achlys_pmod_worker_sup]
+}).
+
 -define(WORKERS, #{clustering => ?SQUADRON_LEADER
     , cleaning => ?CLEANER_WORKER
     , sensing => ?SENSOR_COMMANDER
-}). 
+    , squadron_worker => ?SQUADRON_WORKER
+}).
 
 -define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
@@ -120,7 +137,6 @@
                     , {<<"achlys@my_grisp_board_4_pressure">>, state_awset}
                     , {<<"achlys@my_grisp_board_5_pressure">>, state_awset}
                     , {<<"achlys@my_grisp_board_6_pressure">>, state_awset}]).
-
 
 %%====================================================================
 %% Types

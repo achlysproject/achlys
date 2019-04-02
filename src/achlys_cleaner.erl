@@ -124,12 +124,25 @@ handle_call(_Request , _From , State) ->
     % {noreply , NewState :: #state{} , timeout() | hibernate} |
     % {stop , Reason :: term() , NewState :: #state{}}).
 handle_cast({flush_table, Table} , State) ->
-    _ = case ets:whereis(Table) of
-        undefined ->
-            logger:log(error , "Cannot flush undefined table ~p ~n" , [Table]);
-        Ref ->
-            logger:log(notice , "Flushing table ~p ~n" , [Table]) ,
-            true = ets:delete_all_objects(Ref)
+    case application:get_env(lasp, storage_backend) of
+        {ok, lasp_dets_storage_backend} ->
+            _ = case dets:info(Table) of
+                undefined ->
+                    logger:log(info, "No DETS table ~p, flushing not necessary ~n", [Table]);
+                _ ->
+                    true = dets:delete_all_objects(Table) ,
+                    logger:log(notice , "Flushed DETS table ~p ~n" , [Table])
+            end;
+        {ok, lasp_ets_storage_backend} ->
+            _ = case ets:whereis(Table) of
+                undefined ->
+                    logger:log(error , "Cannot flush undefined table ~p ~n" , [Table]);
+                Ref ->
+                    logger:log(notice , "Flushing ETS table ~p ~n" , [Table]) ,
+                    true = ets:delete_all_objects(Ref)
+            end;
+        _ ->
+            logger:log(error , "Cannot flush table  ~p ~n" , [Table])
     end ,
     {noreply , State};
 handle_cast(_Request , State) ->
@@ -154,8 +167,8 @@ handle_info(dets_sync , State) ->
         _ ->
             ok = dets:sync(N) ,
             logger:log(info, "Synced DETS table ~p ~n", [N])
-    end, 
-    erlang:send_after(5000 , ?SERVER , dets_sync) ,
+    end,
+    erlang:send_after(3000 , ?SERVER , dets_sync) ,
     {noreply , State};
 
 handle_info(_Info , State) ->

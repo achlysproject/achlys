@@ -27,12 +27,6 @@
          terminate/2 ,
          code_change/3]).
 
-
-%% gen_flow callbacks
-% -export([read/1]).
-% -export([process/2]).
-
-
 %%====================================================================
 %% Macros
 %%====================================================================
@@ -50,6 +44,7 @@
     % tasks :: [achlys:task(), {pid(), ref()}, pos_integer()],
     tasks :: dict:dict(term(), term())
     , available_slots :: pos_integer()
+    , task_lookup_interval :: pos_integer()
 }).
 
 -type state() :: #state{}.
@@ -94,12 +89,17 @@ start_link() ->
     {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
-    logger:log(info, "Initializing task worker module"),
+    logger:log(notice, "Initializing task worker module"),
     _Tab = achlys_util:create_table(task_history),
-    erlang:send_after(?TEN, ?SERVER, periodical_check),
+
+    Trigger = achlys_config:get(initial_task_lookup_delay, (?HMIN + ?MIN)) ,
+    Interval = achlys_config:get(task_lookup_interval, (2 * ?MIN)) ,
+    schedule_periodical_lookup(Trigger) ,
+
     {ok , #state{
         tasks = dict:new()
         , available_slots = 5
+        , task_lookup_interval = Interval
     }}.
 
 %%--------------------------------------------------------------------
@@ -157,15 +157,15 @@ handle_cast(_Request , State) ->
     {noreply , NewState :: #state{}} |
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
-handle_info(periodical_check , State) ->
+handle_info(periodical_lookup , State) ->
     Tasks = achlys_util:query(?TASKS),
-    logger:log(info, "Task list : ~p", [Tasks]),
+    logger:log(notice, "Task list : ~p", [Tasks]),
 
     L = [ {H, spawn_task(T)} || {T, H} <- Tasks
         , permanent_execution(T, H) =:= true
         , dict:is_key(H, State#state.tasks) =:= false ],
 
-    logger:log(info, "New tasks : ~p", [L]),
+    logger:log(notice, "New tasks : ~p", [L]),
 
     NewDict = lists:foldl(fun
         (Elem, AccIn) ->
@@ -173,16 +173,17 @@ handle_info(periodical_check , State) ->
             dict:store(H, Proc, AccIn)
     end, State#state.tasks, L),
 
-    logger:log(info, "New dict : ~p", [NewDict]),
+    logger:log(notice, "New dict : ~p", [NewDict]),
 
-    erlang:send_after(?HMIN, ?SERVER, periodical_check),
+    schedule_periodical_lookup(State#state.task_lookup_interval),
+
     {noreply , State#state{tasks = NewDict}, hibernate};
 
 %%--------------------------------------------------------------------
 handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
-    
-    logger:log(info, "Task finished : ~p", [Ref]),
-    
+
+    logger:log(notice, "Task finished : ~p", [Ref]),
+
     NewDict = dict:filter(fun
         (K, V) ->
             case V =/= {Pid, Ref} of
@@ -201,10 +202,10 @@ handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
 
     true = erlang:demonitor(Ref, [flush]),
 
-    logger:log(info, "Task demonitored : ~p", [Ref]),
-    logger:log(info, "New dict : ~p", [NewDict]),
-    logger:log(info, "New Task history : ~p", [ets:match(task_history, '$1')]),
-    
+    logger:log(notice, "Task demonitored : ~p", [Ref]),
+    logger:log(notice, "New dict : ~p", [NewDict]),
+    logger:log(notice, "New Task history : ~p", [ets:match(task_history, '$1')]),
+
     {noreply , State#state{tasks = NewDict}};
 
 %%--------------------------------------------------------------------
@@ -247,19 +248,19 @@ code_change(_OldVsn , State , _Extra) ->
 
 %%--------------------------------------------------------------------
 %% @private
-spawn_task(Task) -> 
-    logger:log(info, "Spawning task : ~p", [Task]),
+spawn_task(Task) ->
+    logger:log(notice, "Spawning task : ~p", [Task]),
     F = get_task_function(Task),
-    logger:log(info, "Func : ~p", [F]),
-    
+    logger:log(notice, "Func : ~p", [F]),
+
     {Pid, Ref} = erlang:spawn_opt(F, [monitor
         , {max_heap_size, #{size => 16384
             , kill => true
             , error_logger => false}}
         , {message_queue_data, off_heap}
         , {fullsweep_after, 0}]),
-    
-    logger:log(info, "Spawned task ~p ", [Ref]),
+
+    logger:log(notice, "Spawned task ~p ", [Ref]),
     {Pid, Ref}.
 
 %%--------------------------------------------------------------------
@@ -280,3 +281,8 @@ permanent_execution(T, H) ->
         _ ->
             false
     end.
+
+%%--------------------------------------------------------------------
+%% @private
+schedule_periodical_lookup(Interval) ->
+    erlang:send_after(Interval, ?SERVER, periodical_lookup).

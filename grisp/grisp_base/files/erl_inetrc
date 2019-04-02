@@ -4,7 +4,9 @@
 %
 %% Edge wireless laptop node :
 %% Replace <hostname> with the value returned by the "hostname -s" command.
-{host, {169,254,187,90}, ["<hostname>"]}.
+% {host, {169,254,187,90}, ["<hostname>"]}.
+% {host, {169,254,187,90}, ["Igors-MacBook-Pro"]}.
+{host, {169,254,187,90}, ["Igors-MBP"]}.
 
 %--- GRiSP boards --------------------------------------------------------------
 
@@ -14,6 +16,10 @@
 {host, {169,254,16,4}, ["my_grisp_board_4"]}.
 {host, {169,254,16,5}, ["my_grisp_board_5"]}.
 {host, {169,254,16,6}, ["my_grisp_board_6"]}.
+{host, {169,254,16,7}, ["my_grisp_board_7"]}.
+{host, {169,254,16,8}, ["my_grisp_board_8"]}.
+{host, {169,254,16,9}, ["my_grisp_board_9"]}.
+{host, {169,254,16,10}, ["my_grisp_board_10"]}.
 
 % Do not monitor the hosts file
 {hosts_file, ""}.

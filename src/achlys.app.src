@@ -10,19 +10,19 @@
         ,          achlys_config
         ,          achlys_cleaner
         ,          achlys_sensor_commander
+        ,          achlys_pmod_worker_sup
         ,          achlys_pmod_nav_worker
         ,          achlys_pmod_als_worker
         ,          achlys_task_server
         ,          achlys_task_worker
         ,          achlys_squadron_leader
+        ,          achlys_load_generator
     ]} ,
 
     {mod , {achlys_app , []}} ,
     {applications , [kernel
         ,            stdlib
-        ,            sasl
         ,            grisp
-        ,            lager
         ,            partisan
         ,            lasp
     ]} ,
@@ -36,20 +36,24 @@
         , achlys_config
         , achlys_cleaner
         , achlys_sensor_commander
+        , achlys_pmod_worker_sup
         , achlys_pmod_nav_worker
         , achlys_pmod_als_worker
         , achlys_task_server
         , achlys_task_worker
         , achlys_squadron_leader
+        , achlys_load_generator
     ]} ,
 
     {maintainers , ["Igor Kopestenski"]} ,
     {licenses , ["Apache 2.0"]} ,
 
     {links , [
-          {"Github" , "https://github.com/Laymer/achlys"}
+          {"Achlys" , "https://ikopest.me"}
+        , {"Github" , "https://github.com/Laymer/achlys"}
         , {"GRiSP" , "https://www.grisp.org"}
         , {"Lasp" , "https://lasp-lang.readme.io"}
+        , {"Partisan" , "https://partisan.cloud"}
         , {"LightKone" , "https://lightkone.eu/"}
     ]} ,
 
@@ -59,7 +63,7 @@
         ,     "src"
         ,     "grisp"
         ,     "priv"
-        ,     "tools.mk"
+        ,     "tools"
         ,     "Makefile"
     ]} ,
     {build_tools , ["rebar3"]}

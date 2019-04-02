@@ -1,22 +1,19 @@
 %%%-------------------------------------------------------------------
-%%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
-%%% 2018, Universite Catholique de Louvain
+%%% @author Kopestenski Igor igor.kopestenski@uclouvain.be
+%%% 2019, UCLouvain
 %%% @doc
 %%%
 %%% @end
-%%% Created : 05. Dec 2018 19:49
+%%% Created : 14. Mar 2019 04:16
 %%%-------------------------------------------------------------------
--module(achlys_task_server).
--author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
+-module(achlys_load_generator).
+-author("Kopestenski Igor").
 
 -behaviour(gen_server).
 
--include("achlys.hrl").
-
 %% API
 -export([start_link/0]).
--export([add_task/1]).
+-export([pressure/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -26,34 +23,16 @@
          terminate/2 ,
          code_change/3]).
 
-%%%===================================================================
-%%% Macros
-%%%===================================================================
-
 -define(SERVER , ?MODULE).
 
-%%%===================================================================
-%%% Records
-%%%===================================================================
-
--record(state , {
-    identifier :: {bitstring(), atom()}
-}).
-
-%%%===================================================================
-%%% Types
-%%%===================================================================
-
--type state() :: #state{}.
+-record(state , {}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
-%% @doc Adds the given task in the replicated task set.
--spec add_task(achlys:task()) -> ok.
-add_task(Task) ->
-    gen_server:cast(?SERVER , {add_task, Task}).
+pressure(Remote) ->
+    gen_server:cast(?SERVER, {pressure, Remote}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -82,11 +61,9 @@ start_link() ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-    {ok , State :: state()} | {ok , State :: state() , timeout() | hibernate} |
+    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
-    logger:log(notice, "Initializing task server module"),
-    erlang:send_after(?ONE, ?SERVER, declare),
     {ok , #state{}}.
 
 %%--------------------------------------------------------------------
@@ -97,13 +74,13 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
-                  State :: state()) ->
-                     {reply , Reply :: term() , NewState :: state()} |
-                     {reply , Reply :: term() , NewState :: state() , timeout() | hibernate} |
-                     {noreply , NewState :: state()} |
-                     {noreply , NewState :: state() , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: state()} |
-                     {stop , Reason :: term() , NewState :: state()}).
+                  State :: #state{}) ->
+                     {reply , Reply :: term() , NewState :: #state{}} |
+                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
+                     {noreply , NewState :: #state{}} |
+                     {noreply , NewState :: #state{} , timeout() | hibernate} |
+                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
+                     {stop , Reason :: term() , NewState :: #state{}}).
 handle_call(_Request , _From , State) ->
     {reply , ok , State}.
 
@@ -114,22 +91,13 @@ handle_call(_Request , _From , State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_cast(Request :: term() , State :: state()) ->
-    {noreply , NewState :: state()} |
-    {noreply , NewState :: state() , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: state()}).
-handle_cast({add_task, Task} , State) ->
-    #{name := Name
-    , targets := _Targets
-    , execution_type := _ExecType
-    , function := _Function} = Task,
-
-    Hash = erlang:phash2(erlang:term_to_binary(Task)),
-
-    logger:log(notice, "Adding Task with name : ~p ~n", [Name]),
-    {ok, {Id, _, _, _}} = lasp:update(State#state.identifier , {add , {Task, Hash}} , self()),
-    {noreply , State#state{identifier = Id}};
-
+-spec(handle_cast(Request :: term() , State :: #state{}) ->
+    {noreply , NewState :: #state{}} |
+    {noreply , NewState :: #state{} , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: #state{}}).
+handle_cast({pressure, Remote} , State) ->
+    schedule_pressure({stress, Remote}),
+    {noreply , State};
 handle_cast(_Request , State) ->
     {noreply , State}.
 
@@ -143,18 +111,31 @@ handle_cast(_Request , State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_info(Info :: timeout() | term() , State :: state()) ->
-    {noreply , NewState :: state()} |
-    {noreply , NewState :: state() , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: state()}).
-handle_info(declare , State) ->
-    %% declare message is received 1 second after initialization function call
-    {ok , {Id , _ , _ , _}} = lasp:declare(?TASKS , state_gset),
-    logger:log(notice, "Task set has been declared with identifier : ~p ~n", [Id]),
-    {noreply , State#state{identifier = Id}};
-
-handle_info(Info , State) ->
-    logger:log(notice, "Unhandled message received by task server : ~p ~n", [Info]),
+-spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
+    {noreply , NewState :: #state{}} |
+    {noreply , NewState :: #state{} , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: #state{}}).
+handle_info({stress_msg_in, Remote} , State) ->
+    logger:log(critical, "stress msg in ~n"),
+    io:format("stress msg in ~n"),
+    timer:sleep(achlys_config:get(stress_interval, 5000)),
+    _ = (lasp_peer_service:manager()):forward_message(Remote
+                                                , 1
+                                                , achlys_load_generator
+                                                , {stress_msg_out, node()}
+                                                , []),
+    {noreply , State};
+handle_info({stress_msg_out, Remote} , State) ->
+    logger:log(critical, "stress msg out ~n"),
+    io:format("stress msg out ~n"),
+    timer:sleep(achlys_config:get(stress_interval, 5000)),
+    _ = (lasp_peer_service:manager()):forward_message(Remote
+                                                , 1
+                                                , achlys_load_generator
+                                                , {stress_msg_in, node()}
+                                                , []),
+    {noreply , State};
+handle_info(_Info , State) ->
     {noreply , State}.
 
 %%--------------------------------------------------------------------
@@ -169,7 +150,7 @@ handle_info(Info , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown , term()} | term()) ,
-                State :: state()) -> term()).
+                State :: #state{}) -> term()).
 terminate(_Reason , _State) ->
     ok.
 
@@ -181,12 +162,15 @@ terminate(_Reason , _State) ->
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
 %% @end
 %%--------------------------------------------------------------------
--spec(code_change(OldVsn :: term() | {down , term()} , State :: state() ,
+-spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
                   Extra :: term()) ->
-                     {ok , NewState :: state()} | {error , Reason :: term()}).
+                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+schedule_pressure({stress, Remote}) ->
+    erlang:send_after(5000 , ?SERVER , {stress_msg_in, Remote}).
