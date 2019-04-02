@@ -150,6 +150,70 @@ get_all_tasks() ->
     {ok, Set} = lasp:query(?TASKS),
     sets:to_list(Set).
 
+%% @doc Shortcut function exposing the utility function that can be
+%% used to pass more readable arguments to create a task model variable
+%% instead of binary strings. The ExecType argument can currently not
+%% provide a transient mode, a task is executed either once or permanently.
+%% Removing the task from the CRDT does not prevent nodes to keep executing it.
+%% But similar behavior can be created with a single execution task that
+%% specifies a function with several loops. However this does not allow the
+%% worker to have full control over the load, since backpressure can be applied
+%% by spawning a process that executes a permanent task at a controlled
+%% frequency that can be based on any stress parameter. Meanwhile a single
+%% execution task could possibly overload the worker, as iterations are
+%% embedded inside a single process.
+%%
+%% When Grow-only Counters and Sets are used, the transient can be achieved
+%% using Lasp's monotonic read function to have a distributed treshold.
+%%
+%%
+-spec declare(Name::atom()
+    , Targets::[node()] | all
+    , ExecType::single | permanent
+    , Func::function()) -> task() | erlang:exception().
+declare(Name, Targets, ExecType, Func) ->
+    achlys_util:declare(Name, Targets, ExecType, Func).
+    % {ok, Set} = lasp:query(?TASKS),
+    % sets:to_list(Set).
+
+-spec rainbow() -> erlang:function().
+rainbow() ->
+    achlys_util:rainbow().
+
+-spec light() -> erlang:function().
+light() ->
+    ok.
+% lists:foldl(fun(X, Prod) -> X * Prod end, 1, [1,2,3,4,5]).
+
+-spec mintemp() -> erlang:function().
+mintemp() ->
+    F = fun() ->
+        Id = {<<"temp">>, state_gset},
+        {ok, {_, _, _, _}} = lasp:declare(Id, state_gset),
+        L = lists:foldl(fun
+            (Elem, AccIn) -> timer:sleep(5000),
+                Temp = pmod_nav:read(acc, [out_temp]),
+                Temp ++ AccIn
+        end, [], lists:seq(1,5)),
+        SList = lists:usort(L),
+        Min = hd(SList),
+        Name = node(),
+        lasp:update(Id, {add, {Min, Name}}, self()),
+        spawn(fun() ->
+                lasp:read(Id, {cardinality, 5}),
+                {ok, S} = lasp:query(Id),
+                Fetched = sets:to_list(S),
+                {Minimum, Node} = hd(lists:usort(Fetched)),
+                Self = node(),
+                case Node =:= Self of
+                    true ->
+                        [ grisp_led:color(X, blue) || X <- [1,2] ],
+                    _ ->
+                        [ grisp_led:color(X, red) || X <- [1,2] ]
+                end
+        end)
+    end.
+
 %% @doc Adds the given task in the replicated task set.
 %% @see achlys_task_server:add_task/1.
 -spec bite(Task :: achlys:task()) -> ok.
