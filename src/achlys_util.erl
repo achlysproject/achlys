@@ -18,6 +18,54 @@
 %% Task model functions
 %%====================================================================
 
+%% @doc Returns the task model variable based on the given arguments
+%% in the form of a map.
+-spec declare(Name::atom()
+    , Targets::[node()] | all
+    , ExecType::single | permanent
+    , Func::function()) -> task() | erlang:exception().
+declare(Name, Targets, ExecType, Func) ->
+    try lists:member(ExecType, [single, permanent]) of
+        true when Targets =:= all orelse is_list(Targets) ->
+            form_map(Name, Targets, ExecType, Func)
+    catch
+        Exception:Reason -> {caught, Exception, Reason}
+    end.
+
+form_map(Name, Targets, ExecType, Func) ->
+        #{name => Name
+        , targets => task_flag(Targets)
+        , execution_type => task_flag(ExecType)
+        , function => Func}.
+
+task_flag(all) ->
+    <<0>>;
+task_flag(permanent) ->
+    <<0>>;
+task_flag(single) ->
+    <<1>>;
+task_flag(Args) ->
+    Args.
+
+-spec rainbow() -> erlang:function().
+rainbow() ->
+    Func = fun() ->
+        Random = fun() ->
+            {rand:uniform(2) - 1, rand:uniform(2) -1, rand:uniform(2) - 1}
+        end,
+        _ = [grisp_led:pattern(L, [{100, Random}]) || L <- [1,2]]
+    end,
+    Func.
+
+ledtask() ->
+    Func = fun
+        () ->
+            logger:log(notice, "Executing ledtask "),
+            grisp_led:color(1, blue),
+            grisp_led:color(1, red),
+            grisp_led:color(1, blue)
+    end.
+
 get_pmod_nav_temp_task() ->
     F = fun
         () ->
