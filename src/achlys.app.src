@@ -16,6 +16,7 @@
         ,          achlys_task_server
         ,          achlys_task_worker
         ,          achlys_squadron_leader
+        ,          achlys_load_generator
     ]} ,
 
     {mod , {achlys_app , []}} ,
@@ -35,11 +36,13 @@
         , achlys_config
         , achlys_cleaner
         , achlys_sensor_commander
+        , achlys_pmod_worker_sup
         , achlys_pmod_nav_worker
         , achlys_pmod_als_worker
         , achlys_task_server
         , achlys_task_worker
         , achlys_squadron_leader
+        , achlys_load_generator
     ]} ,
 
     {maintainers , ["Igor Kopestenski"]} ,
@@ -60,7 +63,7 @@
         ,     "src"
         ,     "grisp"
         ,     "priv"
-        ,     "tools.mk"
+        ,     "tools"
         ,     "Makefile"
     ]} ,
     {build_tools , ["rebar3"]}
