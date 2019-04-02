@@ -125,7 +125,7 @@ handle_cast({add_task, Task} , State) ->
     , function := _Function} = Task,
 
     Hash = erlang:phash2(erlang:term_to_binary(Task)),
-    
+
     logger:log(notice, "Adding Task with name : ~p ~n", [Name]),
     {ok, {Id, _, _, _}} = lasp:update(State#state.identifier , {add , {Task, Hash}} , self()),
     {noreply , State#state{identifier = Id}};
@@ -149,7 +149,7 @@ handle_cast(_Request , State) ->
     {stop , Reason :: term() , NewState :: state()}).
 handle_info(declare , State) ->
     %% declare message is received 1 second after initialization function call
-    {ok , {Id , _ , _ , _}} = lasp:declare(?TASKS , state_awset),
+    {ok , {Id , _ , _ , _}} = lasp:declare(?TASKS , state_gset),
     logger:log(notice, "Task set has been declared with identifier : ~p ~n", [Id]),
     {noreply , State#state{identifier = Id}};
 

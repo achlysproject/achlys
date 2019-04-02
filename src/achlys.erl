@@ -173,8 +173,6 @@ get_all_tasks() ->
     , Func::function()) -> task() | erlang:exception().
 declare(Name, Targets, ExecType, Func) ->
     achlys_util:declare(Name, Targets, ExecType, Func).
-    % {ok, Set} = lasp:query(?TASKS),
-    % sets:to_list(Set).
 
 -spec rainbow() -> erlang:function().
 rainbow() ->
