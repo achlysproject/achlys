@@ -52,19 +52,26 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -include("achlys.hrl").
-% -include_lib("partisan/include/partisan.hrl").
 
 %% Application control
 -export([start/0]).
 -export([stop/0]).
 
+%%====================================================================
 %% Task model API
+%%====================================================================
 -export([get_all_tasks/0]).
 -export([bite/1]).
 -export([declare/4]).
+
+%%====================================================================
+%% Sample Task Model Functions
+%% for testing and demonstration purposes.
+%%====================================================================
 -export([rainbow/0]).
 -export([light/0]).
 -export([mintemp/0]).
+%%====================================================================
 
 %% API
 -export([clusterize/0]).
@@ -124,7 +131,6 @@
 %% Macros
 %%====================================================================
 
-% -define(MANAGER,    lasp_peer_service:manager()).
 -define(MANAGER,    partisan_hyparview_peer_service_manager).
 -define(LPS,    lasp_peer_service).
 
