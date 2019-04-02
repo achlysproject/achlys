@@ -45,7 +45,6 @@
         , achlys_load_generator
     ]} ,
 
-    {maintainers , ["Igor Kopestenski"]} ,
     {licenses , ["Apache 2.0"]} ,
 
     {links , [
@@ -63,7 +62,6 @@
         ,     "src"
         ,     "grisp"
         ,     "priv"
-        ,     "tools"
         ,     "Makefile"
     ]} ,
     {build_tools , ["rebar3"]}
