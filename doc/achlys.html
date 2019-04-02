@@ -42,11 +42,17 @@
 <tr><td valign="top"><a href="#bite-1">bite/1</a></td><td>Adds the given task in the replicated task set.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#contagion-0">contagion/0</a></td><td>Form Lasp cluster without attempting to ping neighbors beforehand.</td></tr>
+<tr><td valign="top"><a href="#declare-4">declare/4</a></td><td>Shortcut function exposing the utility function that can be  
+used to pass more readable arguments to create a task model variable  
+instead of binary strings.</td></tr>
 <tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
 <tr><td valign="top"><a href="#get_bench-0">get_bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
   that could be potential neighbors.</td></tr>
+<tr><td valign="top"><a href="#light-0">light/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#mintemp-0">mintemp/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
+<tr><td valign="top"><a href="#rainbow-0">rainbow/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
 <tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>Stop the Application.</td></tr>
 <tr><td valign="top"><a href="#venom-0">venom/0</a></td><td>Collect data based on sensors available on Pmod modules and store
@@ -90,6 +96,27 @@
 <p><tt>contagion() -&gt; [{error, atom()} | {ok, atom()}]</tt><br></p>
 </div><p>Form Lasp cluster without attempting to ping neighbors beforehand.</p>
 
+<h3 class="function"><a name="declare-4">declare/4</a></h3>
+<div class="spec">
+<p><tt>declare(Name::atom(), Targets::[node()] | all, ExecType::single | permanent, Func::function()) -&gt; <a href="#type-task">task()</a> | <a href="erlang.html#type-exception">erlang:exception()</a></tt><br></p>
+</div><p><p>Shortcut function exposing the utility function that can be  
+used to pass more readable arguments to create a task model variable  
+instead of binary strings. The ExecType argument can currently not  
+provide a transient mode, a task is executed either once or permanently.  
+Removing the task from the CRDT does not prevent nodes to keep executing it.  
+But similar behavior can be created with a single execution task that  
+specifies a function with several loops. However this does not allow the  
+worker to have full control over the load, since backpressure can be applied  
+by spawning a process that executes a permanent task at a controlled  
+frequency that can be based on any stress parameter. Meanwhile a single  
+execution task could possibly overload the worker, as iterations are  
+embedded inside a single process.</p>
+ 
+  <p>When Grow-only Counters and Sets are used, the transient can be achieved  
+using Lasp's monotonic read function to have a distributed treshold.</p>
+ 
+ </p>
+
 <h3 class="function"><a name="get_all_tasks-0">get_all_tasks/0</a></h3>
 <div class="spec">
 <p><tt>get_all_tasks() -&gt; [<a href="achlys.html#type-task">achlys:task()</a>] | []</tt><br></p>
@@ -106,10 +133,25 @@
 </div><p>Returns a list of known remote hostnames
   that could be potential neighbors.</p>
 
+<h3 class="function"><a name="light-0">light/0</a></h3>
+<div class="spec">
+<p><tt>light() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
+</div>
+
+<h3 class="function"><a name="mintemp-0">mintemp/0</a></h3>
+<div class="spec">
+<p><tt>mintemp() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
+</div>
+
 <h3 class="function"><a name="pandemia-0">pandemia/0</a></h3>
 <div class="spec">
 <p><tt>pandemia() -&gt; ok</tt><br></p>
 </div><p>Close disterl TCP connections with neighboring nodes.</p>
+
+<h3 class="function"><a name="rainbow-0">rainbow/0</a></h3>
+<div class="spec">
+<p><tt>rainbow() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
+</div>
 
 <h3 class="function"><a name="start-0">start/0</a></h3>
 <div class="spec">
