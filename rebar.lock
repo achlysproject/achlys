@@ -14,7 +14,7 @@
  {<<"lager">>,{pkg,<<"lager">>,<<"3.6.9">>},2},
  {<<"lasp">>,
   {git,"https://github.com/Laymer/lasp.git",
-       {ref,"1058e881a8a99d9ff210c6e981ecd4110fbebd26"}},
+       {ref,"468ee3e78935fed1d427de3be00479e9993885d7"}},
   0},
  {<<"lasp_support">>,
   {git,"https://github.com/Laymer/lasp_support.git",
