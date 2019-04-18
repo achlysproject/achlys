@@ -122,6 +122,10 @@
     , squadron_worker => ?SQUADRON_WORKER
 }).
 
+-define(STREAMERS, #{pmod_nav => ?NAV_WORKER
+    , pmod_als => ?ALS_WORKER
+}).
+
 -define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
                     , {<<"achlys@my_grisp_board_2_temperature">>, state_awset}

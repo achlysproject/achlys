@@ -33,7 +33,7 @@
 %%====================================================================
 
 -record(state , {
-    streams :: map()
+    streamers :: map()
 }).
 
 -type state() :: #state{}.
@@ -75,9 +75,9 @@ run_nav() ->
 -spec(init([]) -> {ok , state()}).
 init([]) ->
     ok = achlys_config:set(number, achlys_util:get_inet_least_significant()),
-    {ok, Streams} = achlys_config:get(streams),
+    Streamers = achlys_config:get(streamers),
     self() ! {setup_stream_workers},
-    {ok , #state{streams = Streams}}.
+    {ok , #state{streamers = Streamers}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -115,11 +115,11 @@ handle_cast(_Request , State) ->
 %%--------------------------------------------------------------------
 -spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
     {noreply , NewState :: #state{}}).
-handle_info({setup_stream_workers} , State) when is_map(State#state.streams) ->
+handle_info({setup_stream_workers} , State) when is_map(State#state.streamers) ->
     logger:log(notice, "Initializing data stream workers ~n "),
-    _ = [ self() ! {run, X} || X <- maps:keys(State#state.streams)],
+    _ = [ self() ! {run, X} || X <- maps:keys(State#state.streamers)],
 
-    {_Code, Val} = case check_streams(State#state.streams) of
+    {_Code, Val} = case check_streamers(State#state.streamers) of
         {ok, [Ks]} ->
             _ = maybe_run_workers([Ks]),
             {ok, [Ks]};
@@ -177,15 +177,15 @@ code_change(_OldVsn , State , _Extra) ->
 %%%===================================================================
 
 %% @private
-check_streams(Streams) ->
-    try maps:keys(Streams) of
+check_streamers(Streamers) ->
+    try maps:keys(Streamers) of
         [Ks] ->
             {ok, [Ks]};
         [H|T] ->
             {ok, [H|T]}
     catch
         _:_ ->
-            {error, no_streams}
+            {error, no_streamers}
     end.
 
 %% @private
