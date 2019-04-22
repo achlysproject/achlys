@@ -187,6 +187,8 @@ declare(Name, Targets, ExecType, Func) ->
 
 -spec rainbow() -> erlang:function().
 rainbow() ->
+% achlys:bite(achlys:declare(t,all,permanent,fun() -> [grisp_led:color(X,off)|| X <- [1,2]] end)).
+% achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
     achlys_util:rainbow().
 
 -spec light() -> erlang:function().

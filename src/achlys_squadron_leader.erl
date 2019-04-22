@@ -192,7 +192,16 @@ maybe_clusterize(Boards) ->
 
 maybe_concurrent_clusterize(Boards) ->
     % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
-    _ = [ spawn(fun() -> lasp_peer_service:join(X) end) || X <-  Boards ] ,
+    _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
+        ok ->
+            logger:log(critical, "Joined : ~p ~n ", [X])
+    catch
+        _:_ ->
+            logger:log(critical, "Failed join : ~p ~n ", [X])
+    after
+        logger:log(critical, "Formation attempt : ~p ~n ", [X])
+    end end) || X <-  Boards, net_adm:ping(X) =:= pong ] ,
+    
     logger:log(critical, "Formation result : ~p ~n ", [lasp_peer_service:members()]).
 
 maybe_reach(Node) ->
