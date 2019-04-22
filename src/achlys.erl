@@ -267,7 +267,8 @@ pandemia() ->
 bane(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
     % Id = {atom_to_binary(Data, utf8), state_awset_ps},
-    Id = {atom_to_binary(Data, utf8), state_awset},
+    % Id = {atom_to_binary(Data, utf8), state_awset},
+    Id = {atom_to_binary(Data, utf8), state_gset},
     % L = [ unicode:characters_to_binary([X
     %     , "_"
     %     , erlang:atom_to_binary(Data,utf8)] , utf8)
