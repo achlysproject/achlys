@@ -45,7 +45,14 @@ start_link() ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
 
-    ChildSpecs = [?TASK_SERVER, ?TASK_WORKER, ?PMOD_WORKER_SUPERVISOR],
+    WorkersMap = achlys_config:get(workers, #{}),
+    L = workers_specs(maps:to_list(WorkersMap)),
+
+    ChildSpecs = L ++ [
+        ?TASK_SERVER
+        , ?TASK_WORKER
+        , ?PMOD_WORKER_SUPERVISOR
+    ],
 
     {ok , {
         ?SUPFLAGS(?THREE , ?TEN), lists:flatten(ChildSpecs)}}.
@@ -72,3 +79,8 @@ init([]) ->
 
 '$handle_undefined_function'(Func, Args) ->
     error_handler:raise_undef_exception(?MODULE, Func, Args).
+
+%% @private
+-spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> [supervisor:child_spec()] | [].
+workers_specs(WorkersList) ->
+    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList, maps:is_key(K, ?WORKERS)].

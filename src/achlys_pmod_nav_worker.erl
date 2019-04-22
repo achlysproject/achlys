@@ -128,9 +128,9 @@ get_table(Name) ->
 -spec init([]) -> {ok , state()}.
 init([]) ->
     _ = rand:seed(exrop),
-    {ok, Streams} = achlys_config:get(streams),
+    Streamers = achlys_config:get(streamers, #{}),
     % {ok, Num} = achlys_config:get(number),
-    MeasuresMap = mapz:deep_get([pmod_nav], Streams),
+    MeasuresMap = mapz:deep_get([pmod_nav], Streamers),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
     L = [ {X, 1} || X <- maps:keys(MeasuresMap) ],
     {ok, #state{

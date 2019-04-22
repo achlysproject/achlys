@@ -92,6 +92,7 @@
 -export([gc/0]).
 -export([flush/1]).
 -export([join_host/1]).
+-export([join/1]).
 
 -export([bench/0]).
 -export([get_bench/0]).
@@ -343,21 +344,21 @@ seek_neighbors([]) ->
 
 %% @private
 join(Host) ->
-    try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
-        #{channels := _Channels
-        , listen_addrs := _Addresses
-        , name := _Name
-        , parallelism := _Parallelism } = Node ->
-            ok = lasp_peer_service:join(Node),
-            {ok, Host}
-    catch
-        {badrpc, Reason} ->
-            logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
-            {error , Reason};
-        {error, Reason} ->
-            logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
-            {error , Reason}
-    end.
+    % try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
+    %     #{channels := _Channels
+    %     , listen_addrs := _Addresses
+    %     , name := _Name
+    %     , parallelism := _Parallelism } = Node ->
+            ok = lasp_peer_service:join(Host),
+            {ok, Host}.
+    % catch
+    %     {badrpc, Reason} ->
+    %         logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
+    %         {error , Reason};
+    %     {error, Reason} ->
+    %         logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
+    %         {error , Reason}
+    % end.
 
 %% @private
 bidirectional_join(Host) ->

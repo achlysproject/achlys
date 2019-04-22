@@ -34,7 +34,7 @@
 %%====================================================================
 
 -record(state , {
-    % initial_formation_delay :: pos_integer() ,
+    initial_formation_delay :: pos_integer() ,
     formation_check_interval :: pos_integer(),
     boards :: list()
 }).
@@ -81,7 +81,7 @@ init([]) ->
     Boards = achlys_config:get(boards, []) ,
     schedule_formation(Trigger) ,
     {ok , #state{
-        % initial_formation_delay = Trigger ,
+        initial_formation_delay = Trigger ,
         formation_check_interval = Interval,
         boards = Boards
     }}.
@@ -192,9 +192,8 @@ maybe_clusterize(Boards) ->
 
 maybe_concurrent_clusterize(Boards) ->
     % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
-    Reached = [ spawn(fun() -> maybe_reach(X) end) || X <-  Boards ] ,
-    logger:log(notice, "Formation result : ~p ~n ", [lasp_peer_service:members()]),
-    logger:log(notice, "Formation PIDs : ~p ~n ", [Reached]).
+    _ = [ spawn(fun() -> lasp_peer_service:join(X) end) || X <-  Boards ] ,
+    logger:log(critical, "Formation result : ~p ~n ", [lasp_peer_service:members()]).
 
 maybe_reach(Node) ->
     % lists:mapfoldl(fun(X, Reached) ->

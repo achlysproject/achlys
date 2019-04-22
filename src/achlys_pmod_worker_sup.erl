@@ -65,26 +65,17 @@ start_link() ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
 
-    {ok, WorkersMap} = achlys_config:get(workers),
+    % StreamersMap = achlys_config:get(streamers, #{}),
 
-    WorkersSpecs = case erlang:is_map(WorkersMap) of
-        true ->
-            workers_specs(maps:to_list(WorkersMap));
-        _ ->
-            []
-    end,
+    % ChildSpecs = [ maps:get(K, ?STREAMERS) || K <- maps:keys(StreamersMap) ],
 
     {ok , {
-        ?SUPFLAGS(?THREE , ?TEN)
-        , lists:flatten(WorkersSpecs)}}.
+        ?SUPFLAGS(?THREE , ?TEN),
+        [
+            ?SENSOR_COMMANDER
+        ]
+    }}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
-
-%% @private
--spec workers_specs(WorkersList :: [{atom(), boolean()}]) ->
-    [supervisor:child_spec()] | [].
-workers_specs(WorkersList) ->
-    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList
-                            , maps:is_key(K, ?WORKERS)].

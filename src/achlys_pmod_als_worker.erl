@@ -112,9 +112,9 @@ get_table(Name) ->
 % @private
 -spec init([]) -> {ok , state()}.
 init([]) ->
-    {ok, Streams} = achlys_config:get(streams),
-    {ok, Num} = achlys_config:get(number),
-    MeasuresMap = mapz:deep_get([pmod_als], Streams),
+    Streamers = achlys_config:get(streamers, #{}),
+    Num = achlys_config:get(number, 0),
+    MeasuresMap = mapz:deep_get([pmod_als], Streamers),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
     {ok, #state{measures = MeasuresMap, number = Num}}.
 
