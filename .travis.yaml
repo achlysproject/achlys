@@ -1,0 +1,63 @@
+language: erlang
+otp_release:
+  - 21.3.6
+  - 21.3.1
+  - 21.3.2
+  - 21.3.3
+  - 21.3.4
+  - 21.3.5
+  - 21.3
+  - 21.0.2
+  - 20.3
+  - 20.2
+  - 19.3
+script: 
+  - ./tools/rebar3 compile
+# env:
+#   global:
+#     - KERL_BUILD_BACKEND=git
+# matrix:
+#   include:
+#     - sudo: required
+#       dist: trusty
+#       group: edge
+#       name: trusty
+#     - sudo: required
+#       name: precise
+#     - sudo: required
+#       language: generic
+#       dist: xenial
+#       group: edge
+#       name: xenial
+#     - sudo: required
+#       arch: ppc64le
+#       language: generic
+#       dist: xenial
+#       group: edge
+#       name: xenial-ppc64le
+
+# before_install:
+#   - export OS_NAME=$(lsb_release -is | tr "A-Z" "a-z" || echo "osx")
+#   - export RELEASE=$(lsb_release -rs 2>/dev/null || sw_vers -productVersion | sed 's/^\([0-9][0-9]*.[0-9][0-9]*\).*/\1/')
+#   - export TARGET_DIR=${TRAVIS_BUILD_DIR}/${OS_NAME}/${RELEASE}/$(uname -m)
+#   - export VERSION=${VERSION:-21.2}
+#   - mkdir -p ${TARGET_DIR}
+
+# install:
+#   - |
+#     if ! command -v kerl >&/dev/null; then
+#       curl -O https://raw.githubusercontent.com/kerl/kerl/master/kerl
+#       chmod +x kerl
+#       sudo mv kerl /usr/local/bin/kerl
+#     fi
+#     sudo curl -o `which kerl` https://raw.githubusercontent.com/yrashk/kerl/master/kerl
+
+
+# after_success: ./bin/archive
+
+# addons:
+#   artifacts:
+#     paths:
+#     - '${OS_NAME}'
+#     target_paths:
+#     - '/binaries/${OS_NAME}/${LSB_RELEASE}/${ARCH}'
