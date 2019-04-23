@@ -200,7 +200,9 @@ maybe_concurrent_clusterize(Boards) ->
             logger:log(critical, "Failed join : ~p ~n ", [X])
     after
         logger:log(critical, "Formation attempt : ~p ~n ", [X])
-    end end) || X <-  Boards, net_adm:ping(X) =:= pong ] ,
+    end end) || X <-  Boards
+        , X =/= node()
+        , net_adm:ping(X) =:= pong ] ,
     
     logger:log(critical, "Formation result : ~p ~n ", [lasp_peer_service:members()]).
 
