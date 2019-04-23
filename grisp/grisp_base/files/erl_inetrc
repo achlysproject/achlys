@@ -8,6 +8,8 @@
 
 {host, {169,254,187,90}, ["Igors-MBP"]}.
 
+{resolv_conf, "/etc/resolv.conf"}.
+
 %--- GRiSP boards --------------------------------------------------------------
 
 {host, {169,254,16,1}, ["my_grisp_board_1"]}.
@@ -24,8 +26,16 @@
 % Do not monitor the hosts file
 {hosts_file, ""}.
 
+%% 'super.eua.ericsson.se'.
+%% 'renat.eua.ericsson.se'.
+%% 'grouse.eua.ericsson.se'.
+%% 'gauffin1.eua.ericsson.se'.
+%% ^ (new line)
+
 % Disable caching
-{cache_size, 0}.
+{cache_size, 20}.
 
 % Specify lookup method
-{lookup, [file, native]}.
+{lookup, [file, native, dns]}.
+
+% {inet6, false}.

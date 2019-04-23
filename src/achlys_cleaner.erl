@@ -35,6 +35,7 @@
          handle_call/3 ,
          handle_cast/2 ,
          handle_info/2 ,
+         handle_continue/2 ,
          terminate/2 ,
          code_change/3]).
 
@@ -173,6 +174,28 @@ handle_info(dets_sync , State) ->
 
 handle_info(_Info , State) ->
     {noreply , State}.
+
+%%--------------------------------------------------------------------
+
+%% This function is called by a gen_server process
+%% whenever a previous callback returns {continue, Continue}.
+%% handle_continue/2 is invoked immediately after the previous callback,
+%% which makes it useful for performing work after initialization
+%% or for splitting the work in a callback in multiple steps,
+%% updating the process state along the way.
+
+%%--------------------------------------------------------------------
+
+handle_continue(_Continue , State) ->
+    % {noreply,NewState} | {noreply,NewState,Timeout}
+    % | {noreply,NewState,hibernate}
+    % | {noreply,NewState,{continue,Continue}}
+    % | {stop,Reason,NewState}
+    logger:log(critical, "Handle continue"),
+    {noreply , State}.
+
+%%--------------------------------------------------------------------
+
 
 %%--------------------------------------------------------------------
 %% @private

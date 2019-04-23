@@ -1,4 +1,47 @@
+(achlys@Igors-MacBook-Pro-2)15> nc -u -b 255.255.255.255 9998
+(achlys@Igors-MacBook-Pro-2)15> gen_udp:send(S, {255,255,255,255}, 9998, <<"bcast test msg">>).
+* 1: syntax error before: 255.255
 
+(achlys@Igors-MacBook-Pro-2)15> {ok, S} = gen_udp:open( 0, [binary, {broadcast, true}]).
+** exception error: no match of right hand side value {ok,#Port<0.14>}
+(achlys@Igors-MacBook-Pro-2)16> gen_udp:send(S, {255,255,255,255}, 9998, <<"bcast test msg">>).
+{error,closed}
+(achlys@Igors-MacBook-Pro-2)17> {ok, S2} = gen_udp:open( 0, [binary, {broadcast, true}]).
+{ok,#Port<0.15>}
+(achlys@Igors-MacBook-Pro-2)18> gen_udp:send(S, {255,255,255,255}, 9998, <<"bcast test msg">>).
+{error,closed}
+(achlys@Igors-MacBook-Pro-2)19> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>).
+ok
+(achlys@Igors-MacBook-Pro-2)20> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>).
+ok
+
+(achlys@Igors-MacBook-Pro-2)48> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>).
+ok
+(achlys@Igors-MacBook-Pro-2)49> [spawn(fun() -> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>) end) || X <- lists:se
+q(1,10000)].
+[<0.150.0>,<0.151.0>,<0.152.0>,<0.153.0>,<0.154.0>,
+ <0.155.0>,<0.156.0>,<0.157.0>,<0.158.0>,<0.159.0>,<0.160.0>,
+ <0.161.0>,<0.162.0>,<0.163.0>,<0.164.0>,<0.165.0>,<0.166.0>,
+ <0.167.0>,<0.168.0>,<0.169.0>,<0.170.0>,<0.171.0>,<0.172.0>,
+ <0.173.0>,<0.174.0>,<0.175.0>,<0.176.0>,<0.177.0>,<0.178.0>|...]
+(achlys@Igors-MacBook-Pro-2)50> [spawn(fun() -> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>) end) || X <- lists:se
+q(1,10000)].
+[<0.10151.0>,<0.10152.0>,<0.10153.0>,<0.10154.0>,
+ <0.10155.0>,<0.10156.0>,<0.10157.0>,<0.10158.0>,<0.10159.0>,
+ <0.10160.0>,<0.10161.0>,<0.10162.0>,<0.10163.0>,<0.10164.0>,
+ <0.10165.0>,<0.10166.0>,<0.10167.0>,<0.10168.0>,<0.10169.0>,
+ <0.10170.0>,<0.10171.0>,<0.10172.0>,<0.10173.0>,<0.10174.0>,
+ <0.10175.0>,<0.10176.0>,<0.10177.0>,<0.10178.0>,<0.10179.0>|...]
+(achlys@Igors-MacBook-Pro-2)51> [spawn(fun() -> gen_udp:send(S2, {255,255,255,255}, 9998, <<"bcast test msg">>) end) || X <- lists:se
+q(1,1000000)].
+
+
+grisp:add_device(uart,pmod_maxsonar).
+pmod_maxsonar:get().
+pmod_als:percentage().
+pmod_nav:read(alt, [temp_out]).
+pmod_nav:read(mag, [out_x_m, out_y_m, out_z_m]).
+spawn(fun() -> io:format("HYGRO : ~p ", [pmod_hygro:humid()]) end ).
 
 %%====================================================================
 %% igor:create_stubs attempts
@@ -324,7 +367,7 @@ rpc:call(achlys@my_grisp_board_6, rpc, call, [achlys@my_grisp_board_3, achlys, b
 % end,
 % erlang:send_after(?THREEMIN , ?SERVER , {setup_stream_workers}}),
 % maybe_run_workers(Streams),
-%% 
+%%
 
 % lasp:declare({<<"set">>,state_awset_ps},state_awset_ps).
 % lasp:declare({<<"set">>,state_awset},state_awset).
