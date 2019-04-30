@@ -87,10 +87,10 @@ start_link() ->
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) -> {ok , State :: state()}).
 init(_Args) ->
-    {ok, I} = achlys_config:get(gc_interval),
-    erlang:send_after(I , ?SERVER , gc) ,
-    erlang:send_after(5000 , ?SERVER , dets_sync) ,
-    {ok , #state{ gc_interval = I }}.
+    Interval = achlys_config:get(gc_interval, 45000),
+    schedule_gc(Interval),
+    _Res = schedule_dets_sync(achlys_config:get(sync_dets_interval, 3000)),
+    {ok , #state{ gc_interval = Interval }}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -208,3 +208,20 @@ code_change(_OldVsn , State , _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+-spec(schedule_gc(Interval :: pos_integer()) ->
+    TimerRef :: reference()).
+schedule_gc(Interval) ->
+    TimerRef = erlang:send_after(Interval , ?SERVER , gc).
+
+-spec(schedule_dets_sync(Interval :: pos_integer()) ->
+    TimerRef :: reference() | ok).
+schedule_dets_sync(Interval) ->
+    case achlys_config:get(sync_dets_on_update, false) of
+        true ->
+            TimerRef = erlang:send_after(Interval , ?SERVER , dets_sync),
+            logger:log(notice, "Syncing DETS"),
+            TimerRef;
+        _ ->
+            ok
+    end.
