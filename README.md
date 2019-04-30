@@ -64,7 +64,7 @@ Allows for easier visualization of problems and tasks, hence more efficient solv
 - The **API** branch of the map provides a description of some features and simple usage examples.
 - For Achlys, it is currently an additional asset to structure software improvement ideas.
 
-### NOTE : An online interactive version is available [here](https://laymer.github.io/achlys-map/)
+### NOTE : An online interactive version is available [here](https://achlysproject.github.io/achlys-map/)
 
 <p align="center">
   <img src="resources/Achlys.png" alt="MMap"/>
