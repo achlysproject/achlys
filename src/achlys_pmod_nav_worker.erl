@@ -285,7 +285,7 @@ handle_info({mean, Val} , State) ->
     Increment = maps:update_with(Val,
         fun(V) -> V + 1 end,
         State#state.aggregations),
-    ok = achlys_cleaner:flush_table(T) ,
+    % ok = achlys_cleaner:flush_table(T) ,
     {noreply , State#state{aggregations = Increment}};
 
 %%--------------------------------------------------------------------

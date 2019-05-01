@@ -139,7 +139,7 @@ handle_cast({flush_table, Table} , State) ->
                 undefined ->
                     logger:log(error , "Cannot flush undefined table ~p ~n" , [Table]);
                 Ref ->
-                    logger:log(notice , "Flushing ETS table ~p ~n" , [Table]) ,
+                    logger:log(critical , "Flushing ETS table ~p ~n" , [Table]) ,
                     true = ets:delete_all_objects(Ref)
             end;
         _ ->
