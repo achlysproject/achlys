@@ -90,6 +90,24 @@ start_link() ->
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice, "Initializing task worker module"),
+
+    try
+        case dets:open_file(history, [
+                    {file, "History"},
+                    %% Autosave interval, default is 180000
+                    {auto_save, 30000}
+                ]) of
+            {ok, history} ->
+                ok;
+            {error, Error} ->
+                {stop, Error}
+        end
+    catch
+        _:Reason ->
+            _ = logger:log(error,"Backend initialization failed!"),
+            {stop, Reason}
+    end,
+
     _Tab = achlys_util:create_table(task_history),
 
     Trigger = achlys_config:get(initial_task_lookup_delay, (?HMIN + ?MIN)) ,
@@ -159,13 +177,16 @@ handle_cast(_Request , State) ->
     {stop , Reason :: term() , NewState :: #state{}}).
 handle_info(periodical_lookup , State) ->
     Tasks = achlys_util:query(?TASKS),
-    logger:log(notice, "Task list : ~p", [Tasks]),
+    % BinTasks = achlys_util:query(?TASKS),
+    % Tasks = [ erlang:binary_to_term(Elem) || Elem <- BinTasks ],
+    logger:log(critical, "Task list : ~p", [Tasks]),
 
+    % L = [ {H, spawn_task(T)} || {T, H} <- Tasks
     L = [ {H, spawn_task(T)} || {T, H} <- Tasks
         , permanent_execution(T, H) =:= true
         , dict:is_key(H, State#state.tasks) =:= false ],
 
-    logger:log(notice, "New tasks : ~p", [L]),
+    logger:log(critical, "New tasks : ~p", [L]),
 
     NewDict = lists:foldl(fun
         (Elem, AccIn) ->
@@ -190,6 +211,8 @@ handle_info({'DOWN', Ref, process, Pid, Info} , State) ->
                 true ->
                     true;
                 false ->
+                    ok = dets:insert(history, {K, V}),
+                    dets:sync(history),
                     case ets:insert_new(task_history, {K, V}) of
                         true  ->
                             false;
@@ -277,6 +300,12 @@ permanent_execution(T, H) ->
         ?PERMANENT_TASK ->
             true;
         ?SINGLE_EXECUTION_TASK ->
+            case dets:lookup(history, H) of
+                [{_Key, _Record}] ->
+                    false;
+                [] ->
+                    true
+            end,
             not ets:member(task_history, H);
         _ ->
             false
