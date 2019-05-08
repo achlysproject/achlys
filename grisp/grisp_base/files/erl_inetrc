@@ -2,6 +2,9 @@
 
 % Add hosts
 %
+% inet_db:add_rc_list([{host, {130,104,228,16}, ["Igors-MacBook-Pro-2"]}]).
+%
+%
 %% Edge wireless laptop node :
 %% Replace <hostname> with the value returned by the "hostname -s" command
 %% and uncomment host entry.

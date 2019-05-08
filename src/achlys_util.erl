@@ -196,6 +196,13 @@ declare_awset(Name) ->
     application:set_env(achlys , awset , AWSet) ,
     AWSet.
 
+declare_node_crdt(Name, Type) ->
+    BitString = unicode:characters_to_binary([
+        erlang:atom_to_binary(node(),utf8)
+        , "_"
+        , erlang:atom_to_binary(Name,utf8)] , utf8),
+    lasp:declare({BitString, Type},Type).
+
 get_variable_identifier(Name) ->
     {unicode:characters_to_binary([erlang:atom_to_binary(node(),utf8)
         , "_"

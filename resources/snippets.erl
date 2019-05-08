@@ -1,3 +1,5 @@
+% The size of the literal area is configurable through the +MIscs erts_alloc option.
+
 (achlys@Igors-MacBook-Pro-2)15> nc -u -b 255.255.255.255 9998
 (achlys@Igors-MacBook-Pro-2)15> gen_udp:send(S, {255,255,255,255}, 9998, <<"bcast test msg">>).
 * 1: syntax error before: 255.255

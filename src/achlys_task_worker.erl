@@ -33,8 +33,8 @@
 
 -define(SERVER , ?MODULE).
 % 65536 bytes of heap on 32-bit systems (4-byte words) i.e. 16384 words
-% -define(MAX_HEAP_SIZE , (erlang:system_info(wordsize) * 1024 * 16)).
--define(MAX_HEAP_SIZE , 16384).
+-define(MAX_HEAP_SIZE , (erlang:system_info(wordsize) * 1024 * 16)).
+% -define(MAX_HEAP_SIZE , 16384).
 
 %%====================================================================
 %% Records
@@ -277,7 +277,7 @@ spawn_task(Task) ->
     logger:log(notice, "Func : ~p", [F]),
 
     {Pid, Ref} = erlang:spawn_opt(F, [monitor
-        , {max_heap_size, #{size => 16384
+        , {max_heap_size, #{size => ?MAX_HEAP_SIZE
             , kill => true
             , error_logger => false}}
         , {message_queue_data, off_heap}

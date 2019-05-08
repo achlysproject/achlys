@@ -71,6 +71,7 @@
 -export([rainbow/0]).
 -export([light/0]).
 -export([mintemp/0]).
+-export([multilateration/2]).
 %%====================================================================
 
 %% API
@@ -225,6 +226,52 @@ mintemp() ->
                     _ ->
                         [ grisp_led:color(X, red) || X <- [1,2] ]
                 end
+        end)
+    end.
+
+-spec(multilateration(Separation :: pos_integer()
+    , RemoteNode :: atom()) ->
+    Fun :: erlang:function()).
+multilateration(Separation, RemoteNode) ->
+    fun() ->
+        Node = node(),
+        Identifier = achlys_util:declare_node_crdt(sonar
+        , state_gset),
+
+        Poller = fun F() ->
+            lasp:update(Identifier
+            , {add, {erlang:monotonic_time()
+                    , pmod_maxsonar:get()}}
+            , self()),
+            timer:sleep(10000),
+            F()
+        end,
+
+        spawn(fun() -> Poller() end),
+
+        spawn(fun() ->
+            lasp:read(RemoteNode, {cardinality, 1}),
+            {ok, RemoteSet} = lasp:query(RemoteNode),
+            {ok, NodeSet} = lasp:query(Identifier),
+            RemoteList = sets:to_list(RemoteSet),
+            NodeList = sets:to_list(NodeSet),
+            R1 = lists:max(NodeList),
+            R2 = lists:max(RemoteList),
+
+            R1Sq = math:pow(R1, 2),
+            X = ( R1Sq - math:pow(R2, 2) +
+            math:pow(Separation, 2)) / ( 2 * Separation),
+            Y = math:sqrt(R1Sq - math:pow(X, 2)),
+
+            ResultId = achlys_util:declare_node_crdt(results
+            , state_gset),
+
+            lasp:update(ResultId
+                , {add
+                    , {erlang:monotonic_time()
+                    , Node
+                    , {X, Y, (-Y)}}}
+                , self())
         end)
     end.
 

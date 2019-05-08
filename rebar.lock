@@ -9,7 +9,7 @@
  {<<"goldrush">>,{pkg,<<"goldrush">>,<<"0.1.9">>},3},
  {<<"grisp">>,
   {git,"https://github.com/GrispLasp/grisp.git",
-       {ref,"81efbd56ae29e95361128bf835cd8455aab644f4"}},
+       {ref,"31ec4f1c4ccc72cf8fb6ab4612342650f8374903"}},
   0},
  {<<"lager">>,{pkg,<<"lager">>,<<"3.6.10">>},2},
  {<<"lasp">>,
