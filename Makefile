@@ -5,6 +5,11 @@ GRISP_FILES_DIR      = $(CURDIR)/grisp/grisp_base/files
 TOOLS_DIR            = $(CURDIR)/tools
 REBAR                = $(TOOLS_DIR)/rebar3
 LOCAL_REBAR          = $(HOME)/.cache/rebar3/bin/rebar3
+LOCAL_REBAR_DIR          = $(HOME)/.cache/rebar3
+# LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib/*/ebin
+# PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plguins/*/ebin
+LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib
+PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plugins
 ERL                  := $(shell command -v erl 2> /dev/null)
 RELEASE_DIR          = $(CURDIR)/_build/default/rel/achlys
 VERSION              := $(shell cat VERSION | tr -ds \n \r)
@@ -40,7 +45,7 @@ $(error Could not found Erlang/OTP ('erl' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell erlshell docs test dialyzer cover release package tar clean distclean docker push upbar setaddr addemu deploy
+.PHONY: all compile shell erlshell docs test dialyzer cover release package tar clean distclean docker push upbar setaddr addemu deploy wipe cacheclean build
 
 
 
@@ -156,15 +161,28 @@ upbar:
 tar:
 	$(PRE) (rm -rf ./achlys.tar.gz) && (find ./ -type f > ../.achlys_archive) && (tar -zcvf achlys.tar.gz -T - < ../.achlys_archive) && rm -rf ../.achlys_archive $(POST)
 
+build:  
+	@ echo Rebuilding VM 
+	$(PRE) \
+            $(REBAR) update && \
+            $(REBAR) unlock && \
+            $(REBAR) upgrade && \
+            $(REBAR) grisp build --clean true --configure true $(POST) \
+    $(POST)
+
+cacheclean:
+	@ echo Cache purge
+	$(PRE) rm -rdf $(LIB_CACHE_DIR)/*/ebin $(PLUGIN_CACHE_DIR)/*/ebin $(POST)
 
 clean:
-	@ echo Cleaning out
+	@ echo Cleaning out	
 	$(PRE) $(REBAR) clean $(POST)
 	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
 
 
-distclean: clean
-	$(PRE) rm -rf _build rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
+distclean: cacheclean clean 
+	$(PRE) rm -rdf _build _grisp rebar.lock $(LIB_CACHE_DIR)/*/ebin $(PLUGIN_CACHE_DIR)/*/ebin $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
+#   $(PRE) rm -rdf _build _grisp rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
 
 
 docker:
