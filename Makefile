@@ -180,10 +180,8 @@ clean:
 	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
 
 
-distclean: cacheclean clean 
-	$(PRE) rm -rdf _build _grisp rebar.lock $(LIB_CACHE_DIR)/*/ebin $(PLUGIN_CACHE_DIR)/*/ebin $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
-#   $(PRE) rm -rdf _build _grisp rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
-
+distclean: clean 
+	$(PRE) rm -rdf _build _grisp rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
 
 docker:
 	$(PRE) docker build -t achlys ./ $(POST)
