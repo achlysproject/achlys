@@ -3,7 +3,8 @@
 CFG_DIR              = $(CURDIR)/config
 GRISP_FILES_DIR      = $(CURDIR)/grisp/grisp_base/files
 TOOLS_DIR            = $(CURDIR)/tools
-REBAR                = $(TOOLS_DIR)/rebar3
+# REBAR                = $(TOOLS_DIR)/rebar3
+REBAR                = rebar3
 LOCAL_REBAR          = $(HOME)/.cache/rebar3/bin/rebar3
 LOCAL_REBAR_DIR          = $(HOME)/.cache/rebar3
 # LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib/*/ebin
