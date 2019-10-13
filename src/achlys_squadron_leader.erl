@@ -28,6 +28,12 @@
 %%====================================================================
 
 -define(SERVER , ?MODULE).
+-define(SQUADRON_BCASTADDR, {169,254,255,255}).
+-define(SQUADRON_BCASTPORT, 27002).
+-define(SQUADRON_SOCK_ARGS, [binary, {broadcast, true}]).
+-define(SQUADRON_BCAST_FREQ, ?ONE).
+-define(SQUADRON_RECRUIT, <<1:1>>).
+-define(SQUADRON_ENLIST, <<0:1>>).
 
 %%====================================================================
 %% Records
@@ -35,8 +41,9 @@
 
 -record(state , {
     initial_formation_delay :: pos_integer() ,
-    formation_check_interval :: pos_integer(),
-    boards :: list()
+    formation_check_interval :: pos_integer() ,
+    boards :: list() ,
+    squad_sock :: gen_udp:socket()
 }).
 
 -type state() :: #state{}.
@@ -76,14 +83,18 @@ start_link() ->
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice , "Initializing cluster maintainer. ~n") ,
+    {ok, SquadSock} = gen_udp:open(?SQUADRON_BCASTPORT, ?SQUADRON_SOCK_ARGS) ,
+    logger:log(notice , "Squadron port open. ~n") ,
     Trigger = achlys_config:get(initial_formation_delay, 30000) ,
     Interval = achlys_config:get(formation_check_interval, 60000) ,
     Boards = achlys_config:get(boards, []) ,
+    % schedule_squadron_advertising() ,
     schedule_formation(Trigger) ,
     {ok , #state{
         initial_formation_delay = Trigger ,
-        formation_check_interval = Interval,
-        boards = Boards
+        formation_check_interval = Interval ,
+        boards = Boards ,
+        squad_sock = SquadSock
     }}.
 
 %%--------------------------------------------------------------------
@@ -191,6 +202,7 @@ maybe_clusterize(Boards) ->
     logger:log(notice, "Formation result : ~p ~n ", [Reached]).
 
 maybe_concurrent_clusterize(Boards) ->
+    % V= receive {udp, _, _, _, Bin} = Msg -> io:format("received~p ~n",[Msg], erlang:binary_to_term(Bin) after 2000 -> 0 end.
     % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
     _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
         ok ->
@@ -233,3 +245,9 @@ maybe_reach(Node) ->
 schedule_disterl_disconnect(Node) ->
     % true = net_kernel:disconnect(Node).
     erlang:send_after(60000 , ?SERVER , {disconnect_disterl, Node}).
+
+%% private
+-spec schedule_squadron_advertising() -> ok.
+schedule_squadron_advertising() ->
+    ok.
+    % gen_udp:send( SquadSock, ?SQUADRON_BCASTADDR, ?SQUADRON_BCASTPORT, ?SQUADRON_RECRUIT).
