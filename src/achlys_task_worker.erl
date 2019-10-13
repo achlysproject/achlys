@@ -131,15 +131,6 @@ handle_call(_Request , _From , State) ->
     {noreply , NewState :: #state{}} |
     {noreply , NewState :: #state{} , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: #state{}}).
-handle_cast({start_task, TaskName} , State) ->
-    %% TODO : basic approach for generic task execution can be done using :
-    %% List = achlys:get_all_tasks(),
-    %% T = hd([ X || X <- List, #{name := N} = X, N =:= TaskName ]),
-    %% #{function := Fun, targets := _Targets} = T,
-    %% % TODO : Check if part of destination set
-    %% Result = Fun(),
-    {noreply , State};
-
 handle_cast(_Request , State) ->
     {noreply , State}.
 
