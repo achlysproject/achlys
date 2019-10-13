@@ -62,7 +62,7 @@ compile:
         $(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/achlys/ebin $(CURDIR)
 
-shell: addemu
+shell:
 	$(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
 
 deploy:
