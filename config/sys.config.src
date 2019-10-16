@@ -44,6 +44,7 @@
 ]} ,
 
 {partisan , [
+    {peer_ip, ${PEER_IP}},
     {peer_port, 27000},
     {partisan_peer_service_manager , partisan_hyparview_peer_service_manager},
     {acceptor_pool_size, 5}
