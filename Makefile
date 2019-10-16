@@ -64,7 +64,7 @@ compile:
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/achlys/ebin $(CURDIR)
 
 shell:
-	$(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
+	SELF=$(echo hostname -s) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
 
 deploy:
 	$(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
