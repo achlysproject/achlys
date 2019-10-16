@@ -8,12 +8,15 @@
 %%% Created : 13. Dec 2018 19:30
 %%%-------------------------------------------------------------------
 -module(achlys_squadron_leader).
--author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
+-include_lib("achlys.hrl").
 
 -behaviour(gen_server).
 
 %% API
 -export([start_link/0]).
+-export([do_open/0]).
+-export([stop/1]).
+-export([receiver/0]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -30,8 +33,12 @@
 -define(SERVER , ?MODULE).
 -define(SQUADRON_BCASTADDR, {169,254,255,255}).
 -define(SQUADRON_BCASTPORT, 27002).
--define(SQUADRON_SOCK_ARGS, [binary, {broadcast, true}]).
--define(SQUADRON_BCAST_FREQ, ?ONE).
+-define(SQUADRON_SOCK_ARGS, [binary
+                            , {active, false}
+                            , {reuseaddr, true}
+                            , {multicast_loop, false}
+                            , {multicast_ttl, 3}
+                            , {broadcast, true}]).
 -define(SQUADRON_RECRUIT, <<1:1>>).
 -define(SQUADRON_ENLIST, <<0:1>>).
 
@@ -43,7 +50,8 @@
     initial_formation_delay :: pos_integer() ,
     formation_check_interval :: pos_integer() ,
     boards :: list() ,
-    squad_sock :: gen_udp:socket()
+    squad_sock :: gen_udp:socket() ,
+    controlling_process :: {pid(), reference()}
 }).
 
 -type state() :: #state{}.
@@ -83,8 +91,8 @@ start_link() ->
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice , "Initializing cluster maintainer. ~n") ,
-    {ok, SquadSock} = gen_udp:open(?SQUADRON_BCASTPORT, ?SQUADRON_SOCK_ARGS) ,
-    logger:log(notice , "Squadron port open. ~n") ,
+%%    {ok, SquadSock} = gen_udp:open(?SQUADRON_BCASTPORT, ?SQUADRON_SOCK_ARGS) ,
+%%    logger:log(notice , "Squadron port open. ~n") ,
     Trigger = achlys_config:get(initial_formation_delay, 30000) ,
     Interval = achlys_config:get(formation_check_interval, 60000) ,
     Boards = achlys_config:get(boards, []) ,
@@ -94,7 +102,7 @@ init([]) ->
         initial_formation_delay = Trigger ,
         formation_check_interval = Interval ,
         boards = Boards ,
-        squad_sock = SquadSock
+        controlling_process = {undefined, undefined}
     }}.
 
 %%--------------------------------------------------------------------
@@ -146,11 +154,23 @@ handle_cast(_Request , State) ->
 handle_info(formation , State) ->
     % _ = achlys:clusterize() ,
     % _ = achlys:contagion() ,
-    % maybe_clusterize(),
+    ControllingProcess = case State#state.controlling_process of
+        {undefined, undefined} ->
+            S = do_open(),
+            {Pid, Ref} = spawn_opt(?SERVER, receiver, [], [monitor]),
+            io:format("~nFirst Pid: ~p~nRef: ~p~n",[Pid, Ref]),
+            ok = gen_udp:controlling_process(S, Pid),
+            {Pid, Ref};
+        {Pid, Ref} ->
+            io:format("~nPid: ~p~nRef: ~p~n",[Pid, Ref]),
+            {Pid, Ref}
+    end,
     maybe_concurrent_clusterize(State#state.boards),
     _ = schedule_formation(State#state.formation_check_interval) ,
     % erlang:send_after(?MIN , ?SERVER , formation) ,
-    {noreply , State, hibernate};
+    {noreply
+        , State#state{ controlling_process = ControllingProcess }
+        , hibernate};
 handle_info({disconnect_disterl, Node} , State) ->
     true = net_kernel:disconnect(Node),
     logger:log(notice, "Disterl connection closed for node : ~p ~n ", [Node]),
@@ -202,7 +222,12 @@ maybe_clusterize(Boards) ->
     logger:log(notice, "Formation result : ~p ~n ", [Reached]).
 
 maybe_concurrent_clusterize(Boards) ->
-    % V= receive {udp, _, _, _, Bin} = Msg -> io:format("received~p ~n",[Msg], erlang:binary_to_term(Bin) after 2000 -> 0 end.
+    % V= receive {udp, _, _, _, Bin} = Msg ->
+    %   io:format("received~p ~n",[Msg],
+    %   erlang:binary_to_term(Bin)
+    % after 2000 ->
+    %   0
+    % end.
     % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
     _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
         ok ->
@@ -246,8 +271,26 @@ schedule_disterl_disconnect(Node) ->
     % true = net_kernel:disconnect(Node).
     erlang:send_after(60000 , ?SERVER , {disconnect_disterl, Node}).
 
-%% private
--spec schedule_squadron_advertising() -> ok.
-schedule_squadron_advertising() ->
-    ok.
-    % gen_udp:send( SquadSock, ?SQUADRON_BCASTADDR, ?SQUADRON_BCASTPORT, ?SQUADRON_RECRUIT).
+receiver() ->
+   receive
+       {udp, _Socket, IP, InPortNo, Packet} ->
+           io:format("~n~nFrom: ~p~nPort: ~p~nData: ~p~n",[IP,InPortNo,inet_dns:decode(Packet)]),
+           receiver();
+       stop -> true;
+       AnythingElse -> io:format("RECEIVED: ~p~n",[AnythingElse]),
+           receiver()
+   end.
+
+stop({S,Pid}) ->
+   gen_udp:close(S),
+   Pid ! stop.
+
+do_open() ->
+    {ok,S} = gen_udp:open(5353,[
+       {reuseaddr,true}
+        , {ip,{224,0,0,251}}
+        , {multicast_ttl,3}
+        , {multicast_loop,false}
+        , binary]),
+    inet:setopts(S,[{add_membership,{{224,0,0,251},{0,0,0,0}}}]),
+    S.
