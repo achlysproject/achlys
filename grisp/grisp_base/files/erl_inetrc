@@ -2,13 +2,14 @@
 
 % Add hosts
 
-{{#env.SELF}}
-{host, {169,254,187,90}, ["{{#env.SELF}}"]}.
-{{#env.SELF}}
-
+% {{#env.NAME}}
+% {{#env.PEER_IP}}
+% {host, {{{env.PEER_IP}}}, ["{{env.NAME}}"]}.
+% {{/env.PEER_IP}}
+% {{/env.NAME}}
 %--- GRiSP boards --------------------------------------------------------------
 
-% {host, {169,254,16,1}, ["my_grisp_board_1"]}.
+% {host, {169,254,255,255}, ["my_grisp_board_1"]}.
 % {host, {169,254,16,2}, ["my_grisp_board_2"]}.
 % {host, {169,254,16,3}, ["my_grisp_board_3"]}.
 % {host, {169,254,16,4}, ["my_grisp_board_4"]}.
@@ -26,4 +27,4 @@
 {cache_size, 0}.
 
 % Specify lookup method
-{lookup, [file, native]}.
+{lookup, [file, native, dns]}.
