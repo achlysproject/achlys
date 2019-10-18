@@ -6,9 +6,7 @@
 %% Replace <hostname> with the value returned by the "hostname -s" command
 %% and uncomment host entry.
 
-{host, {169,254,187,90}, ["MBP"]}.
-
-% {resolv_conf, "/etc/resolv.conf"}.
+% {host, {169,254,187,90}, ["MBP"]}.
 
 %--- GRiSP boards --------------------------------------------------------------
 
@@ -26,16 +24,8 @@
 % Do not monitor the hosts file
 {hosts_file, ""}.
 
-%% 'super.eua.ericsson.se'.
-%% 'renat.eua.ericsson.se'.
-%% 'grouse.eua.ericsson.se'.
-%% 'gauffin1.eua.ericsson.se'.
-%% ^ (new line)
-
 % Disable caching
 {cache_size, 0}.
 
 % Specify lookup method
-{lookup, [file, native, dns]}.
-
-% {inet6, false}.
+{lookup, [file, native]}.
