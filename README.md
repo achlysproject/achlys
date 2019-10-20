@@ -18,7 +18,7 @@ Disclaimer : Achlys is currently under active development, hence a production-re
 
 - [otp](https://github.com/erlang/otp) `22.0.4`
 - [rebar3](https://github.com/erlang/rebar3) `3.12.0`
-- [grisp](https://github.com/grisp/grisp) `1.1.6
+- [grisp](https://github.com/grisp/grisp) `1.1.6`
 - [rebar3_grisp](https://github.com/grisp/rebar3_grisp) `1.2.6`
 - [grisp-software](https://github.com/grisp/grisp-software) : a fully built grisp toolchain.
 - [partisan](https://github.com/lasp-lang/partisan) `3.0.0`
