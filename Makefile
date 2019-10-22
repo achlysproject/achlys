@@ -71,11 +71,23 @@ compile:
 		$(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/achlys/ebin $(CURDIR)
 
-shell: addemu
-	$(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
+shell:
+	@ echo Launching shell
+	$(PRE) \
+        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
+        export NAME=$(hostname -s) && \
+	    echo 'PEER_IP=$(PEER_IP)' > $(CURDIR)/default.env && \
+	    echo 'NAME=$(NAME)' >> $(CURDIR)/default.env && \
+	    $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
 
 deploy:
-	$(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
+	@ echo Deploying
+	$(PRE) \
+        export NAME=$(echo hostname -s) && \
+        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
+        echo "PEER_IP=$(PEER_IP)" > $(CURDIR)/default.env && \
+        echo "NAME=$(NAME)" > $(CURDIR)/default.env && \
+	    $(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
 
 erlshell:
 	@ echo Compiling user_default module
