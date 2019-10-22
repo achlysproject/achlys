@@ -46,7 +46,7 @@ $(error Could not find Rebar3 ('rebar3' command) installed on this system.)
 endif
 
 
-.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean distclean push upbar addemu deploy cacheclean build
+.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean distclean push upbar addemu deploy cacheclean build upgrade tree
 
 
 
@@ -167,13 +167,24 @@ upbar:
 tar:
 	$(PRE) (rm -rf ./achlys.tar.gz) && (find ./ -type f > ../.achlys_archive) && (tar -zcvf achlys.tar.gz -T - < ../.achlys_archive) && rm -rf ../.achlys_archive $(POST)
 
-build:  
-	@ echo Rebuilding VM 
+upgrade:
+	@ echo Upgrading dependencies
 	$(PRE) \
 			$(REBAR) update && \
 			$(REBAR) unlock && \
-			$(REBAR) upgrade && \
+			$(REBAR) upgrade \
+	$(POST)
+
+build: upgrade
+	@ echo Rebuilding VM 
+	$(PRE) \
 			$(REBAR) grisp build --clean true --configure true $(POST) \
+	$(POST)
+
+tree: upgrade
+	@ echo Dependency tree :
+	$(PRE) \
+			$(REBAR) tree \
 	$(POST)
 
 cacheclean:
