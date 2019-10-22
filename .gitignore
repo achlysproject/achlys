@@ -13,6 +13,9 @@ rel/example_project
 _grisp
 _build
 
+# Rebar3
+_checkouts
+
 # Achlys
 achlys_21.0_plt
 LICENSE.md
