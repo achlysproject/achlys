@@ -85,6 +85,7 @@ start_link() ->
     {ok , State :: state()} | {ok , State :: state() , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
+    {ok, _Deps} = application:ensure_all_started(lasp),
     logger:log(notice, "Initializing task server module"),
     erlang:send_after(?ONE, ?SERVER, declare),
     {ok , #state{}}.

@@ -1,7 +1,7 @@
 { application , achlys , [
     {description , "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"} ,
-    {vsn , "0.3.0"} ,
+    {vsn , "0.3.1"} ,
 
     {registered , [achlys
         ,          achlys_app
@@ -23,8 +23,6 @@
     {applications , [kernel
         ,            stdlib
         ,            grisp
-        ,            partisan
-        ,            lasp
     ]} ,
 
     {env , []} ,
@@ -61,7 +59,6 @@
         ,     "rebar.lock"
         ,     "src"
         ,     "grisp"
-        ,     "priv"
         ,     "Makefile"
     ]} ,
     {build_tools , ["rebar3"]}
