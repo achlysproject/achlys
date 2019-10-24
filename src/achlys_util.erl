@@ -236,42 +236,5 @@ do_disconnect(5) ->
 do_disconnect(6) ->
     net_kernel:disconnect(achlys@my_grisp_board_6).
 
-add_sample_task() ->
-    F = sample_function(),
-    #{
-        name => sample_task,
-        targets => ?TARGET_ALL_NODES,
-        execution_type => ?PERMANENT_TASK,
-        function => F
-    }.
-
-sample_function() ->
-    fun F() -> io:format("Sample function ! ~n") end.
-
-get_temperatures() ->
-    {ok,S1} = lasp:query({<<"achlys@my_grisp_board_1_temperature">> , state_awset}) ,
-    {ok,S2} = lasp:query({<<"achlys@my_grisp_board_2_temperature">> , state_awset}) ,
-    {ok,S3} = lasp:query({<<"achlys@my_grisp_board_3_temperature">> , state_awset}) ,
-    {ok,S4} = lasp:query({<<"achlys@my_grisp_board_4_temperature">> , state_awset}) ,
-    {ok,S5} = lasp:query({<<"achlys@my_grisp_board_5_temperature">> , state_awset}) ,
-    {ok,S6} = lasp:query({<<"achlys@my_grisp_board_6_temperature">> , state_awset}) ,
-    logger:log(notice, "Board 1 Temp : ~p ~n", [ sets:to_list(S1) ]) ,
-    logger:log(notice, "Board 2 Temp : ~p ~n", [ sets:to_list(S2) ]) ,
-    logger:log(notice, "Board 3 Temp : ~p ~n", [ sets:to_list(S3) ]) ,
-    logger:log(notice, "Board 4 Temp : ~p ~n", [ sets:to_list(S4) ]) ,
-    logger:log(notice, "Board 5 Temp : ~p ~n", [ sets:to_list(S5) ]) ,
-    logger:log(notice, "Board 6 Temp : ~p ~n", [ sets:to_list(S6) ]).
-
-get_pressures() ->
-    {ok,S1} = lasp:query({<<"achlys@my_grisp_board_1_pressure">> , state_awset}) ,
-    {ok,S2} = lasp:query({<<"achlys@my_grisp_board_2_pressure">> , state_awset}) ,
-    {ok,S3} = lasp:query({<<"achlys@my_grisp_board_3_pressure">> , state_awset}) ,
-    {ok,S4} = lasp:query({<<"achlys@my_grisp_board_4_pressure">> , state_awset}) ,
-    {ok,S5} = lasp:query({<<"achlys@my_grisp_board_5_pressure">> , state_awset}) ,
-    {ok,S6} = lasp:query({<<"achlys@my_grisp_board_6_pressure">> , state_awset}) ,
-    logger:log(notice, "Board 1 Press : ~p ~n", [ sets:to_list(S1) ]) ,
-    logger:log(notice, "Board 2 Press : ~p ~n", [ sets:to_list(S2) ]) ,
-    logger:log(notice, "Board 3 Press : ~p ~n", [ sets:to_list(S3) ]) ,
-    logger:log(notice, "Board 4 Press : ~p ~n", [ sets:to_list(S4) ]) ,
-    logger:log(notice, "Board 5 Press : ~p ~n", [ sets:to_list(S5) ]) ,
-    logger:log(notice, "Board 6 Press : ~p ~n", [ sets:to_list(S6) ]).
+rainbow_test() ->
+    achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
