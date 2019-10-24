@@ -239,15 +239,14 @@ clusterize() ->
     clusterize(Reachable).
 
 %% @doc Form Lasp cluster without attempting to ping neighbors beforehand.
--spec contagion() -> [{ error , atom() } | { ok , atom() } ].
+-spec contagion() -> {ok, []} | {ok, [map()]}.
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
-    % L = get_preys(),
-    % Self = ?MANAGER:myself(),
     N = seek_neighbors() ,
     Remotes = binary_remotes_to_atoms(N) ,
-    [ bidirectional_join(R) || R <- Remotes
-        ,        R =/= node()].
+    L = [ bidirectional_join(R) || R <- Remotes
+        ,        R =/= node()],
+    {ok, L}.
 
 %% @doc Close disterl TCP connections with neighboring nodes.
 -spec pandemia() -> ok.
@@ -318,9 +317,15 @@ seek_neighbors([]) ->
     [].
 
 %% @private
+-spec join(atom()) -> {ok, atom()} | {error, atom(), atom()}.
 join(Host) ->
-    ok = lasp_peer_service:join(Host),
-    {ok, Host}.
+    case lasp_peer_service:join(Host) of
+        ok ->
+            {ok, Host};
+        {error, Reason} ->
+            logger:log(warning , "Failed lasp_peer_service join for : ~p ~nReason : ~p ~n" , [Host, Reason]) ,
+            {error, Reason, Host}
+     end.
 
 
 %% @private
