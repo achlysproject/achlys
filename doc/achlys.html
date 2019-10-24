@@ -38,7 +38,6 @@
   as seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#bane_all_preys-1">bane_all_preys/1</a></td><td>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</td></tr>
-<tr><td valign="top"><a href="#bench-0">bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#bite-1">bite/1</a></td><td>Adds the given task in the replicated task set.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#contagion-0">contagion/0</a></td><td>Form Lasp cluster without attempting to ping neighbors beforehand.</td></tr>
@@ -46,7 +45,6 @@
 used to pass more readable arguments to create a task model variable  
 instead of binary strings.</td></tr>
 <tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
-<tr><td valign="top"><a href="#get_bench-0">get_bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
   that could be potential neighbors.</td></tr>
 <tr><td valign="top"><a href="#light-0">light/0</a></td><td></td></tr>
@@ -74,11 +72,6 @@ instead of binary strings.</td></tr>
 <p><tt>bane_all_preys(Data::atom()) -&gt; list()</tt><br></p>
 </div><p>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</p>
-
-<h3 class="function"><a name="bench-0">bench/0</a></h3>
-<div class="spec">
-<p><tt>bench() -&gt; any()</tt></p>
-</div>
 
 <h3 class="function"><a name="bite-1">bite/1</a></h3>
 <div class="spec">
@@ -121,11 +114,6 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
 <div class="spec">
 <p><tt>get_all_tasks() -&gt; [<a href="achlys.html#type-task">achlys:task()</a>] | []</tt><br></p>
 </div><p>Returns current view of all tasks.</p>
-
-<h3 class="function"><a name="get_bench-0">get_bench/0</a></h3>
-<div class="spec">
-<p><tt>get_bench() -&gt; any()</tt></p>
-</div>
 
 <h3 class="function"><a name="get_preys-0">get_preys/0</a></h3>
 <div class="spec">
