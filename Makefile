@@ -46,7 +46,7 @@ $(error Could not find Rebar3 ('rebar3' command) installed on this system.)
 endif
 
 
-.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean distclean push upbar addemu deploy cacheclean build upgrade tree
+.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
 
 
 
@@ -203,7 +203,11 @@ cacheclean:
 	@ echo Cache purge
 	$(PRE) rm -rdf $(LIB_CACHE_DIR)/*/ebin $(PLUGIN_CACHE_DIR)/*/ebin $(POST)
 
-clean:
+clean: relclean
 	@ echo Cleaning out	
 	$(PRE) $(REBAR) clean $(POST)
 	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
+
+relclean:
+	@ echo Release clean
+	$(PRE) rm -rdf $(CURDIR)/$(RELEASE_NAME)/ && rm -rdf $(CURDIR)/$(RELEASE_NAME).tar.gz $(POST)
