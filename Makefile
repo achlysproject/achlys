@@ -17,6 +17,8 @@ NAME_UPPER           := $(shell echo achlys | awk '{print toupper($$1)}')
 GRISPAPP             ?= $(shell basename `find src -name "*.app.src"` .app.src)
 REBAR_CONFIG         = $(CURDIR)/rebar.config
 COOKIE               ?= MyCookie
+NAME 				 := $(hostname -s)
+PEER_IP 	 		 := $(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
 
 PRE         = @
 POST        =
@@ -74,11 +76,7 @@ compile:
 shell:
 	@ echo Launching shell
 	$(PRE) \
-        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
-        export NAME=$(hostname -s) && \
-	    echo 'PEER_IP=$(PEER_IP)' > $(CURDIR)/default.env && \
-	    echo 'NAME=$(NAME)' >> $(CURDIR)/default.env && \
-	    $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
+	    NAME=$(NAME) PEER_IP=$(HOST_PEER_IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
 
 deploy:
 	@ echo Deploying
@@ -86,7 +84,6 @@ deploy:
         export NAME=$(echo hostname -s) && \
         export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
         echo "PEER_IP=$(PEER_IP)" > $(CURDIR)/default.env && \
-        echo "NAME=$(NAME)" > $(CURDIR)/default.env && \
 	    $(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
 
 erlshell:
