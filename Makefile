@@ -17,8 +17,8 @@ NAME_UPPER           := $(shell echo achlys | awk '{print toupper($$1)}')
 GRISPAPP             ?= $(shell basename `find src -name "*.app.src"` .app.src)
 REBAR_CONFIG         = $(CURDIR)/rebar.config
 COOKIE               ?= MyCookie
-NAME 				 := $(hostname -s)
-PEER_IP 	 		 := $(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
+NAME 				 := $(shell hostname -s)
+PEER_IP 	 		 := $(shell ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
 
 PRE         = @
 POST        =
@@ -76,7 +76,7 @@ compile:
 shell:
 	@ echo Launching shell
 	$(PRE) \
-	    NAME=$(NAME) PEER_IP=$(HOST_PEER_IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
+	    NAME=$(NAME) PEER_IP=$(PEER_IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
 
 deploy:
 	@ echo Deploying
@@ -203,7 +203,7 @@ cacheclean:
 clean: relclean
 	@ echo Cleaning out	
 	$(PRE) $(REBAR) clean $(POST)
-	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
+	$(PRE) rm -rf $(CURDIR)/ebin && rm -rdf $(CURDIR)/_build/ && rm -rdf $(CURDIR)/_checkouts/*/ebin $(POST)
 
 relclean:
 	@ echo Release clean
