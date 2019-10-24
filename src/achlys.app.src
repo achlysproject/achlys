@@ -16,7 +16,6 @@
         ,          achlys_task_server
         ,          achlys_task_worker
         ,          achlys_squadron_leader
-        ,          achlys_load_generator
     ]} ,
 
     {mod , {achlys_app , []}} ,
@@ -40,7 +39,6 @@
         , achlys_task_server
         , achlys_task_worker
         , achlys_squadron_leader
-        , achlys_load_generator
     ]} ,
 
     {licenses , ["Apache 2.0"]} ,
