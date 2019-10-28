@@ -1,7 +1,7 @@
 { application , achlys , [
     {description , "A framework for applications using Lasp
     on GRiSP embedded systems at the edge"} ,
-    {vsn , "0.3.0"} ,
+    {vsn , "0.3.1"} ,
 
     {registered , [achlys
         ,          achlys_app
@@ -16,15 +16,12 @@
         ,          achlys_task_server
         ,          achlys_task_worker
         ,          achlys_squadron_leader
-        ,          achlys_load_generator
     ]} ,
 
     {mod , {achlys_app , []}} ,
     {applications , [kernel
         ,            stdlib
         ,            grisp
-        ,            partisan
-        ,            lasp
     ]} ,
 
     {env , []} ,
@@ -42,7 +39,6 @@
         , achlys_task_server
         , achlys_task_worker
         , achlys_squadron_leader
-        , achlys_load_generator
     ]} ,
 
     {licenses , ["Apache 2.0"]} ,
@@ -61,7 +57,6 @@
         ,     "rebar.lock"
         ,     "src"
         ,     "grisp"
-        ,     "priv"
         ,     "Makefile"
     ]} ,
     {build_tools , ["rebar3"]}
