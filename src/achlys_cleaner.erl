@@ -131,7 +131,7 @@ handle_cast({flush_table, Table} , State) ->
                 undefined ->
                     logger:log(info, "No DETS table ~p, flushing not necessary ~n", [Table]);
                 _ ->
-                    true = dets:delete_all_objects(Table) ,
+                    ok = dets:delete_all_objects(Table) ,
                     logger:log(notice , "Flushed DETS table ~p ~n" , [Table])
             end;
         {ok, lasp_ets_storage_backend} ->

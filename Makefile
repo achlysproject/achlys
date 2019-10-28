@@ -3,9 +3,8 @@
 CFG_DIR              = $(CURDIR)/config
 GRISP_FILES_DIR      = $(CURDIR)/grisp/grisp_base/files
 TOOLS_DIR            = $(CURDIR)/tools
+HOST_REBAR           := $(shell command which rebar3)
 REBAR                = $(TOOLS_DIR)/rebar3
-LOCAL_REBAR          = $(HOME)/.cache/rebar3/bin/rebar3
-LOCAL_REBAR_DIR          = $(HOME)/.cache/rebar3
 # LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib/*/ebin
 # PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plguins/*/ebin
 LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib
@@ -16,10 +15,10 @@ VERSION              := $(shell cat VERSION | tr -ds \n \r)
 RELEASE_NAME         = achlys-$(VERSION)
 NAME_UPPER           := $(shell echo achlys | awk '{print toupper($$1)}')
 GRISPAPP             ?= $(shell basename `find src -name "*.app.src"` .app.src)
-GRISP_TEST_SRC_DIR	 ?= $(CURDIR)/_build/default/lib/grisp/test/
 REBAR_CONFIG         = $(CURDIR)/rebar.config
-REBAR_APPEND	     ?= {extra_src_dirs, [\"$(GRISP_TEST_SRC_DIR)\"]}.
 COOKIE               ?= MyCookie
+NAME 				 := $(shell hostname -s)
+PEER_IP 	 		 := $(shell ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
 
 PRE         = @
 POST        =
@@ -41,47 +40,66 @@ coverage = /dev/null
 endif
 
 ifndef ERL
-$(error Could not found Erlang/OTP ('erl' command) installed on this system.)
+$(error Could not find Erlang/OTP ('erl' command) installed on this system.)
+endif
+
+ifndef HOST_REBAR
+$(error Could not find Rebar3 ('rebar3' command) installed on this system.)
 endif
 
 
-.PHONY: all compile shell erlshell docs test dialyzer cover release package tar clean distclean docker push upbar setaddr addemu deploy wipe cacheclean build
+.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
 
 
 
 all: test docs package
 
+checkrebar3:
+	@ echo Checking host Rebar3 version
+	$(PRE) \
+			$(HOST_REBAR) version \
+		$(POST)
+	@ echo Adding locally installed Rebar3 to tools directory
+	$(PRE) (cp -r $(HOST_REBAR) $(REBAR)) && ($(REBAR) version) $(POST)
+
 
 compile:
 	@ echo Compiling code
 	$(PRE)                                         \
-            export $(NAME_UPPER)_BUILD=COMPILE      && \
-            export DEBUG=$(REBAR_DEBUG)             && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) compile                           \
-        $(POST)
+			export $(NAME_UPPER)_BUILD=COMPILE      && \
+			export DEBUG=$(REBAR_DEBUG)             && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) compile                           \
+		$(POST)
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/achlys/ebin $(CURDIR)
 
-shell: addemu
-	$(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP)
+shell:
+	@ echo Launching shell
+	$(PRE) \
+	    NAME=$(NAME) PEER_IP=$(PEER_IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
 
 deploy:
-	$(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
+	@ echo Deploying
+	$(PRE) \
+        export NAME=$(echo hostname -s) && \
+        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
+        echo "PEER_IP=$(PEER_IP)" > $(CURDIR)/default.env && \
+	    $(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
 
 erlshell:
 	@ echo Compiling user_default module
 	$(PRE) erlc -o $(TOOLS_DIR) $(TOOLS_DIR)/user_default.erl $(POST)
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=SHELL && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) compile \
-        $(POST) && \
-        erl -pa `ls -d _build/default/lib/*/ebin` \
-                -pz $(TOOLS_DIR) \
-                -config $(CFG_DIR)/sys.config \
-                -args_file $(CFG_DIR)/vm.args \
-                -eval "begin application:load('achlys'), catch code:load_file('achlys') end" \
+			export $(NAME_UPPER)_BUILD=SHELL && \
+			export DEBUG=$(REBAR_DEBUG) && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) compile \
+		$(POST) && \
+		erl -pa `ls -d _build/default/lib/*/ebin` \
+				-pz $(TOOLS_DIR) \
+				-config $(CFG_DIR)/sys.config \
+				-args_file $(CFG_DIR)/vm.args \
+				-eval "begin application:load('achlys'), catch code:load_file('achlys') end" \
 
 addemu:
 	@ if [ -f $(REBAR_CONFIG) ]; then \
@@ -92,17 +110,14 @@ addemu:
 		echo "ERROR: no rebar"; \
 	fi \
 
-setaddr:
-	networksetup -setmanual "Wi-Fi" 169.254.187.90 255.255.0.0 169.254.187.90
-
 docs:
 	@ echo Building documentation
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=DOC && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) edoc \
-        $(POST)
+			export $(NAME_UPPER)_BUILD=DOC && \
+			export DEBUG=$(REBAR_DEBUG) && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) edoc \
+		$(POST)
 
 
 test: cover
@@ -111,42 +126,42 @@ test: cover
 dialyzer: compile
 	@ echo Running dialyzer
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=DIALYZER && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) dialyzer \
-        $(POST)
+			export $(NAME_UPPER)_BUILD=DIALYZER && \
+			export DEBUG=$(REBAR_DEBUG) && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) dialyzer \
+		$(POST)
 
 
 cover: compile
 	@ echo Running tests
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=TEST && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) do ct, cover \
-        $(POST)
+			export $(NAME_UPPER)_BUILD=TEST && \
+			export DEBUG=$(REBAR_DEBUG) && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) do ct, cover \
+		$(POST)
 	@ echo Coverage summary:
 	$(PRE) \
-            awk -f $(TOOLS_DIR)/coverage_summary.awk \
-                -v indent="\t" \
-                -v colorize=1 \
-                $(CURDIR)/_build/test/cover/index.html \
-            || true
+			awk -f $(TOOLS_DIR)/coverage_summary.awk \
+				-v indent="\t" \
+				-v colorize=1 \
+				$(CURDIR)/_build/test/cover/index.html \
+			|| true
 	$(PRE) \
-            awk -f $(TOOLS_DIR)/coverage_summary.awk \
-                   $(CURDIR)/_build/test/cover/index.html \
-            > $(coverage) || true
+			awk -f $(TOOLS_DIR)/coverage_summary.awk \
+				   $(CURDIR)/_build/test/cover/index.html \
+			> $(coverage) || true
 
 
 release: compile
 	@ echo Building release $(RELEASE_NAME)
 	$(PRE) \
-            export $(NAME_UPPER)_BUILD=RELEASE && \
-            export DEBUG=$(REBAR_DEBUG) && \
-            export $(NAME_UPPER)_VERSION=$(VERSION) && \
-            $(REBAR) release \
-        $(POST)
+			export $(NAME_UPPER)_BUILD=RELEASE && \
+			export DEBUG=$(REBAR_DEBUG) && \
+			export $(NAME_UPPER)_VERSION=$(VERSION) && \
+			$(REBAR) release \
+		$(POST)
 	$(PRE) mkdir -p $(CURDIR)/$(RELEASE_NAME) $(POST)
 	$(PRE) cp -r $(RELEASE_DIR)/* $(CURDIR)/$(RELEASE_NAME) $(POST)
 
@@ -161,32 +176,35 @@ upbar:
 tar:
 	$(PRE) (rm -rf ./achlys.tar.gz) && (find ./ -type f > ../.achlys_archive) && (tar -zcvf achlys.tar.gz -T - < ../.achlys_archive) && rm -rf ../.achlys_archive $(POST)
 
-build:  
+upgrade:
+	@ echo Upgrading dependencies
+	$(PRE) \
+			$(REBAR) update && \
+			$(REBAR) unlock && \
+			$(REBAR) upgrade \
+	$(POST)
+
+build: upgrade
 	@ echo Rebuilding VM 
 	$(PRE) \
-            $(REBAR) update && \
-            $(REBAR) unlock && \
-            $(REBAR) upgrade && \
-            $(REBAR) grisp build --clean true --configure true $(POST) \
-    $(POST)
+			$(REBAR) grisp build --clean true --configure true $(POST) \
+	$(POST)
+
+tree: upgrade
+	@ echo Dependency tree :
+	$(PRE) \
+			$(REBAR) tree \
+	$(POST)
 
 cacheclean:
 	@ echo Cache purge
 	$(PRE) rm -rdf $(LIB_CACHE_DIR)/*/ebin $(PLUGIN_CACHE_DIR)/*/ebin $(POST)
 
-clean:
+clean: relclean
 	@ echo Cleaning out	
 	$(PRE) $(REBAR) clean $(POST)
-	$(PRE) rm -rf $(CURDIR)/ebin $(POST)
+	$(PRE) rm -rf $(CURDIR)/ebin && rm -rdf $(CURDIR)/_build/ && rm -rdf $(CURDIR)/_checkouts/*/ebin $(POST)
 
-
-distclean: clean 
-	$(PRE) rm -rdf _build _grisp rebar.lock $(RELEASE_NAME) $(RELEASE_NAME).tar.gz achlys.tar.gz ebin tools/user_default.beam $(POST)
-
-docker:
-	$(PRE) docker build -t achlys ./ $(POST)
-
-
-push: cover
-	@ echo Pushing to master branch
-	$(PRE) git push origin master
+relclean:
+	@ echo Release clean
+	$(PRE) rm -rdf $(CURDIR)/$(RELEASE_NAME)/ && rm -rdf $(CURDIR)/$(RELEASE_NAME).tar.gz $(POST)

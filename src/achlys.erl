@@ -78,7 +78,6 @@
 -export([contagion/0]).
 -export([pandemia/0]).
 -export([get_preys/0]).
-% -export([get_bounded_preys/0]).
 -export([bidirectional_join/1]).
 
 %% PMOD-related functions API
@@ -93,10 +92,6 @@
 -export([flush/1]).
 -export([join_host/1]).
 -export([join/1]).
-
--export([bench/0]).
--export([get_bench/0]).
-
 
 %%====================================================================
 %% TODO: Binary encoding of values propagated through CRDTs instead
@@ -187,8 +182,6 @@ declare(Name, Targets, ExecType, Func) ->
 
 -spec rainbow() -> erlang:function().
 rainbow() ->
-% achlys:bite(achlys:declare(t,all,permanent,fun() -> [grisp_led:color(X,off)|| X <- [1,2]] end)).
-% achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
     achlys_util:rainbow().
 
 -spec light() -> erlang:function().
@@ -246,15 +239,14 @@ clusterize() ->
     clusterize(Reachable).
 
 %% @doc Form Lasp cluster without attempting to ping neighbors beforehand.
--spec contagion() -> [{ error , atom() } | { ok , atom() } ].
+-spec contagion() -> {ok, []} | {ok, [map()]}.
 contagion() ->
     logger:log(notice , "Pure Lasp Cluster formation attempt ~n") ,
-    % L = get_preys(),
-    % Self = ?MANAGER:myself(),
     N = seek_neighbors() ,
     Remotes = binary_remotes_to_atoms(N) ,
-    [ bidirectional_join(R) || R <- Remotes
-        ,        R =/= node()].
+    L = [ bidirectional_join(R) || R <- Remotes
+        ,        R =/= node()],
+    {ok, L}.
 
 %% @doc Close disterl TCP connections with neighboring nodes.
 -spec pandemia() -> ok.
@@ -269,13 +261,7 @@ pandemia() ->
 % bane(Data) when is_atom(Data) ->
 bane(Data) ->
     logger:log(notice , "Reading ~p CRDT ~n", [Data]) ,
-    % Id = {atom_to_binary(Data, utf8), state_awset_ps},
-    % Id = {atom_to_binary(Data, utf8), state_awset},
     Id = {atom_to_binary(Data, utf8), state_gset},
-    % L = [ unicode:characters_to_binary([X
-    %     , "_"
-    %     , erlang:atom_to_binary(Data,utf8)] , utf8)
-    %     || X <- seek_neighbors() ],
     {ok, S} = lasp:query(Id),
     sets:to_list(S).
 
@@ -291,20 +277,7 @@ bane_all_preys(pressure) ->
 bane_all_preys(Data) ->
     logger:log(error , "Unknown value ~p ~n", [Data]) ,
     [undefined].
-    % bane(L).
-% bane([H|T]) ->
-%     {ok, S} = lasp:query({H, state_awset}),
-%     L = sets:to_list(S),
-%     [ L | bane(T) ];
-% bane([]) ->
-%     [].
 
-bench() ->
-    achlys_pmod_nav_worker:bench_awset().
-
-get_bench() ->
-    {ok, S} = lasp:query({<<"bench">>,state_awset}),
-    sets:to_list(S).
 %% @doc Collect data based on sensors available on Pmod modules and store
 %% aggregated values in corresponding Lasp variable.
 -spec venom() -> ok.
@@ -316,7 +289,6 @@ venom() ->
 -spec venom(atom()) -> ok.
 venom(Worker) ->
     Worker:run().
-    % achlys_pmod_nav_worker:run().
 
 %%====================================================================
 %% Clustering helper functions
@@ -345,22 +317,16 @@ seek_neighbors([]) ->
     [].
 
 %% @private
+-spec join(atom()) -> {ok, atom()} | {error, atom(), atom()}.
 join(Host) ->
-    % try rpc:call(Host , partisan_hyparview_peer_service_manager , myself , []) of
-    %     #{channels := _Channels
-    %     , listen_addrs := _Addresses
-    %     , name := _Name
-    %     , parallelism := _Parallelism } = Node ->
-            ok = lasp_peer_service:join(Host),
-            {ok, Host}.
-    % catch
-    %     {badrpc, Reason} ->
-    %         logger:log(error , "Unable to RPC remote : ~p~n" , [Reason]) ,
-    %         {error , Reason};
-    %     {error, Reason} ->
-    %         logger:log(error , "Unable to retrieve remote : ~p~n" , [Reason]) ,
-    %         {error , Reason}
-    % end.
+    case lasp_peer_service:join(Host) of
+        ok ->
+            {ok, Host};
+        {error, Reason} ->
+            logger:log(warning , "Failed lasp_peer_service join for : ~p ~nReason : ~p ~n" , [Host, Reason]) ,
+            {error, Reason, Host}
+     end.
+
 
 %% @private
 bidirectional_join(Host) ->

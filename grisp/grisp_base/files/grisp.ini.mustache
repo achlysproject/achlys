@@ -2,13 +2,17 @@
 image_path = /media/mmcsd-0-0/{{release_name}}/erts-{{erts_vsn}}/bin/beam.bin
 
 [erlang]
-args = erl.rtems -- -mode embedded -home . -pa . -root {{release_name}} -config {{release_name}}/releases/{{release_version}}/sys.config -boot {{release_name}}/releases/{{release_version}}/{{release_name}} -internal_epmd epmd_sup -kernel inetrc "./erl_inetrc" -sname {{release_name}} -setcookie MyCookie
+args = erl.rtems -- -mode embedded -home . -pa . -root {{release_name}} -config {{release_name}}/releases/{{release_version}}/sys.config.src -boot {{release_name}}/releases/{{release_version}}/{{release_name}} -internal_epmd epmd_sup -kernel inetrc "./erl_inetrc" -sname {{release_name}} -setcookie MyCookie
 
 [network]
 wlan=enable
-ip_self=169.254.16.1
+{{#env.IP}}
+ip_self={{env.IP}}
+{{/env.IP}}
 wlan_ip_netmask=255.255.0.0
 wlan_mode=adhoc
 wlan_adhocname=edge
 wlan_channel=6
-hostname=my_grisp_board_1
+{{#env.NAME}}
+hostname={{env.NAME}}
+{{/env.NAME}}
