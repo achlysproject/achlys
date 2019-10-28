@@ -39,7 +39,6 @@
 ]} ,
 
 {partisan , [
-    {peer_ip, {${PEER_IP}}},
     {peer_port, 27000},
     {partisan_peer_service_manager , partisan_default_peer_service_manager} ,
     {channels , [data, control]}
@@ -81,9 +80,9 @@
 
 {grisp , [
     {drivers , [
-        % {spi , grisp_emulation_spi_drv} ,
-        % {gpio , grisp_emulation_gpio_drv} ,
-        % {i2c , grisp_emulation_i2c_drv}
+        {spi , grisp_emulation_spi_drv} ,
+        {gpio , grisp_emulation_gpio_drv} ,
+        {i2c , grisp_emulation_i2c_drv}
         % {spi , grisp_spi_drv_emu} ,
         % {gpio , grisp_gpio_drv_emu} ,
         % {i2c , grisp_i2c_drv_emu}

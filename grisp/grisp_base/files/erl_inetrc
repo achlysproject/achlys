@@ -6,7 +6,7 @@
 %% Replace <hostname> with the value returned by the "hostname -s" command
 %% and uncomment host entry.
 
-{host, {169,254,187,90}, ["MBP"]}.
+{host, {169,254,187,90}, ["<hostname>"]}.
 
 
 %--- GRiSP boards --------------------------------------------------------------
