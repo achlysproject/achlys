@@ -3,7 +3,7 @@
 CFG_DIR              = $(CURDIR)/config
 GRISP_FILES_DIR      = $(CURDIR)/grisp/grisp_base/files
 TOOLS_DIR            = $(CURDIR)/tools
-HOST_REBAR           := $(shell command which rebar3)
+HOST_REBAR           = rebar3
 REBAR                = $(TOOLS_DIR)/rebar3
 # LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib/*/ebin
 # PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plguins/*/ebin
@@ -42,10 +42,6 @@ endif
 
 ifndef ERL
 $(error Could not find Erlang/OTP ('erl' command) installed on this system.)
-endif
-
-ifndef HOST_REBAR
-$(error Could not find Rebar3 ('rebar3' command) installed on this system.)
 endif
 
 
@@ -170,9 +166,9 @@ release: compile
 package: release
 	$(PRE) tar -zcvf $(RELEASE_NAME).tar.gz $(CURDIR)/$(RELEASE_NAME) $(POST)
 
-upbar:
-	@ echo Overwriting rebar3 with locally cached version
-	cp $(LOCAL_REBAR) $(TOOLS_DIR)
+# upbar:
+# 	@ echo Overwriting rebar3 with locally cached version
+# 	cp $(LOCAL_REBAR) $(TOOLS_DIR)
 
 tar:
 	$(PRE) (rm -rf ./achlys.tar.gz) && (find ./ -type f > ../.achlys_archive) && (tar -zcvf achlys.tar.gz -T - < ../.achlys_archive) && rm -rf ../.achlys_archive $(POST)
