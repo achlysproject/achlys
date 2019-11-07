@@ -18,7 +18,8 @@ GRISPAPP             ?= $(shell basename `find src -name "*.app.src"` .app.src)
 REBAR_CONFIG         = $(CURDIR)/rebar.config
 COOKIE               ?= MyCookie
 NAME 				 := $(shell hostname -s)
-PEER_IP 	 		 := $(shell ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
+PEER_IP 	 		 := $(ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
+IP 	 				 := $(ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}')
 
 PRE         = @
 POST        =
@@ -76,7 +77,7 @@ compile:
 shell:
 	@ echo Launching shell
 	$(PRE) \
-	    NAME=$(NAME) PEER_IP=$(PEER_IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
+	    NAME=$(NAME) PEER_IP=$(PEER_IP) IP=$(IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
 
 deploy:
 	@ echo Deploying
