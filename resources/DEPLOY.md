@@ -9,3 +9,13 @@ Two environment variables can be passed to `rebar3` when deploying an applicatio
 A full call to the `deploy` function of the rebar3 Grisp plugin for an Achlys application could look like :
 
 `IP=X.X.X.X NAME=board_name rebar3 grisp deploy -n app_name -v 0.1.0`
+
+# Test shell deployment
+
+A full call to the command below dynamically assigns the correct local IPv4 address to Partisan and the local short name :
+
+`NAME=$(echo hostname -s) PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}') rebar3 as test shell --sname achlys --setcookie MyCookie --apps achlys`
+
+Once the `rebar3 shell` is launched, the Partisan configuration can be verified using :
+
+`(lasp_peer_service:manager()):myself()`
