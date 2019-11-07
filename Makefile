@@ -19,9 +19,8 @@ GRISPAPP             ?= $(shell basename `find src -name "*.app.src"` .app.src)
 REBAR_CONFIG         = $(CURDIR)/rebar.config
 COOKIE               ?= MyCookie
 NAME 				 := $(shell hostname -s)
-PEER_IP 	 		 := $(ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g')
-IP 	 				 := $(ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}')
-
+PEER_IP 	 		 := $(shell ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $$2}' | sed 's/\./,/g')
+IP 	 				 := $(shell ifconfig | grep 'inet ' | grep -m 1 -Fv 127.0.0.1 | awk '{print $$2}')
 PRE         = @
 POST        =
 REBAR_DEBUG =
