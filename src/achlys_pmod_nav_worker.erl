@@ -39,7 +39,6 @@
 -export([get_crdt/1]).
 -export([get_table/1]).
 
--export([bench_awset/0]).
 %%====================================================================
 %% Gen Server Callbacks
 %%====================================================================
@@ -69,8 +68,7 @@
     aggregations :: map(),
     number :: binary(),
     additions :: pos_integer(),
-    removals :: pos_integer(),
-    bench :: crdt()
+    removals :: pos_integer()
 }).
 
 -type state() :: #state{}.
@@ -103,10 +101,6 @@ start_link() ->
 run() ->
     gen_server:cast(?SERVER , run).
 
--spec bench_awset() -> ok.
-bench_awset() ->
-    gen_server:call(?SERVER, bench).
-
 %% @doc Returns the current view of the contents in the temperatures
 %% Lasp variable.
 % -spec get_crdt() -> crdt().
@@ -129,14 +123,11 @@ get_table(Name) ->
 init([]) ->
     _ = rand:seed(exrop),
     Streamers = achlys_config:get(streamers, #{}),
-    % {ok, Num} = achlys_config:get(number),
     MeasuresMap = mapz:deep_get([pmod_nav], Streamers),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
     L = [ {X, 1} || X <- maps:keys(MeasuresMap) ],
     {ok, #state{
         measures = MeasuresMap,
-        % number = Num,
-        bench = [],
         additions = 0,
         removals = 0,
         aggregations = maps:from_list(L)}}.
@@ -146,23 +137,9 @@ init([]) ->
 % @private
 handle_call({get_crdt, Name} , _From , State) ->
     Id = mapz:deep_get([Name, crdt], State#state.measures),
-    % {ok , S} = lasp:query(State#state.crdt) ,
     {ok , S} = lasp:query(Id) ,
     L = sets:to_list(S) ,
     {reply , L , State};
-
-%%--------------------------------------------------------------------
-
-% @private
-handle_call(bench , _From , State) ->
-    % Id = mapz:deep_get([Name, crdt], State#state.measures),
-    % {ok , S} = lasp:query(State#state.crdt) ,
-    % {ok , S} = lasp:query(Id) ,
-    % L = sets:to_list(S) ,
-    {ok, {Id,_,_,_}} = lasp:declare({<<"bench">> , state_awset}, state_awset),
-    schedule_update(add),
-    schedule_update(rmv),
-    {reply , Id , State#state{bench = Id}};
 
 %%--------------------------------------------------------------------
 
@@ -318,38 +295,6 @@ handle_info({measure, Map} , State) ->
 
 %%--------------------------------------------------------------------
 
-
-handle_info({bench_update, add} , State) ->
-    Adds = State#state.additions,
-    case Adds =< 100 of
-        true ->
-            Awset = State#state.bench,
-            Node = node(),
-            {ok, {_Id, _, _, _}} = lasp:update(Awset , {add , {Node,Adds}} , self()),
-            schedule_update(add);
-        _ ->
-            logger:log(notice, "Finished adding ~n")
-    end,
-    {noreply , State#state{additions = (State#state.additions + 1)}};
-
-%%--------------------------------------------------------------------
-
-
-handle_info({bench_update, rmv} , State) ->
-    Rmvs = State#state.removals,
-    case Rmvs =< 100 of
-        true ->
-            Awset = State#state.bench,
-            Node = node(),
-            {ok, {_Id, _, _, _}} = lasp:update(Awset , {rmv , {Node,Rmvs}} , self()),
-            schedule_update(rmv);
-        _ ->
-            logger:log(notice, "Finished adding ~n")
-    end,
-    {noreply , State#state{removals = (State#state.removals + 1)}};
-
-%%--------------------------------------------------------------------
-
 handle_info(Info , State) ->
     logger:log(notice , "Info ~p values ~n" , [Info]),
     {noreply , State}.
@@ -441,12 +386,3 @@ is_pmod_nav_alive() ->
         _:_ ->
             {error , unknown}
     end.
-
-schedule_update(Op) ->
-    RandDelay = rand:uniform(20000),
-    Delay = 10000 + RandDelay,
-    erlang:send_after(Delay , ?SERVER , {bench_update, Op}).
-% schedule_remove(Id),
-% RandDelay = rand:uniform(20000),
-% Delay = 10000 + RandDelay,
-% erlang:send_after(Delay , ?SERVER , bench_add).

@@ -70,7 +70,7 @@ init([]) ->
     % ChildSpecs = [ maps:get(K, ?STREAMERS) || K <- maps:keys(StreamersMap) ],
 
     {ok , {
-        ?SUPFLAGS(?THREE , ?TEN),
+        ?SUPFLAGS(2 , 6),
         [
             ?SENSOR_COMMANDER
         ]

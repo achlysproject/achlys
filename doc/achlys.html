@@ -38,7 +38,6 @@
   as seen by the current node.</td></tr>
 <tr><td valign="top"><a href="#bane_all_preys-1">bane_all_preys/1</a></td><td>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</td></tr>
-<tr><td valign="top"><a href="#bench-0">bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#bite-1">bite/1</a></td><td>Adds the given task in the replicated task set.</td></tr>
 <tr><td valign="top"><a href="#clusterize-0">clusterize/0</a></td><td>Attempts to discover and join other neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#contagion-0">contagion/0</a></td><td>Form Lasp cluster without attempting to ping neighbors beforehand.</td></tr>
@@ -46,12 +45,10 @@
 used to pass more readable arguments to create a task model variable  
 instead of binary strings.</td></tr>
 <tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
-<tr><td valign="top"><a href="#get_bench-0">get_bench/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
   that could be potential neighbors.</td></tr>
 <tr><td valign="top"><a href="#light-0">light/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#mintemp-0">mintemp/0</a></td><td></td></tr>
-<tr><td valign="top"><a href="#multilateration-2">multilateration/2</a></td><td></td></tr>
 <tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#rainbow-0">rainbow/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
@@ -76,11 +73,6 @@ instead of binary strings.</td></tr>
 </div><p>Returns the aggregates for the given variable
   as seen by the current node for all nodes.</p>
 
-<h3 class="function"><a name="bench-0">bench/0</a></h3>
-<div class="spec">
-<p><tt>bench() -&gt; any()</tt></p>
-</div>
-
 <h3 class="function"><a name="bite-1">bite/1</a></h3>
 <div class="spec">
 <p><tt>bite(Task::<a href="achlys.html#type-task">achlys:task()</a>) -&gt; ok</tt><br></p>
@@ -94,7 +86,7 @@ instead of binary strings.</td></tr>
 
 <h3 class="function"><a name="contagion-0">contagion/0</a></h3>
 <div class="spec">
-<p><tt>contagion() -&gt; [{error, atom()} | {ok, atom()}]</tt><br></p>
+<p><tt>contagion() -&gt; {ok, []} | {ok, [map()]}</tt><br></p>
 </div><p>Form Lasp cluster without attempting to ping neighbors beforehand.</p>
 
 <h3 class="function"><a name="declare-4">declare/4</a></h3>
@@ -123,11 +115,6 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
 <p><tt>get_all_tasks() -&gt; [<a href="achlys.html#type-task">achlys:task()</a>] | []</tt><br></p>
 </div><p>Returns current view of all tasks.</p>
 
-<h3 class="function"><a name="get_bench-0">get_bench/0</a></h3>
-<div class="spec">
-<p><tt>get_bench() -&gt; any()</tt></p>
-</div>
-
 <h3 class="function"><a name="get_preys-0">get_preys/0</a></h3>
 <div class="spec">
 <p><tt>get_preys() -&gt; any()</tt></p>
@@ -144,12 +131,6 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
 <p><tt>mintemp() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
 </div>
 
-<h3 class="function"><a name="multilateration-2">multilateration/2</a></h3>
-<div class="spec">
-<p><tt>multilateration(Separation::pos_integer(), RemoteNode::atom()) -&gt; Fun::<a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
-</div>
-
->>>>>>> Stashed changes
 <h3 class="function"><a name="pandemia-0">pandemia/0</a></h3>
 <div class="spec">
 <p><tt>pandemia() -&gt; ok</tt><br></p>

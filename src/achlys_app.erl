@@ -45,6 +45,10 @@ start(_StartType , _StartArgs) ->
             {ok, _} = application:ensure_all_started(grisp),
             LEDs = [1, 2],
             [grisp_led:color(L, red) || L <- LEDs],
+            % {ok, PeerIp} = inet:parse_ipv4_address(os:getenv("IP")),
+            % logger:log(critical, "Peer IP : ~p ~n", [PeerIp]),
+            % application:set_env(partisan, peer_ip, PeerIp),
+            % logger:log(critical, "Peer IP set~n"),
             {ok , Pid};
         Error ->
             {error, Error}

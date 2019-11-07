@@ -55,7 +55,7 @@ init([]) ->
     ],
 
     {ok , {
-        ?SUPFLAGS(?THREE , ?TEN), lists:flatten(ChildSpecs)}}.
+        ?SUPFLAGS(3 , 10), lists:flatten(ChildSpecs)}}.
 
 %%====================================================================
 %% Internal functions

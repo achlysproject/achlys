@@ -8,7 +8,6 @@
 %%% Created : 13. Dec 2018 19:30
 %%%-------------------------------------------------------------------
 -module(achlys_squadron_leader).
--author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -behaviour(gen_server).
 
@@ -133,12 +132,8 @@ handle_cast(_Request , State) ->
     {noreply , NewState :: state() , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: state()}).
 handle_info(formation , State) ->
-    % _ = achlys:clusterize() ,
-    % _ = achlys:contagion() ,
-    % maybe_clusterize(),
     maybe_concurrent_clusterize(State#state.boards),
     _ = schedule_formation(State#state.formation_check_interval) ,
-    % erlang:send_after(?MIN , ?SERVER , formation) ,
     {noreply , State, hibernate};
 handle_info({disconnect_disterl, Node} , State) ->
     true = net_kernel:disconnect(Node),
@@ -186,10 +181,6 @@ code_change(_OldVsn , State , _Extra) ->
 schedule_formation(Interval) ->
     erlang:send_after(Interval , ?SERVER , formation).
 
-maybe_clusterize(Boards) ->
-    Reached = [ lasp_peer_service:join(X) || X <- Boards] ,
-    logger:log(notice, "Formation result : ~p ~n ", [Reached]).
-
 maybe_concurrent_clusterize(Boards) ->
     % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
     _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
@@ -205,31 +196,3 @@ maybe_concurrent_clusterize(Boards) ->
         , net_adm:ping(X) =:= pong ] ,
     
     logger:log(critical, "Formation result : ~p ~n ", [lasp_peer_service:members()]).
-
-maybe_reach(Node) ->
-    % lists:mapfoldl(fun(X, Reached) ->
-    %     case expression of
-    %         pattern when guard ->
-    %             body
-    %     end
-    %     % {2*X, X+Reached} end,
-    %     0, [1,2,3,4,5]).
-    case net_kernel:hidden_connect_node(Node) of
-        true ->
-            ok = lasp_peer_service:join(Node),
-            true = schedule_disterl_disconnect(Node),
-            {true, Node};
-        false ->
-            logger:log(notice, "net_kernel:hidden_connect_node(Node) failed for ~p ~n ", [Node]),
-            {false, Node};
-        ignored ->
-            logger:log(notice, "net_kernel:hidden_connect_node(Node) ignored for ~p ~n ", [Node]),
-            {false, Node};
-        _ ->
-            logger:log(notice, "net_kernel:hidden_connect_node(Node) undef for ~p ~n ", [Node]),
-            {false, Node}
-    end.
-
-schedule_disterl_disconnect(Node) ->
-    % true = net_kernel:disconnect(Node).
-    erlang:send_after(60000 , ?SERVER , {disconnect_disterl, Node}).
