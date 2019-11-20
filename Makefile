@@ -46,8 +46,6 @@ endif
 
 .PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
 
-
-
 all: test docs package
 
 checkrebar3:
