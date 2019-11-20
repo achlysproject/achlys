@@ -46,3 +46,5 @@ logs/debug\.siz
 achlys-0\.3\.0/
 
 logs/
+
+grisp/grisp_base/files/wpa_supplicant.conf
