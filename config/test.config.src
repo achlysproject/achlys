@@ -29,7 +29,7 @@
         }
     }},
     {boards, [
-        achlys@my_grisp_board_1
+        % achlys@my_grisp_board_1
     ]}
 ]} ,
 
