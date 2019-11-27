@@ -1,13 +1,13 @@
 %% -*- mode: erlang;erlang-indent-level: 2;indent-tabs-mode: nil -*-
 %% ex: ts=4 sw=4 ft=erlang et
 [{achlys , [
-    {gc_interval, 45000},
+    {gc_interval, 180000},
     {sync_dets_on_update , false} ,
     {sync_dets_interval , 3000} ,
-    {initial_formation_delay, 10000},
-    {formation_check_interval, 10000},
-    {initial_task_lookup_delay, 10000},
-    {task_lookup_interval, 10000},
+    {initial_formation_delay, 5000},
+    {formation_check_interval, 2000},
+    {initial_task_lookup_delay, 2000},
+    {task_lookup_interval, 2000},
 
     {workers,  #{
             clustering => true,
@@ -40,8 +40,8 @@
 
 {partisan , [
     {peer_ip, {${PEER_IP}}},
-    {peer_port, 27000},
-    {partisan_peer_service_manager , partisan_default_peer_service_manager} ,
+    {peer_port, ${PEER_PORT}},
+    {partisan_peer_service_manager , partisan_hyparview_peer_service_manager} ,
     {acceptor_pool_size, 5}
 ]} ,
 
