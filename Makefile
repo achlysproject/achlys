@@ -72,7 +72,7 @@ compile:
 shell:
 	@ echo Launching shell
 	$(PRE) \
-	    NAME=$(NAME) PEER_IP=$(PEER_IP) IP=$(IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
+	    NAME=$(NAME) PEER_IP=$(PEER_IP) IP=$(IP) $(REBAR) as test shell --name '$(GRISPAPP)$(n)@$(IP)' --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
 
 deploy:
 	@ echo Deploying
