@@ -34,12 +34,6 @@ Additional information on the deployment of GRiSP applications with Achlys can b
 
 - [Deployment guide](https://github.com/achlysproject/achlys/blob/feature/documentation/resources/DEPLOY.md)
 
-## Deployment guide
-
-Additional information on the deployment of GRiSP applications with Achlys can be found below :
-
-- [Deployment guide](https://github.com/achlysproject/achlys/blob/feature/documentation/resources/DEPLOY.md)
-
 ## Wiki
 
 A [Wiki](https://github.com/Laymer/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
