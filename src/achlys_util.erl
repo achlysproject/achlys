@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
+%%%     [https://github.com/achlysproject/achlys]
 %%% @doc
 %%% Utility module mainly for shorthands and conversions.
 %%% @end
@@ -94,13 +94,12 @@ get_pmod_nav_temp_task() ->
 %% Utility functions
 %%====================================================================
 
-query(Id) ->
-    {ok , S} = lasp:query(Id) ,
+query(Name , Type) when is_atom(Name), is_atom(Type) ->
+    {ok , S} = lasp:query({atom_to_binary(Name , utf8) , Type}) ,
     sets:to_list(S).
 
-query(Name , Type) ->
-    BitString = atom_to_binary(Name , utf8) ,
-    {ok , S} = lasp:query({BitString , Type}) ,
+query(Id) ->
+    {ok , S} = lasp:query(Id) ,
     sets:to_list(S).
 
 declare_crdt(Name , Type) ->
@@ -109,7 +108,8 @@ declare_crdt(Name , Type) ->
     Id.
 
 do_gc() ->
-    _ = [erlang:garbage_collect(X , [{type , 'major'}]) || X <- erlang:processes()] ,
+    _ = [erlang:garbage_collect(X , [{type , 'major'}]) 
+        || X <- erlang:processes()] ,
     ok.
 
 gc_info() ->
@@ -174,7 +174,7 @@ fetch_resolv_conf() ->
     ok = inet_db:add_rc(F) ,
     inet_db:get_rc().
 
-get_packet(Size) ->
+forge_binary_packet(Size) ->
     <<1:Size>>.
 
 bitstring_name() ->
@@ -238,3 +238,29 @@ do_disconnect(6) ->
 
 rainbow_test() ->
     achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
+
+%%====================================================================
+%% TODO: Binary encoding of values propagated through CRDTs instead
+%% of propagating tuples directly in the cluster
+%%
+%% 32 bits :
+%%
+%% first 8 bits :
+%% [_][_] [_][_]  [_][_] [_][_]
+%%                |--------------> 4 bits for node ID : [0][0] [0][0]
+%%                |--------------> 4 bits for node ID : [0][0] [0][1]
+%%                                                          ...
+%%                |--------------> 4 bits for node ID : [1][1] [1][1]
+%%        |----|---------> 2 bits for value type : [0][0] => temperature
+%%        |----|---------> 2 bits for value type : [0][1] => pressure
+%%        |----|---------> 2 bits for value type : [1][0] => light
+%%        |----|---------> 2 bits for value type : [1][1] => humidity
+%%
+%% 8-16 bits :
+%% [_][_] [_][_]  [_][_] [_][_]
+%%        |-------------> 8 bits for aggregations count : 0 to 255
+%%
+%% 14-32 bits :
+%% [_][_] [_][_]  [_][_] [_][_]  [_][_] [_][_]  [_][_]
+%% |-------------> 14 bits for aggregation value : 0 to 262 143
+%%====================================================================

@@ -19,7 +19,11 @@
 %% Internal export:
 -export(['$handle_undefined_function'/2]).
 
+%%====================================================================
+%% Macros
+%%====================================================================
 -define(SERVER , ?MODULE).
+
 
 %%====================================================================
 %% API functions
@@ -44,18 +48,15 @@ start_link() ->
 -spec init(term()) ->
     {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
 init([]) ->
-
-    WorkersMap = achlys_config:get(workers, #{}),
-    L = workers_specs(maps:to_list(WorkersMap)),
-
-    ChildSpecs = L ++ [
-        ?TASK_SERVER
-        , ?TASK_WORKER
-        , ?PMOD_WORKER_SUPERVISOR
-    ],
-
     {ok , {
-        ?SUPFLAGS(3 , 10), lists:flatten(ChildSpecs)}}.
+        ?SUPFLAGS(5 , 25), [
+            ?CHILD(achlys_squadron_leader, worker)
+            , ?CHILD(achlys_cleaner, worker)
+            , ?CHILD(achlys_task_server, worker)
+            , ?CHILD(achlys_task_worker, worker)
+            , ?CHILD(achlys_pmod_worker_sup, supervisor)
+        ]}
+    }.
 
 %%====================================================================
 %% Internal functions
@@ -79,8 +80,3 @@ init([]) ->
 
 '$handle_undefined_function'(Func, Args) ->
     error_handler:raise_undef_exception(?MODULE, Func, Args).
-
-%% @private
--spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> [supervisor:child_spec()] | [].
-workers_specs(WorkersList) ->
-    [ maps:get(K, ?WORKERS) || {K, true} <- WorkersList, maps:is_key(K, ?WORKERS)].

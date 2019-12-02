@@ -11,13 +11,12 @@
 
     {workers,  #{
             clustering => true,
-            cleaning => true,
-            sensing => false
+            cleaning => true
         }
     },
     {initial_tasks, venom},
     {streamers,  #{
-        pmod_nav => #{
+        achlys_pmod_nav_worker => #{
             temperature => #{
                 poll_interval => 6000,
                 aggregation_trigger => 3
@@ -83,11 +82,8 @@
         {spi , grisp_emulation_spi_drv} ,
         {gpio , grisp_emulation_gpio_drv} ,
         {i2c , grisp_emulation_i2c_drv}
-        % {spi , grisp_spi_drv_emu} ,
-        % {gpio , grisp_gpio_drv_emu} ,
-        % {i2c , grisp_i2c_drv_emu}
     ]} ,
     {devices , [
-        % {spi1 , pmod_nav}
+        {spi1 , pmod_nav}
     ]}
 ]}].

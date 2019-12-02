@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
+%%%     [https://github.com/achlysproject/achlys]
 %%% 2018, Universite Catholique de Louvain
 %%% @doc
 %%%
@@ -132,7 +132,7 @@ handle_cast(_Request , State) ->
     {noreply , NewState :: state() , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: state()}).
 handle_info(formation , State) ->
-    maybe_concurrent_clusterize(State#state.boards),
+    maybe_concurrent_clusterize(achlys_config:get(boards, State#state.boards)),
     _ = schedule_formation(State#state.formation_check_interval) ,
     {noreply , State, hibernate};
 handle_info({disconnect_disterl, Node} , State) ->
@@ -177,22 +177,37 @@ code_change(_OldVsn , State , _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-%% private
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% Convert process state when code is changed
+%%
+%% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
+%% @end
+%%--------------------------------------------------------------------
 schedule_formation(Interval) ->
     erlang:send_after(Interval , ?SERVER , formation).
 
-maybe_concurrent_clusterize(Boards) ->
-    % Reached = [ spawn(fun() -> maybe_reach(X) end) || X <- ?BOARDS ] ,
+%%--------------------------------------------------------------------
+%% @private
+%% @doc
+%% Attempt do clusterize with all provided peers
+%%
+%% @spec maybe_concurrent_clusterize(Boards) -> ok
+%% @end
+%%--------------------------------------------------------------------
+-spec(maybe_concurrent_clusterize(Boards :: [node()]) -> ok).
+maybe_concurrent_clusterize(Boards) when is_list(Boards) ->
     _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
         ok ->
             logger:log(critical, "Joined : ~p ~n ", [X])
-    catch
-        _:_ ->
+        catch
+          _:_ ->
             logger:log(critical, "Failed join : ~p ~n ", [X])
-    after
-        logger:log(critical, "Formation attempt : ~p ~n ", [X])
-    end end) || X <-  Boards
-        , X =/= node()
-        , net_adm:ping(X) =:= pong ] ,
-    
-    logger:log(critical, "Formation result : ~p ~n ", [lasp_peer_service:members()]).
+        after
+          logger:log(critical, "Formation attempt : ~p ~n ", [X])
+        end 
+    end) || X <-  Boards , X =/= node() ] ,
+    ok = logger:log(critical
+      , "Formation result : ~p ~n "
+      , [lasp_peer_service:members()]).

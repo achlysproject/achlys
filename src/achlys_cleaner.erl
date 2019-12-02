@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
+%%%     [https://github.com/achlysproject/achlys]
 %%%
 %%% @doc The garbage collection worker.
 %%% The general purpose of this worker is to perform

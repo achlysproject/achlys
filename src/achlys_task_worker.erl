@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
+%%%     [https://github.com/achlysproject/achlys]
 %%% 2018, Universite Catholique de Louvain
 %%% @doc
 %%%
@@ -11,13 +11,11 @@
 -author("Igor Kopestenski <igor.kopestenski@uclouvain.be>").
 
 -behaviour(gen_server).
-% -behaviour(gen_flow).
 
 -include("achlys.hrl").
 
 %% API
 -export([start_link/0]).
--export([start_task/1]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -41,23 +39,16 @@
 %%====================================================================
 
 -record(state , {
-    % tasks :: [achlys:task(), {pid(), ref()}, pos_integer()],
     tasks :: dict:dict(term(), term())
     , available_slots :: pos_integer()
     , task_lookup_interval :: pos_integer()
 }).
 
--type state() :: #state{}.
-% -record(state, {source}).
+-type state() :: state().
 
 %%%===================================================================
 %%% API
 %%%===================================================================
-
-%% @doc Attempt to execute a given function if found in the task set.
--spec start_task(atom()) -> ok.
-start_task(TaskName) ->
-    gen_server:cast(?SERVER , {start_task, TaskName}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -86,7 +77,7 @@ start_link() ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(init(Args :: term()) ->
-    {ok , State :: #state{}} | {ok , State :: #state{} , timeout() | hibernate} |
+    {ok , State :: state()} | {ok , State :: state() , timeout() | hibernate} |
     {stop , Reason :: term()} | ignore).
 init([]) ->
     logger:log(notice, "Initializing task worker module"),
@@ -110,13 +101,13 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(handle_call(Request :: term() , From :: {pid() , Tag :: term()} ,
-                  State :: #state{}) ->
-                     {reply , Reply :: term() , NewState :: #state{}} |
-                     {reply , Reply :: term() , NewState :: #state{} , timeout() | hibernate} |
-                     {noreply , NewState :: #state{}} |
-                     {noreply , NewState :: #state{} , timeout() | hibernate} |
-                     {stop , Reason :: term() , Reply :: term() , NewState :: #state{}} |
-                     {stop , Reason :: term() , NewState :: #state{}}).
+                  State :: state()) ->
+                     {reply , Reply :: term() , NewState :: state()} |
+                     {reply , Reply :: term() , NewState :: state() , timeout() | hibernate} |
+                     {noreply , NewState :: state()} |
+                     {noreply , NewState :: state() , timeout() | hibernate} |
+                     {stop , Reason :: term() , Reply :: term() , NewState :: state()} |
+                     {stop , Reason :: term() , NewState :: state()}).
 handle_call(_Request , _From , State) ->
     {reply , ok , State}.
 
@@ -127,19 +118,10 @@ handle_call(_Request , _From , State) ->
 %%
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_cast(Request :: term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
-handle_cast({start_task, TaskName} , State) ->
-    %% TODO : basic approach for generic task execution can be done using :
-    %% List = achlys:get_all_tasks(),
-    %% T = hd([ X || X <- List, #{name := N} = X, N =:= TaskName ]),
-    %% #{function := Fun, targets := _Targets} = T,
-    %% % TODO : Check if part of destination set
-    %% Result = Fun(),
-    {noreply , State};
-
+-spec(handle_cast(Request :: term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
 handle_cast(_Request , State) ->
     {noreply , State}.
 
@@ -153,10 +135,10 @@ handle_cast(_Request , State) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
--spec(handle_info(Info :: timeout() | term() , State :: #state{}) ->
-    {noreply , NewState :: #state{}} |
-    {noreply , NewState :: #state{} , timeout() | hibernate} |
-    {stop , Reason :: term() , NewState :: #state{}}).
+-spec(handle_info(Info :: timeout() | term() , State :: state()) ->
+    {noreply , NewState :: state()} |
+    {noreply , NewState :: state() , timeout() | hibernate} |
+    {stop , Reason :: term() , NewState :: state()}).
 handle_info(periodical_lookup , State) ->
     Tasks = achlys_util:query(?TASKS),
     logger:log(notice, "Task list : ~p", [Tasks]),
@@ -224,7 +206,7 @@ handle_info(_Info , State) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec(terminate(Reason :: (normal | shutdown | {shutdown , term()} | term()) ,
-                State :: #state{}) -> term()).
+                State :: state()) -> term()).
 terminate(_Reason , _State) ->
     ok.
 
@@ -236,9 +218,9 @@ terminate(_Reason , _State) ->
 %% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
 %% @end
 %%--------------------------------------------------------------------
--spec(code_change(OldVsn :: term() | {down , term()} , State :: #state{} ,
+-spec(code_change(OldVsn :: term() | {down , term()} , State :: state() ,
                   Extra :: term()) ->
-                     {ok , NewState :: #state{}} | {error , Reason :: term()}).
+                     {ok , NewState :: state()} | {error , Reason :: term()}).
 code_change(_OldVsn , State , _Extra) ->
     {ok , State}.
 
@@ -248,6 +230,12 @@ code_change(_OldVsn , State , _Extra) ->
 
 %%--------------------------------------------------------------------
 %% @private
+%% @doc
+%% Spawn a process that encapsulates a task function.
+%%  
+%% @spec spawn_task(Task) -> {Pid, Ref}
+%% @end
+-spec(spawn_task(Task :: achlys:task()) -> {Pid :: pid(), Ref :: reference()}).
 spawn_task(Task) ->
     logger:log(notice, "Spawning task : ~p", [Task]),
     F = get_task_function(Task),

@@ -3,13 +3,9 @@
 CFG_DIR              = $(CURDIR)/config
 GRISP_FILES_DIR      = $(CURDIR)/grisp/grisp_base/files
 TOOLS_DIR            = $(CURDIR)/tools
-# HOST_REBAR           = rebar3
-# REBAR                = $(TOOLS_DIR)/rebar3
 REBAR                = rebar3
-# LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib/*/ebin
-# PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plguins/*/ebin
-LIB_CACHE_DIR          = $(LOCAL_REBAR_DIR)/lib
-PLUGIN_CACHE_DIR          = $(LOCAL_REBAR_DIR)/plugins
+LIB_CACHE_DIR        = $(LOCAL_REBAR_DIR)/lib
+PLUGIN_CACHE_DIR     = $(LOCAL_REBAR_DIR)/plugins
 ERL                  := $(shell command -v erl 2> /dev/null)
 RELEASE_DIR          = $(CURDIR)/_build/default/rel/achlys
 VERSION              := $(shell cat VERSION | tr -ds \n \r)
@@ -44,7 +40,7 @@ ifndef ERL
 $(error Could not find Erlang/OTP ('erl' command) installed on this system.)
 endif
 
-.PHONY: all compile checkrebar3 shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
+.PHONY: all compile checkrebar3 snameshell shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
 
 
 
@@ -70,9 +66,16 @@ compile:
 	$(PRE) cp -r $(CURDIR)/_build/default/lib/achlys/ebin $(CURDIR)
 
 shell:
-	@ echo Launching shell
+	@ echo Launching shell node
+	@ echo Using long names
 	$(PRE) \
 	    NAME=$(NAME) PEER_IP=$(PEER_IP) IP=$(IP) $(REBAR) as test shell --name '$(GRISPAPP)$(n)@$(IP)' --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
+
+snameshell:
+	@ echo Launching shell node
+	@ echo Using short names
+	$(PRE) \
+	    NAME=$(NAME) PEER_IP=$(PEER_IP) IP=$(IP) $(REBAR) as test shell --sname $(GRISPAPP)$(n) --setcookie $(COOKIE) --apps $(GRISPAPP) $(POST)
 
 deploy:
 	@ echo Deploying

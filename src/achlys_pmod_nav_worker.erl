@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%   [https://github.com/Laymer/achlys/]
+%%%   [https://github.com/achlysproject/achlys/]
 %%% @doc The Pmod_NAV worker server.
 %%% The general purpose of this worker is to gather
 %%% and process sensor data from one of the 3 components
@@ -57,7 +57,6 @@
 
 -define(SERVER , ?MODULE).
 -define(PMOD_NAV_SLOT , spi1).
--define(TIME , erlang:monotonic_time()).
 
 %%====================================================================
 %% Records
@@ -72,14 +71,6 @@
 }).
 
 -type state() :: #state{}.
-
--type crdt() :: {bitstring(), atom()}.
-
-%% Configuration parameters
--type nav_config() :: #{table := atom()
-    , poll_interval := pos_integer()
-    , aggregation_trigger := pos_integer()
-}.
 
 -type pmod_nav_status() :: {ok , pmod_nav}
     | {error , no_device | no_pmod_nav | unknown}.
@@ -123,7 +114,7 @@ get_table(Name) ->
 init([]) ->
     _ = rand:seed(exrop),
     Streamers = achlys_config:get(streamers, #{}),
-    MeasuresMap = mapz:deep_get([pmod_nav], Streamers),
+    MeasuresMap = mapz:deep_get([?SERVER], Streamers),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
     L = [ {X, 1} || X <- maps:keys(MeasuresMap) ],
     {ok, #state{
@@ -217,7 +208,7 @@ handle_info(temperature , State) ->
     Res = maybe_get_temp() ,
     case Res of
         {ok , [Temp]} when is_number(Temp) ->
-            true = ets:insert_new(temperature , {?TIME , erlang:round(Temp)});
+            true = ets:insert_new(temperature , {erlang:monotonic_time() , erlang:round(Temp)});
         _ ->
             logger:log(notice , "Could not fetch temperature : ~p ~n" , [Res])
     end ,
@@ -230,7 +221,7 @@ handle_info(pressure , State) ->
     Res = maybe_get_press() ,
     case Res of
         {ok , [Press]} when is_number(Press) ->
-            true = ets:insert_new(pressure , {?TIME , erlang:round(Press)});
+            true = ets:insert_new(pressure , {erlang:monotonic_time() , erlang:round(Press)});
         _ ->
             logger:log(notice , "Could not fetch pressure : ~p ~n" , [Res])
     end ,

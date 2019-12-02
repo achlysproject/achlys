@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%   [https://github.com/Laymer/achlys/]
+%%%   [https://github.com/achlysproject/achlys/]
 %%% @doc The Pmod_ALS worker server.
 %%% The general purpose of this worker is to gather
 %%% and process sensor data the pmod_als module :
@@ -53,7 +53,6 @@
 
 -define(SERVER , ?MODULE).
 -define(PMOD_ALS_SLOT , spi2).
--define(TIME , erlang:monotonic_time()).
 
 %%====================================================================
 %% Records
@@ -114,7 +113,7 @@ get_table(Name) ->
 init([]) ->
     Streamers = achlys_config:get(streamers, #{}),
     Num = achlys_config:get(number, 0),
-    MeasuresMap = mapz:deep_get([pmod_als], Streamers),
+    MeasuresMap = mapz:deep_get([?SERVER], Streamers),
     erlang:send_after(?ONE , ?SERVER , {measure, MeasuresMap}),
     {ok, #state{measures = MeasuresMap, number = Num}}.
 
@@ -205,7 +204,7 @@ handle_info(light , State) ->
     case Res of
         {ok , Light} when is_number(Light) ->
             % true = ets:insert_new(State#state.measures , {?TIME , [Temp]});
-            true = ets:insert_new(light , {?TIME , Light});
+            true = ets:insert_new(light , {erlang:monotonic_time() , Light});
         _ ->
             logger:log(notice , "Could not fetch light : ~p ~n" , [Res])
     end ,

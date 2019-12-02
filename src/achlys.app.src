@@ -44,8 +44,8 @@
     {licenses , ["Apache 2.0"]} ,
 
     {links , [
-          {"Achlys" , "https://ikopest.me"}
-        , {"Github" , "https://github.com/Laymer/achlys"}
+          {"Achlys" , "https://achlys.app"}
+        , {"Github" , "https://github.com/achlysproject/achlys"}
         , {"GRiSP" , "https://www.grisp.org"}
         , {"Lasp" , "https://lasp-lang.readme.io"}
         , {"Partisan" , "https://partisan.cloud"}

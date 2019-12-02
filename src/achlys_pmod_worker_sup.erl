@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-%%%     [https://github.com/Laymer/achlys]
+%%%     [https://github.com/achlysproject/achlys]
 %%% 2018, Universite Catholique de Louvain
 %%% @doc
 %%%
@@ -18,8 +18,6 @@
 %%====================================================================
 
 -export([start_link/0]).
-% -export([start_worker/1]).
-% -export([stop_worker/1]).
 
 %%====================================================================
 %% Supervisor callbacks
@@ -38,7 +36,7 @@
 %%====================================================================
 
 % {ok, Pid :: pid()} | ignore | {error, Reason :: term()}.
-%% @doc Start achlys top level supervisor.
+%% @doc Start achlys sensor worker supervisor.
 -spec start_link() ->
     {ok , pid()}
     | {error , {already_started , pid()}
@@ -47,13 +45,6 @@
 start_link() ->
     supervisor:start_link({local , ?SERVER} , ?MODULE , []).
 
-% -spec start_worker(node()) -> {ok, pid()}.
-% start_worker(Node) ->
-%     supervisor:start_child(?MODULE, [Node]).
-%
-% -spec stop_worker(pid()) -> ok | {error, not_found}.
-% stop_worker(Pid) ->
-%     supervisor:terminate_child(?MODULE, Pid).
 
 %%====================================================================
 %% Supervisor callbacks
@@ -62,20 +53,46 @@ start_link() ->
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 %% @private
 -spec init(term()) ->
-    {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}}.
+    {ok , {supervisor:sup_flags() , [supervisor:child_spec()]}} 
+    | ignore.
 init([]) ->
+    case Streamers = maps:keys(achlys_config:get(streamers, #{})) of
+        [] ->
+            ignore;
+        _ when is_list(Streamers) ->
+            StreamerSpecs = [ maps:get( S , ?STREAMERS) 
+                || S <- Streamers,
+                maps:is_key(S , ?STREAMERS ) ],
+            {ok , { ?SUPFLAGS(2 , 6), StreamerSpecs }}
+    end.
 
-    % StreamersMap = achlys_config:get(streamers, #{}),
 
-    % ChildSpecs = [ maps:get(K, ?STREAMERS) || K <- maps:keys(StreamersMap) ],
-
-    {ok , {
-        ?SUPFLAGS(2 , 6),
-        [
-            ?SENSOR_COMMANDER
-        ]
-    }}.
 
 %%====================================================================
 %% Internal functions
 %%====================================================================
+
+%% @private
+% -spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> 
+%     [supervisor:child_spec()] 
+%     | [].
+% workers_specs(WorkersList) ->
+%     [ maps:get(K, ?WORKERS) 
+%     || {K, true} <- WorkersList, maps:is_key(K, ?WORKERS)].
+
+% L = workers_specs(maps:to_list(WorkersMap)),
+% {ok , {
+%     ?SUPFLAGS(3 , 10), lists:flatten(ChildSpecs)}}.
+% StreamersMap = achlys_config:get(streamers, #{}),
+
+% ChildSpecs = [ maps:get(K, ?STREAMERS) || K <- maps:keys(StreamersMap) ],
+% ChildSpecs = [?CHILD(achlys_sensor_commander, worker)] ++ StreamerSpecs,
+% ChildSpecs = StreamerSpecs,
+
+% -spec start_worker(node()) -> {ok, pid()}.
+% start_worker(Node) ->
+%     supervisor:start_child(?MODULE, [Node]).
+%
+% -spec stop_worker(pid()) -> ok | {error, not_found}.
+% stop_worker(Pid) ->
+%     supervisor:terminate_child(?MODULE, Pid).

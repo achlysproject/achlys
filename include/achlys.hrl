@@ -25,7 +25,6 @@
 
 -define(MILLION , 1000000).
 
-
 %%====================================================================
 %% Common Macros
 %%====================================================================
@@ -44,103 +43,21 @@
     ,                                    period    => Period
 }).
 
--define(NAV_WORKER , #{id     => achlys_pmod_nav_worker
-    , start    => {achlys_pmod_nav_worker , start_link , []}
-    , restart  => transient
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_pmod_nav_worker]
-}).
-
--define(ALS_WORKER , #{id     => achlys_pmod_als_worker
-    , start    => {achlys_pmod_als_worker , start_link , []}
-    , restart  => transient
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_pmod_als_worker]
-}).
-
--define(CLEANER_WORKER , #{id     => achlys_cleaner
-    , start    => {achlys_cleaner , start_link , []}
+-define(CHILD(I, Type) , #{id     => I
+    , start    => {I , start_link , []}
     , restart  => permanent
     , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_cleaner]
+    , type     => Type
+    , modules  => [I]
 }).
 
--define(SENSOR_COMMANDER , #{id     => achlys_sensor_commander
-    , start    => {achlys_sensor_commander , start_link , []}
-    , restart  => permanent
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_sensor_commander]
+-define(NAV_WORKER , ?CHILD(achlys_pmod_nav_worker, worker)).
+-define(ALS_WORKER , ?CHILD(achlys_pmod_als_worker, worker)).
+-define(SENSOR_COMMANDER , ?CHILD(achlys_sensor_commander, worker)).
+
+-define(STREAMERS, #{achlys_pmod_nav_worker => ?NAV_WORKER
+    , achlys_pmod_als_worker => ?ALS_WORKER
 }).
-
--define(TASK_SERVER , #{id     => achlys_task_server
-    , start    => {achlys_task_server , start_link , []}
-    , restart  => permanent
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_task_server]
-}).
-
--define(TASK_WORKER , #{id     => achlys_task_worker
-    , start    => {achlys_task_worker , start_link , []}
-    , restart  => permanent
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_task_worker]
-}).
-
--define(SQUADRON_LEADER , #{id     => achlys_squadron_leader
-    , start    => {achlys_squadron_leader , start_link , []}
-    , restart  => permanent
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_squadron_leader]
-}).
-
--define(SQUADRON_WORKER , #{id     => achlys_squadron_worker
-    , start    => {achlys_squadron_worker , start_link , []}
-    , restart  => temporary
-    , shutdown => 5000
-    , type     => worker
-    , modules  => [achlys_squadron_worker]
-}).
-
--define(PMOD_WORKER_SUPERVISOR , #{id     => achlys_pmod_worker_sup
-    , start    => {achlys_pmod_worker_sup , start_link , []}
-    , restart  => permanent
-    , shutdown => 5000
-    , type     => supervisor
-    , modules  => [achlys_pmod_worker_sup]
-}).
-
--define(WORKERS, #{clustering => ?SQUADRON_LEADER
-    , cleaning => ?CLEANER_WORKER
-    , sensing => ?SENSOR_COMMANDER
-    , squadron_worker => ?SQUADRON_WORKER
-}).
-
--define(STREAMERS, #{pmod_nav => ?NAV_WORKER
-    , pmod_als => ?ALS_WORKER
-}).
-
--define(TEMP_LIST , [{<<"achlys@LaymerMac_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_1_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_2_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_3_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_4_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_5_temperature">>, state_awset}
-                    , {<<"achlys@my_grisp_board_6_temperature">>, state_awset}]).
-
--define(PRESS_LIST , [{<<"achlys@LaymerMac_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_1_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_2_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_3_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_4_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_5_pressure">>, state_awset}
-                    , {<<"achlys@my_grisp_board_6_pressure">>, state_awset}]).
 
 %%====================================================================
 %% Types
@@ -156,3 +73,20 @@
                     targets => task_targets(),
                     execution_type => task_execution_type(),
                     function => function()}.
+
+%%====================================================================
+%% Misc
+%%====================================================================
+-define(TEMP_LIST , [{<<"achlys@my_grisp_board_1_temperature">>, state_awset}
+                , {<<"achlys@my_grisp_board_2_temperature">>, state_awset}
+                , {<<"achlys@my_grisp_board_3_temperature">>, state_awset}
+                , {<<"achlys@my_grisp_board_4_temperature">>, state_awset}
+                , {<<"achlys@my_grisp_board_5_temperature">>, state_awset}
+                , {<<"achlys@my_grisp_board_6_temperature">>, state_awset}]).
+
+-define(PRESS_LIST , [{<<"achlys@my_grisp_board_1_pressure">>, state_awset}
+                , {<<"achlys@my_grisp_board_2_pressure">>, state_awset}
+                , {<<"achlys@my_grisp_board_3_pressure">>, state_awset}
+                , {<<"achlys@my_grisp_board_4_pressure">>, state_awset}
+                , {<<"achlys@my_grisp_board_5_pressure">>, state_awset}
+                , {<<"achlys@my_grisp_board_6_pressure">>, state_awset}]).
