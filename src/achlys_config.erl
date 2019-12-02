@@ -16,11 +16,20 @@
 -export([get/2]).
 -export([set/2]).
 
+%% @doc
+%% Retrieve the value of a configuration parameter
+%% of the achlys application. If the parameter is
+%% not present in the configuration, the atom
+%% `undefined` is returned.
 %% @equiv application:get_env(achlys, Key)
 -spec get(atom()) -> undefined|{ok , term()}.
 get(Key) ->
     application:get_env(achlys , Key).
 
+%% @doc
+%% Retrieve the value of a configuration parameter
+%% of the achlys application, and return a default
+%% value if the parameter is not present.
 %% @equiv application:get_env(achlys, Key, Default)
 -spec get(atom() , term()) -> term().
 get(Key , Default) ->
@@ -30,6 +39,9 @@ get(Key , Default) ->
     %% The typing is simply any term
     application:get_env(achlys , Key , Default).
 
+%% @doc
+%% Sets a parameter in the achlys application configuration
+%% to the given value.
 %% @equiv application:set_env(achlys, Par, Val)
 -spec set(atom() , term()) -> ok.
 set(Par , Val) ->
