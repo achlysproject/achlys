@@ -182,7 +182,6 @@ code_change(_OldVsn , State , _Extra) ->
 %% @doc
 %% Convert process state when code is changed
 %%
-%% @spec code_change(OldVsn, State, Extra) -> {ok, NewState}
 %% @end
 %%--------------------------------------------------------------------
 schedule_formation(Interval) ->

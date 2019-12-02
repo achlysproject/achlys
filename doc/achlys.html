@@ -14,7 +14,7 @@
    Top level module operating the achlys application
    as well as providing the main API to the underlying components.
 
-<p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys" target="_top">https://github.com/Laymer/achlys</a></tt>].</p>
+<p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/achlysproject/achlys" target="_top">https://github.com/achlysproject/achlys</a></tt>].</p>
 
 <h2><a name="description">Description</a></h2>
    Top level module operating the achlys application
@@ -44,10 +44,17 @@
 <tr><td valign="top"><a href="#declare-4">declare/4</a></td><td>Shortcut function exposing the utility function that can be  
 used to pass more readable arguments to create a task model variable  
 instead of binary strings.</td></tr>
+<tr><td valign="top"><a href="#gc-0">gc/0</a></td><td>
+  Performs a VM-wide garbage collection.</td></tr>
 <tr><td valign="top"><a href="#get_all_tasks-0">get_all_tasks/0</a></td><td>Returns current view of all tasks.</td></tr>
 <tr><td valign="top"><a href="#get_preys-0">get_preys/0</a></td><td>Returns a list of known remote hostnames
   that could be potential neighbors.</td></tr>
+<tr><td valign="top"><a href="#join-1">join/1</a></td><td>A shortcut function that performs  
+a join operation on a Partisan node.</td></tr>
 <tr><td valign="top"><a href="#light-0">light/0</a></td><td></td></tr>
+<tr><td valign="top"><a href="#members-0">members/0</a></td><td>
+  Returns the local view of the Lasp
+  cluster membership.</td></tr>
 <tr><td valign="top"><a href="#mintemp-0">mintemp/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
 <tr><td valign="top"><a href="#rainbow-0">rainbow/0</a></td><td></td></tr>
@@ -76,7 +83,11 @@ instead of binary strings.</td></tr>
 <h3 class="function"><a name="bite-1">bite/1</a></h3>
 <div class="spec">
 <p><tt>bite(Task::<a href="achlys.html#type-task">achlys:task()</a>) -&gt; ok</tt><br></p>
-</div><p>Adds the given task in the replicated task set.</p>
+</div><p>Adds the given task in the replicated task set.
+  This function allows users to propagate previously
+  created tasks using <code>achlys:declare/4</code>. The Achlys
+  application maintains a working set for the task
+  model that is a Grow-Only Set Lasp CRDT variable.</p>
 <p><b>See also:</b> <a href="achlys_task_server.html#add_task-1">achlys_task_server:add_task/1</a>.</p>
 
 <h3 class="function"><a name="clusterize-0">clusterize/0</a></h3>
@@ -108,7 +119,23 @@ embedded inside a single process.</p>
   <p>When Grow-only Counters and Sets are used, the transient can be achieved  
 using Lasp's monotonic read function to have a distributed treshold.</p>
  
- </p>
+  <p>Example usage in an Erlang shell :</p>
+ 
+  <pre>  &gt; Name = mytask.
+  &gt; Targets = all.
+  &gt; ExecType = permanent.
+  &gt; F = fun() -&gt; io:format("hello world ~n", []), timer:sleep(5000) end.
+  &gt; Task = achlys:declare(Name, Targets, ExecType, F).</pre>
+ 
+  The variable <em>Task</em> is now named <code>mytask</code>,
+  is intended to run on all nodes in the cluster, and
+  will run function F in permanent cycles.</p>
+
+<h3 class="function"><a name="gc-0">gc/0</a></h3>
+<div class="spec">
+<p><tt>gc() -&gt; any()</tt></p>
+</div><p>
+  Performs a VM-wide garbage collection.</p>
 
 <h3 class="function"><a name="get_all_tasks-0">get_all_tasks/0</a></h3>
 <div class="spec">
@@ -121,10 +148,33 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
 </div><p>Returns a list of known remote hostnames
   that could be potential neighbors.</p>
 
+<h3 class="function"><a name="join-1">join/1</a></h3>
+<div class="spec">
+<p><tt>join(Host::atom()) -&gt; {ok, atom()} | {error, atom(), atom()}</tt><br></p>
+</div><p><p>A shortcut function that performs  
+a join operation on a Partisan node.</p>
+ 
+  <p>Example in an Erlang shell :</p>
+ 
+  <pre>  &gt; achlys:join('achlys@grisp_node_1').</pre>
+ 
+  <p>Is equivalent to :</p>
+ 
+  <pre>  &gt; lasp_peer_service:join('achlys@grisp_node_1').</pre></p>
+
 <h3 class="function"><a name="light-0">light/0</a></h3>
 <div class="spec">
 <p><tt>light() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
 </div>
+
+<h3 class="function"><a name="members-0">members/0</a></h3>
+<div class="spec">
+<p><tt>members() -&gt; any()</tt></p>
+</div><p>Equivalent to <a href="lasp_peer_service.html#members-0"><tt>lasp_peer_service:members()</tt></a>.</p>
+<p>
+  Returns the local view of the Lasp
+  cluster membership.
+ </p>
 
 <h3 class="function"><a name="mintemp-0">mintemp/0</a></h3>
 <div class="spec">
@@ -145,30 +195,6 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
 <div class="spec">
 <p><tt>start() -&gt; ok</tt><br></p>
 </div><p>Start the application.</p>
-<p><b><font color="red">To do</font></b><ul><li><font color="red"><p> Binary encoding of values propagated through CRDTs instead  
-of propagating tuples directly in the cluster</p>
- 
-  <p>32 bits :</p>
- 
-  <p>first 8 bits :  
-[_][_] [_][_]  [_][_] [_][_]                 
-|--------------&gt; 4 bits for node ID : [0][0] [0][0]                 
-|--------------&gt; 4 bits for node ID : [0][0] [0][1]                                                           
-...                 
-|--------------&gt; 4 bits for node ID : [1][1] [1][1]         
-|----|---------&gt; 2 bits for value type : [0][0] =&gt; temperature         
-|----|---------&gt; 2 bits for value type : [0][1] =&gt; pressure         
-|----|---------&gt; 2 bits for value type : [1][0] =&gt; light         
-|----|---------&gt; 2 bits for value type : [1][1] =&gt; humidity</p>
- 
-  <p>8-16 bits :  
-[_][_] [_][_]  [_][_] [_][_]         
-|-------------&gt; 8 bits for aggregations count : 0 to 255</p>
- 
-  14-32 bits :
-  [_][_] [_][_]  [_][_] [_][_]  [_][_] [_][_]  [_][_]
-  |-------------&gt; 14 bits for aggregation value : 0 to 262 143
- ====================================================================</font></li></ul></p>
 
 <h3 class="function"><a name="stop-0">stop/0</a></h3>
 <div class="spec">

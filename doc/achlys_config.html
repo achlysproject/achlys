@@ -14,18 +14,22 @@
    This is a utility module that provides shortcuts
    for operations on achlys application environment variables.
 
-<p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/Laymer/achlys" target="_top">https://github.com/Laymer/achlys</a></tt>].</p>
+<p><b>Authors:</b> Igor Kopestenski (<a href="mailto:igor.kopestenski@uclouvain.be"><tt>igor.kopestenski@uclouvain.be</tt></a>) [<em>web site:</em> <tt><a href="https://github.com/achlysproject/achlys" target="_top">https://github.com/achlysproject/achlys</a></tt>].</p>
 
 <h2><a name="description">Description</a></h2>
    This is a utility module that provides shortcuts
    for operations on achlys application environment variables.
 <h2><a name="index">Function Index</a></h2>
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#get-1">get/1</a></td><td>Equivalent to <a href="application.html#get_env-2"><tt>application:get_env(achlys, Key)</tt></a>.
-</td></tr>
-<tr><td valign="top"><a href="#get-2">get/2</a></td><td>Equivalent to <a href="application.html#get_env-3"><tt>application:get_env(achlys, Key, Default)</tt></a>.
-</td></tr>
-<tr><td valign="top"><a href="#set-2">set/2</a></td><td>Equivalent to <a href="application.html#set_env-3"><tt>application:set_env(achlys, Par, Val)</tt></a>.
-</td></tr>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#get-1">get/1</a></td><td>
+  Retrieve the value of a configuration parameter
+  of the achlys application.</td></tr>
+<tr><td valign="top"><a href="#get-2">get/2</a></td><td>
+  Retrieve the value of a configuration parameter
+  of the achlys application, and return a default
+  value if the parameter is not present.</td></tr>
+<tr><td valign="top"><a href="#set-2">set/2</a></td><td>
+  Sets a parameter in the achlys application configuration
+  to the given value.</td></tr>
 </table>
 
 <h2><a name="functions">Function Details</a></h2>
@@ -34,19 +38,28 @@
 <div class="spec">
 <p><tt>get(Key::atom()) -&gt; undefined | {ok, term()}</tt><br></p>
 </div><p>Equivalent to <a href="application.html#get_env-2"><tt>application:get_env(achlys, Key)</tt></a>.</p>
-
+<p>
+  Retrieve the value of a configuration parameter
+  of the achlys application. If the parameter is
+  not present in the configuration, the atom
+  <code>undefined</code> is returned.</p>
 
 <h3 class="function"><a name="get-2">get/2</a></h3>
 <div class="spec">
 <p><tt>get(Key::atom(), Default::term()) -&gt; term()</tt><br></p>
 </div><p>Equivalent to <a href="application.html#get_env-3"><tt>application:get_env(achlys, Key, Default)</tt></a>.</p>
-
+<p>
+  Retrieve the value of a configuration parameter
+  of the achlys application, and return a default
+  value if the parameter is not present.</p>
 
 <h3 class="function"><a name="set-2">set/2</a></h3>
 <div class="spec">
 <p><tt>set(Par::atom(), Val::term()) -&gt; ok</tt><br></p>
 </div><p>Equivalent to <a href="application.html#set_env-3"><tt>application:set_env(achlys, Par, Val)</tt></a>.</p>
-
+<p>
+  Sets a parameter in the achlys application configuration
+  to the given value.</p>
 <hr>
 
 <div class="navbar"><a name="#navbar_bottom"></a><table width="100%" border="0" cellspacing="0" cellpadding="2" summary="navigation bar"><tr><td><a href="overview-summary.html" target="overviewFrame">Overview</a></td><td><a href="http://www.erlang.org/"><img src="erlang.png" align="right" border="0" alt="erlang logo"></a></td></tr></table></div>

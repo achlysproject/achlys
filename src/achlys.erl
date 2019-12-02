@@ -380,7 +380,8 @@ clusterize([]) ->
 %% @doc
 %% Returns the local view of the Lasp
 %% cluster membership.
-%% @equiv lasp_peer_service:members().
+%%
+%% @equiv lasp_peer_service:members()
 members() ->
     lasp_peer_service:members().
 

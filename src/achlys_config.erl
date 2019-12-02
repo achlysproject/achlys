@@ -20,7 +20,7 @@
 %% Retrieve the value of a configuration parameter
 %% of the achlys application. If the parameter is
 %% not present in the configuration, the atom
-%% `undefined` is returned.
+%% `undefined' is returned.
 %% @equiv application:get_env(achlys, Key)
 -spec get(atom()) -> undefined|{ok , term()}.
 get(Key) ->

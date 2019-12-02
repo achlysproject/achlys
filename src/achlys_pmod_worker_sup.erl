@@ -72,7 +72,6 @@ init([]) ->
 %% Internal functions
 %%====================================================================
 
-%% @private
 % -spec workers_specs(WorkersList :: [{atom(), boolean()}]) -> 
 %     [supervisor:child_spec()] 
 %     | [].
