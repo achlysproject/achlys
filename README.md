@@ -32,7 +32,7 @@ Disclaimer : Achlys is currently under active development, hence a production-re
 
 Additional information on the deployment of GRiSP applications with Achlys can be found below :
 
-- [Deployment guide](https://github.com/achlysproject/achlys/blob/feature/documentation/resources/DEPLOY.md)
+- [Deployment guide](https://github.com/achlysproject/achlys/blob/master/resources/DEPLOY.md)
 
 ## Wiki
 
