@@ -56,11 +56,13 @@ you can open and terminal and call :
 
 And add 2 lines such as :
 
-`# Home addr/host pair`
-`192.168.1.2	Hostname`
+```
+# Home addr/host pair
+192.168.1.2	Hostname
 
-`# Work addr/host pair`
-`130.104.222.50	Hostname`
+# Work addr/host pair
+130.104.222.50	Hostname
+```
 
 _NOTE :_ The file is sensitive to subnet masks, and if other entries
 are present, the address with the highest subnet mask will always be
@@ -97,6 +99,7 @@ You can clusterize them using the Lasp API that forwards `join` calls to
 the Partisan peer service :
 
 - on node `achlys1@yourhostname` :
+
 `lasp_peer_service:join('achlys2@yourhostname').`
 
 _NOTE :_ the single quotes around the node name are required in order to
@@ -108,7 +111,7 @@ treated as atoms. For example :
 
 will both throw an error, whereas :
 
-`lasp_peer_service:join('achlys2@User-Computer-Name').`
-`lasp_peer_service:join('achlys2@192.168.1.1').`
+- `lasp_peer_service:join('achlys2@User-Computer-Name').`
+- `lasp_peer_service:join('achlys2@192.168.1.1').`
 
 will work correctly.
