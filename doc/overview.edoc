@@ -1,6 +1,6 @@
 @author Igor Kopestenski <igor.kopestenski@uclouvain.be>
-  [https://github.com/Laymer/]
-@version : 0.3.2
+  [https://achlys.app/]
+@version : 0.3.3
 @title The Achlys framework
 @doc A base for building Erlang applications combining
 <a target="_blank" href="https://lasp-lang.readme.io/">Lasp</a> components for

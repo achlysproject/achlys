@@ -1,63 +1,28 @@
-{ application , achlys , [
-    {description , "A framework for applications using Lasp
-    on GRiSP embedded systems at the edge"} ,
-    {vsn , "0.3.2"} ,
-
-    {registered , [achlys
-        ,          achlys_app
-        ,          achlys_sup
-        ,          achlys_util
-        ,          achlys_config
-        ,          achlys_cleaner
-        ,          achlys_sensor_commander
-        ,          achlys_pmod_worker_sup
-        ,          achlys_pmod_nav_worker
-        ,          achlys_pmod_als_worker
-        ,          achlys_task_server
-        ,          achlys_task_worker
-        ,          achlys_squadron_leader
-    ]} ,
-
-    {mod , {achlys_app , []}} ,
-    {applications , [kernel
-        ,            stdlib
-        ,            grisp
-    ]} ,
-
-    {env , []} ,
-    {modules , [
-          achlys
-        , achlys_app
-        , achlys_sup
-        , achlys_util
-        , achlys_config
-        , achlys_cleaner
-        , achlys_sensor_commander
-        , achlys_pmod_worker_sup
-        , achlys_pmod_nav_worker
-        , achlys_pmod_als_worker
-        , achlys_task_server
-        , achlys_task_worker
-        , achlys_squadron_leader
-    ]} ,
-
-    {licenses , ["Apache 2.0"]} ,
-
-    {links , [
-          {"Achlys" , "https://achlys.app"}
-        , {"Github" , "https://github.com/achlysproject/achlys"}
-        , {"GRiSP" , "https://www.grisp.org"}
-        , {"Lasp" , "https://lasp-lang.readme.io"}
-        , {"Partisan" , "https://partisan.cloud"}
-        , {"LightKone" , "https://lightkone.eu/"}
-    ]} ,
-
-    {files , ["LICENSE"
-        ,     "README.md"
-        ,     "rebar.lock"
-        ,     "src"
-        ,     "grisp"
-        ,     "Makefile"
-    ]} ,
-    {build_tools , ["rebar3"]}
-]}.
+{application,achlys,
+             [{description,"A framework for applications using Lasp\n    on GRiSP embedded systems at the edge"},
+              {vsn,"0.3.3"},
+              {registered,[achlys,achlys_app,achlys_sup,achlys_util,
+                           achlys_config,achlys_cleaner,
+                           achlys_sensor_commander,achlys_pmod_worker_sup,
+                           achlys_pmod_nav_worker,achlys_pmod_als_worker,
+                           achlys_task_server,achlys_task_worker,
+                           achlys_squadron_leader]},
+              {mod,{achlys_app,[]}},
+              {applications,[kernel,stdlib,grisp]},
+              {env,[]},
+              {modules,[achlys,achlys_app,achlys_sup,achlys_util,
+                        achlys_config,achlys_cleaner,achlys_sensor_commander,
+                        achlys_pmod_worker_sup,achlys_pmod_nav_worker,
+                        achlys_pmod_als_worker,achlys_task_server,
+                        achlys_task_worker,achlys_squadron_leader]},
+              {licenses,["Apache 2.0"]},
+              {links,[{"Achlys","https://achlys.app"},
+                      {"Github","https://github.com/achlysproject/achlys"},
+                      {"GRiSP","https://www.grisp.org"},
+                      {"Lasp","https://lasp-lang.readme.io"},
+                      {"Partisan","https://partisan.cloud"},
+                      {"LightKone","https://lightkone.eu/"}]},
+              {files,["LICENSE","README.md","rebar.lock","src","grisp",
+                      "Makefile"]},
+              {exclude_files,["./grisp/.DS_Store"]},
+              {build_tools,["rebar3"]}]}.
