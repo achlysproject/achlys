@@ -36,7 +36,7 @@ Additional information on the deployment of GRiSP applications with Achlys can b
 
 ## Wiki
 
-A [Wiki](https://github.com/Laymer/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
+A [Wiki](https://github.com/achlysproject/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
 range of examples and tutorials in order to demonstrate the capabilities of Lasp on GRiSP at the Edge.
 
 The [GRiSP Wiki](https://github.com/grisp/grisp/wiki) also provides necessary steps in order to setup the required dependencies in order to run Achlys on the GRiSP boards. There are also useful resources that are interesting for general usage of GRiSP boards.
