@@ -239,6 +239,10 @@ do_disconnect(6) ->
 rainbow_test() ->
     achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
 
+add_node(Node) when is_atom(Node) ->
+    achlys_config:set(boards, [Node] ++ achlys_config:get(boards, [])).
+
+
 %%====================================================================
 %% TODO: Binary encoding of values propagated through CRDTs instead
 %% of propagating tuples directly in the cluster
