@@ -34,6 +34,13 @@ Additional information on the deployment of GRiSP applications with Achlys can b
 
 - [Deployment guide](https://github.com/achlysproject/achlys/blob/master/resources/DEPLOY.md)
 
+## Extending Achlys
+
+Achlys is a framework for generic computations by definition, therefore it can be
+extented and fine-tuned to turn it into a software that supports any possible application :
+
+- [Task Model API example usage](https://github.com/achlysproject/achlys/blob/master/resources/TASK_MODEL.md)
+
 ## Wiki
 
 A [Wiki](https://github.com/achlysproject/achlys/wiki/Achlys-Wiki) is currently being written and will aim at providing a wide
