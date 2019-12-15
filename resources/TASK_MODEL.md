@@ -170,6 +170,9 @@ handle_cast(_Request , State) ->
 
 Done !
 
+_The complete source code of the module can be found 
+[here](https://github.com/achlysproject/achlys/blob/master/resources/examples/achlys_task_provider.erl)_
+
 ### Execution
 Testing the provider with 2 nodes can be done locally using
 the following sequence of commands : 
