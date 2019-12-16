@@ -2,7 +2,7 @@
 image_path = /media/mmcsd-0-0/{{release_name}}/erts-{{erts_vsn}}/bin/beam.bin
 
 [erlang]
-args = erl.rtems -- -mode embedded -home . -pa . -root {{release_name}} -config {{release_name}}/releases/{{release_version}}/sys.config.src -boot {{release_name}}/releases/{{release_version}}/{{release_name}} -internal_epmd epmd_sup -kernel inetrc "./erl_inetrc" -sname {{release_name}} -setcookie MyCookie
+args = erl.rtems -- -mode embedded -home . -pa . -root {{release_name}} -config {{release_name}}/releases/{{release_version}}/sys.config -boot {{release_name}}/releases/{{release_version}}/{{release_name}} -internal_epmd epmd_sup -kernel inetrc "./erl_inetrc" -sname {{release_name}} -setcookie MyCookie
 
 [network]
 wlan=enable
