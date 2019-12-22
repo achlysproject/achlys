@@ -13,6 +13,7 @@
 
 %% API
 -export([start_link/0]).
+-export([formation/0]).
 
 %% gen_server callbacks
 -export([init/1 ,
@@ -54,6 +55,15 @@
     {ok , Pid :: pid()} | ignore | {error , Reason :: term()}).
 start_link() ->
     gen_server:start_link({local , ?SERVER} , ?MODULE , [] , []).
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Formation signal call
+%% @end
+%%--------------------------------------------------------------------
+-spec(formation() -> ok).
+formation() ->
+    gen_server:cast(?SERVER , formation).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -114,6 +124,10 @@ handle_call(_Request , _From , State) ->
     {noreply , NewState :: state()} |
     {noreply , NewState :: state() , timeout() | hibernate} |
     {stop , Reason :: term() , NewState :: state()}).
+handle_cast(formation , State) ->
+    maybe_concurrent_clusterize(achlys_config:get(boards, State#state.boards)),
+    _ = schedule_formation(State#state.formation_check_interval) ,
+    {noreply , State, hibernate};
 handle_cast(_Request , State) ->
     {noreply , State}.
 

@@ -28,17 +28,16 @@
 
 -spec rainbow() -> erlang:function().
 rainbow() ->
-    Func = fun() ->
+    fun() ->
         Random = fun() ->
             {rand:uniform(2) - 1, rand:uniform(2) -1, rand:uniform(2) - 1}
         end,
         _ = [grisp_led:pattern(L, [{100, Random}]) || L <- [1,2]]
-    end,
-    Func.
+    end.
 
 -spec light() -> erlang:function().
 light() ->
-    F = fun() ->
+    fun() ->
             AmbLight = pmod_als:percentage(),
             logger:log(notice , "AL Level : ~p % ~n", [AmbLight]),
             AmbLight
@@ -46,11 +45,11 @@ light() ->
 
 -spec mintemp() -> erlang:function().
 mintemp() ->
-    F = fun() ->
+    fun() ->
         Id = {<<"temp">>, state_gset},
         {ok, {_, _, _, _}} = lasp:declare(Id, state_gset),
         L = lists:foldl(fun
-            (Elem, AccIn) -> timer:sleep(5000),
+            (_Elem, AccIn) -> timer:sleep(5000),
                 Temp = pmod_nav:read(acc, [out_temp]),
                 Temp ++ AccIn
         end, [], lists:seq(1,5)),
@@ -62,7 +61,7 @@ mintemp() ->
                 lasp:read(Id, {cardinality, 5}),
                 {ok, S} = lasp:query(Id),
                 Fetched = sets:to_list(S),
-                {Minimum, Node} = hd(lists:usort(Fetched)),
+                {_Minimum, Node} = hd(lists:usort(Fetched)),
                 Self = node(),
                 case Node =:= Self of
                     true ->
