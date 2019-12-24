@@ -78,8 +78,8 @@ snameshell:
 deploy:
 	@ echo Deploying
 	$(PRE) \
-        export NAME=$(echo hostname -s) && \
-        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
+        export NAME=$(NAME) && \
+        export PEER_IP=$(PEER_IP) && \
         echo "PEER_IP=$(PEER_IP)" > $(CURDIR)/default.env && \
 	    $(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
 
