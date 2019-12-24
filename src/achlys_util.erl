@@ -15,82 +15,6 @@
 -compile(export_all).
 
 %%====================================================================
-%% Task model functions
-%%====================================================================
-
-%% @doc Returns the task model variable based on the given arguments
-%% in the form of a map.
--spec declare(Name::atom()
-    , Targets::[node()] | all
-    , ExecType::single | permanent
-    , Func::function()) -> task() | erlang:exception().
-declare(Name, Targets, ExecType, Func) ->
-    try lists:member(ExecType, [single, permanent]) of
-        true when Targets =:= all orelse is_list(Targets) ->
-            form_map(Name, Targets, ExecType, Func)
-    catch
-        Exception:Reason -> {caught, Exception, Reason}
-    end.
-
-form_map(Name, Targets, ExecType, Func) ->
-        #{name => Name
-        , targets => task_flag(Targets)
-        , execution_type => task_flag(ExecType)
-        , function => Func}.
-
-task_flag(all) ->
-    <<0>>;
-task_flag(permanent) ->
-    <<0>>;
-task_flag(single) ->
-    <<1>>;
-task_flag(Args) ->
-    Args.
-
--spec rainbow() -> erlang:function().
-rainbow() ->
-    Func = fun() ->
-        Random = fun() ->
-            {rand:uniform(2) - 1, rand:uniform(2) -1, rand:uniform(2) - 1}
-        end,
-        _ = [grisp_led:pattern(L, [{100, Random}]) || L <- [1,2]]
-    end,
-    Func.
-
-ledtask() ->
-    Func = fun
-        () ->
-            logger:log(notice, "Executing ledtask "),
-            grisp_led:color(1, blue),
-            grisp_led:color(1, red),
-            grisp_led:color(1, blue)
-    end.
-
-get_pmod_nav_temp_task() ->
-    F = fun
-        () ->
-            logger:log(notice, "Executing pmod_nav_temp_task "),
-            achlys:venom()
-            % achlys:venom(),
-            % {TempId, _} = achlys_util:get_variable_identifier(temperature),
-            % InvariantFun = fun
-            %     % (TempId) ->
-            %     () ->
-            %         logger:log(notice, "Enforcing func for Id : ~p", [TempId]),
-            %         % lasp:read(Id, {cardinality, 3}),
-            %         ok = achlys_pmod_als_worker:terminate(normal, #{})
-            %         % L = achlys_util:query(Id),
-            %         % io:format("Temperatures : ~p", [L])
-            % end,
-            % % spawn(F(TempId))
-            % lasp:invariant(TempId, {cardinality, 3}, InvariantFun)
-    end,
-    #{name => pmod_nav_temp_task
-    , targets => ?TARGET_ALL_NODES
-    , execution_type => ?SINGLE_EXECUTION_TASK
-    , function => F}.
-
-%%====================================================================
 %% Utility functions
 %%====================================================================
 
@@ -108,9 +32,7 @@ declare_crdt(Name , Type) ->
     Id.
 
 do_gc() ->
-    _ = [erlang:garbage_collect(X , [{type , 'major'}]) 
-        || X <- erlang:processes()] ,
-    ok.
+    achlys:gc().
 
 gc_info() ->
     statistics(garbage_collection).
@@ -122,7 +44,7 @@ read_temp() ->
 create_table(Name) ->
     case ets:info(Name, size) of
       undefined ->
-        T = ets:new(Name , [
+        ets:new(Name , [
             ordered_set
             , public
             , named_table
@@ -162,7 +84,6 @@ remotes_to_atoms([]) ->
     [].
 
 fetch_resolv_conf() ->
-
     {ok , F} = case os:type() of
                    {unix , rtems} ->
                        {ok , "nofile"};
@@ -181,7 +102,7 @@ bitstring_name() ->
     atom_to_binary(node() , utf8).
 
 get_inet_least_significant() ->
-  {ok, [{{_,_,_,In},_,_}|T]} = inet:getif(),
+  {ok, [{{_,_,_,In},_,_}|_T]} = inet:getif(),
   integer_to_binary(In).
 
 %% https://stackoverflow.com/a/12795014/6687529
@@ -237,14 +158,17 @@ do_disconnect(6) ->
     net_kernel:disconnect(achlys@my_grisp_board_6).
 
 rainbow_test() ->
-    achlys:bite(achlys:declare(t,all,permanent,fun() -> achlys:rainbow() end)).
+    achlys:bite(achlys:declare(rainbow
+        ,all
+        ,permanent
+        ,achlys_task_container:rainbow())).
 
 add_node(Node) when is_atom(Node) ->
     achlys_config:set(boards, [Node] ++ achlys_config:get(boards, [])).
 
 
 %%====================================================================
-%% TODO: Binary encoding of values propagated through CRDTs instead
+%% NOTE: Binary encoding of values propagated through CRDTs instead
 %% of propagating tuples directly in the cluster
 %%
 %% 32 bits :
