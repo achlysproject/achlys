@@ -42,8 +42,6 @@ endif
 
 .PHONY: all compile checkrebar3 snameshell shell erlshell docs test dialyzer cover release package tar clean relclean push upbar addemu deploy cacheclean build upgrade tree
 
-
-
 all: test docs package
 
 checkrebar3:
@@ -80,8 +78,9 @@ snameshell:
 deploy:
 	@ echo Deploying
 	$(PRE) \
-        export NAME=$(echo hostname -s) && \
-        export PEER_IP=$(ifconfig | grep "inet " | grep -m 1 -Fv 127.0.0.1 | awk '{print $2}' | sed 's/\./,/g') && \
+        export NAME=$(NAME) && \
+        export PEER_IP=$(PEER_IP) && \
+		export IP=$(IP) && \
 	    $(REBAR) grisp deploy -n $(GRISPAPP) -v $(VERSION)
 
 erlshell:

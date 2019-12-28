@@ -5,8 +5,10 @@
 %% Edge wireless laptop node :
 %% Replace <hostname> with the value returned by the "hostname -s" command
 %% and uncomment host entry.
+%% Also replace {X,X,X,X} by the IP starting with "172" when executing
+%% the "hostname -I" command
 
-{host, {169,254,187,90}, ["<hostname>"]}.
+{host, {X,X,X,X}, ["<hostname>"]}.
 
 
 %--- GRiSP boards --------------------------------------------------------------
