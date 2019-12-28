@@ -99,7 +99,7 @@ For this example, we have one GRiSP board to which we want to connect with one s
 #### `/etc/hosts`
 ```bash
 169.254.16.1	my_grisp_board_1
-169.254.126.125	julienbastin
+169.254.126.125	myhost
 ```
 #### Deploying the GRiSP
 `NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy -n achlys -v 0.3.3`
