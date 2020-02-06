@@ -77,32 +77,111 @@ For this example, we have one GRiSP board to which we want to connect with one s
 ```
 %--- Add hosts -----------------------------------------------------------------
 {host, {169,254,126,125}, ["myhost"]}.
+
 %--- GRiSP boards --------------------------------------------------------------
 {host, {169,254,16,1}, ["my_grisp_board_1"]}.
 ```
 
-#### [sys.config](../config/sys.config) and [test.config.src](../config/test.config.src)
+#### [sys.config](../config/sys.config)
 
- - When deploying the GRiSP board :
+ - Configuration deployed on the GRiSP board :
+
 ```
-{boards, [
-     'achlys@myhost'
- ]}
+[{achlys , [
+	
+	%% ...
+	%% other achlys configuration parameters
+	%% ...
+
+	{boards, [
+        'achlys@myhost'
+    ]}
+]} ,
+
+%% ...
+%% other applications configuration parameters
+%% ...
+
+{grisp , [
+    {drivers , [
+        %% drivers
+    ]} ,
+    {devices , [
+        %% devices
+    ]}
+]}].
+``` 
+#### [test.config.src](../config/test.config.src) 
+
+ - Configuration used when running `achlys` in the `rebar3` shell :
+ 
 ```
- - When deploying the shell
-```
-{boards, [
-     'achlys@my_grisp_board_1'
- ]}
-```
+[{achlys , [
+	
+	%% ...
+	%% other achlys configuration parameters
+	%% ...
+
+	{boards, [
+        'achlys@my_grisp_board_1'
+    ]}
+]} ,
+
+%% ...
+%% other applications configuration parameters
+%% ...
+
+{grisp , [
+    {drivers , [
+        %% drivers
+    ]} ,
+    {devices , [
+        %% devices
+    ]}
+]}].
+``` 
 
 #### `/etc/hosts`
 ```bash
 169.254.16.1	my_grisp_board_1
 169.254.126.125	myhost
 ```
-#### Deploying the GRiSP
-`NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy -n achlys -v 0.3.3`
+#### Deploying on a GRiSP board
+The mount point of the MicroSD card serving as destination for the deployment release can be defined in 
+[`rebar.config`](../rebar.config) or directly when the `deploy` command is called.
 
-#### Deploying the shell
+##### Destination setup in `rebar.config`
+By setting the following in the `grisp` section of the `rebar.config` file :
+
+```
+{ grisp , [
+	{otp , [
+		{version , "22.0"}
+	]} ,
+	
+	%% Example : running on a linux host with username "user" :
+	{deploy , [
+		{pre_script , "rm -rf /media/user/GRISP/*"} ,
+		{destination , "/media/user/GRISP"} ,
+		{post_script , "umount /media/user/GRISP"}
+    ]}
+]}.
+```
+
+The command below will clean the destination before attempting to copy
+version `0.3.3` of the `achlys` release to the MicroSD card, and unmount it :
+ 
+```
+NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy -n achlys -v 0.3.3
+```
+
+##### Passing the options when calling the `deploy` command
+The alternative equivalent without configuring the destination in the `rebar.config` file
+is to specify the options when calling the command :
+
+```
+NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy --relname achlys --relvsn 0.3.3 --force true --destination "/media/user/GRISP"
+```
+
+#### Running the shell
 `NAME=myhost PEER_PORT=27000 PEER_IP=169,254,126,125 IP=169.254.126.125 rebar3 as test shell --sname achlys --setcookie MyCookie --apps achlys`
