@@ -31,6 +31,12 @@ declare_crdt(Name , Type) ->
     {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
     Id.
 
+gset(Name) -> 
+    ?MODULE:declare_crdt(Name, state_gset).
+
+orset(Name) -> 
+    ?MODULE:declare_crdt(Name, state_orset).
+
 do_gc() ->
     achlys:gc().
 
