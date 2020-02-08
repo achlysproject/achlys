@@ -30,6 +30,7 @@
  {<<"plumtree">>,{pkg,<<"plumtree">>,<<"0.5.0">>},1},
  {<<"quickrand">>,{pkg,<<"quickrand">>,<<"1.8.0">>},3},
  {<<"rand_compat">>,{pkg,<<"rand_compat">>,<<"0.0.3">>},1},
+ {<<"recon">>,{pkg,<<"recon">>,<<"2.5.0">>},0},
  {<<"time_compat">>,{pkg,<<"time_compat">>,<<"0.0.1">>},1},
  {<<"types">>,{pkg,<<"types">>,<<"0.1.8">>},1},
  {<<"uuid">>,{pkg,<<"uuid_erl">>,<<"1.8.0">>},2}]}.
@@ -46,6 +47,7 @@
  {<<"plumtree">>, <<"F3521CE631AD22AC00635E79C7F046A163BD1135889CDC1D0B18AB577F76EC70">>},
  {<<"quickrand">>, <<"E47CE597FF067385FF5836C8C7706AC7F8AA7B47DD90C6417E05B64696F872FA">>},
  {<<"rand_compat">>, <<"011646BC1F0B0C432FE101B816F25B9BBB74A085713CEE1DAFD2D62E9415EAD3">>},
+ {<<"recon">>, <<"2F7FCBEC2C35034BADE2F9717F77059DC54EB4E929A3049CA7BA6775C0BD66CD">>},
  {<<"time_compat">>, <<"23FE0AD1FDF3B5B88821B2D04B4B5E865BF587AE66056D671FE0F53514ED8139">>},
  {<<"types">>, <<"5782B67231E8C174FE2835395E71E669FE0121076779D2A09F1C0D58EE0E2F13">>},
  {<<"uuid">>, <<"280014F8FF57FCE36EE6E91C3ECF21CBFCE78AAE9854C09597BB4C11E27B66D6">>}]}
