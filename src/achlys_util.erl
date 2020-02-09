@@ -37,6 +37,13 @@ gset(Name) ->
 orset(Name) -> 
     ?MODULE:declare_crdt(Name, state_orset).
 
+add_to_orset(Value) ->
+    lasp:update({<<"orset">>,state_orset}, {add, Value}, self()).
+
+get_orset() ->
+    {ok, Set} = lasp:query({<<"orset">>,state_orset}) , 
+    sets:to_list(Set).
+
 do_gc() ->
     achlys:gc().
 
