@@ -44,6 +44,41 @@ get_orset() ->
     {ok, Set} = lasp:query({<<"orset">>,state_orset}) , 
     sets:to_list(Set).
 
+recon_info() ->
+    CacheHitRates = recon_alloc:cache_hit_rates(),
+    Frag = recon_alloc:fragmentation(current),
+    Alloc = recon_alloc:memory(allocated),
+    Used = recon_alloc:memory(used),
+    Unused = recon_alloc:memory(unused),
+    SingleToMultiBlockRatio = recon_alloc:sbcs_to_mbcs(current),
+    [CacheHitRates
+        ,Frag
+        ,Alloc
+        ,Used
+        ,Unused
+        ,SingleToMultiBlockRatio].
+
+recon_info([CacheHitRates
+        ,Frag
+        ,Alloc
+        ,Used
+        ,Unused
+        ,SingleToMultiBlockRatio]) ->
+    io:format("recon_alloc statistics : ~n 
+        cache_hit_rates = ~p ~n
+        Frag =  ~p ~n
+        Alloc =  ~p ~n
+        Used =  ~p ~n
+        Unused =  ~p ~n
+        SingleToMultiBlockRatio = ~p ~n"
+        , [CacheHitRates
+            ,Frag
+            ,Alloc
+            ,Used
+            ,Unused
+            ,SingleToMultiBlockRatio]).
+
+
 do_gc() ->
     achlys:gc().
 
