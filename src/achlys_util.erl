@@ -40,9 +40,32 @@ orset(Name) ->
 add_to_orset(Value) ->
     lasp:update({<<"orset">>,state_orset}, {add, Value}, self()).
 
+rmv_from_orset(Value) ->
+    lasp:update({<<"orset">>,state_orset}, {rmv, Value}, self()).
+
 get_orset() ->
     {ok, Set} = lasp:query({<<"orset">>,state_orset}) , 
     sets:to_list(Set).
+
+populate_orset() ->
+    fun() ->
+        {ok, Backpressure} = achlys_config:get(backpressure_interval),
+        ?MODULE:add_to_orset(orset_test_atom),
+        erlang:send_after(Backpressure , self() , {added}),
+        receive
+            {added} ->
+                io:format("added ~n"),
+                ?MODULE:rmv_from_orset(),
+                erlang:send_after(Backpressure , self() , {removed});
+            {removed} ->
+                io:format("removed ~n"),
+                ?MODULE:add_to_orset(),
+                erlang:send_after(Backpressure , self() , {added})
+        after 10000 ->
+            logger:critical("benchmark update timeout ~n"),
+            io:format("benchmark update timeout ~n")
+        end
+    end.
 
 recon_info() ->
     CacheHitRates = recon_alloc:cache_hit_rates(),
