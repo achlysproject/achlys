@@ -4,10 +4,10 @@
     {gc_interval, 180000},
     {sync_dets_on_update , false} ,
     {sync_dets_interval , 5000} ,
-    {initial_formation_delay, 5000},
-    {formation_check_interval, 15000},
-    {initial_task_lookup_delay, 10000},
-    {task_lookup_interval, 3000},
+    {initial_formation_delay, 3000},
+    {formation_check_interval, 3000},
+    {initial_task_lookup_delay, 5000},
+    {task_lookup_interval, 1000},
 
     {workers,  #{
             clustering => true,
@@ -33,7 +33,7 @@
 ]} ,
 
 {plumtree, [
-    {broadcast_exchange_timer , 6000} ,
+    % {broadcast_exchange_timer , 6000} ,
     {broadcast_mods, [lasp_plumtree_backend]}
 ]} ,
 
@@ -47,11 +47,11 @@
 {lasp , [
     {membership , true} ,
     {storage_backend , lasp_ets_storage_backend} ,
-    {mode , state_based} ,
-    {max_gc_counter , 10} ,
-    {delta_mode_max_gc_counter , 10} ,
-    {plumtree_peer_refresh_interval , 10000} ,
-    {delta_interval , 5000}
+    {mode , state_based}
+    % {max_gc_counter , 10} ,
+    % {delta_mode_max_gc_counter , 10} ,
+    % {plumtree_peer_refresh_interval , 10000} ,
+    % {delta_interval , 5000}
 ]} ,
 
 {kernel, [
