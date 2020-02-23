@@ -31,6 +31,47 @@ declare_crdt(Name , Type) ->
     {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
     Id.
 
+lager_level() ->
+    % default to notice
+    lager:set_loglevel(lager_console_backend, notice).
+
+lager_level(ConsoleLevel) ->
+    lager:set_loglevel(lager_console_backend, ConsoleLevel).
+
+logger_level(LoggerPrimaryLevel) ->
+    % OTP Kernel logger module log level
+    logger:set_primary_config(level,LoggerPrimaryLevel).
+
+%%====================================================================
+%% Harware/IO helpers
+%%====================================================================
+
+gpio_pins() ->
+    [% slot 1
+    gpio1_1 
+    , gpio1_2 
+    , gpio1_3 
+    , gpio1_4
+    % slot 2
+    , gpio2_1 
+    , gpio2_2 
+    , gpio2_3 
+    , gpio2_4].
+
+gpio_clear() ->
+    [ grisp_gpio:clear(X) || X <- gpio_pins() ].
+
+gpio_set_all() ->
+    [ grisp_gpio:set(X) || X <- gpio_pins() ].
+
+pmod_led_set(Count) ->
+    Leds = lists:usort(gpio_pins()),
+    [ grisp_gpio:set(X) || X <- lists:sublist(Leds, Count) ].
+
+%%====================================================================
+%% Benchmark helpers
+%%====================================================================
+
 gset(Name) -> 
     ?MODULE:declare_crdt(Name, state_gset).
 
@@ -54,16 +95,16 @@ populate_orset() ->
         erlang:send_after(Backpressure , self() , {added}),
         receive
             {added} ->
-                io:format("added ~n"),
+                logger:log(notice, "added ~n"),
                 ?MODULE:rmv_from_orset(),
                 erlang:send_after(Backpressure , self() , {removed});
             {removed} ->
-                io:format("removed ~n"),
+                logger:log(notice, "removed ~n"),
                 ?MODULE:add_to_orset(),
                 erlang:send_after(Backpressure , self() , {added})
         after 10000 ->
             logger:critical("benchmark update timeout ~n"),
-            io:format("benchmark update timeout ~n")
+            logger:log(notice, "benchmark update timeout ~n")
         end
     end.
 
@@ -87,7 +128,7 @@ recon_info([CacheHitRates
         ,Used
         ,Unused
         ,SingleToMultiBlockRatio]) ->
-    io:format("recon_alloc statistics : ~n 
+    logger:log(notice, "recon_alloc statistics : ~n 
         cache_hit_rates = ~p ~n
         Frag =  ~p ~n
         Alloc =  ~p ~n
