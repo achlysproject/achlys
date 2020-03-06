@@ -211,7 +211,11 @@ schedule_formation(Interval) ->
 %%--------------------------------------------------------------------
 -spec(maybe_concurrent_clusterize(Boards :: [node()]) -> ok).
 maybe_concurrent_clusterize(Boards) when is_list(Boards) ->
-    _ = [ spawn(fun() -> try lasp_peer_service:join(X) of
+  L = case hd(Boards) =:= node() of
+    true ->
+      [];
+    _ ->
+      [ spawn(fun() -> try lasp_peer_service:join(X) of
         ok ->
             logger:log(critical, "Joined : ~p ~n ", [X])
         catch
@@ -220,7 +224,9 @@ maybe_concurrent_clusterize(Boards) when is_list(Boards) ->
         after
           logger:log(critical, "Formation attempt : ~p ~n ", [X])
         end 
-    end) || X <-  Boards , X =/= node() ] ,
-    ok = logger:log(critical
-      , "Formation result : ~p ~n "
-      , [lasp_peer_service:members()]).
+    end) || X <-  Boards , X =/= node() ]
+  end,
+  ok = logger:log(critical
+    , "Formation result : ~p ~n " , [L]),
+  ok = logger:log(critical
+    , "Local cluster view : ~p ~n " , [lasp_peer_service:members()]).
