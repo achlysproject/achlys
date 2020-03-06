@@ -232,8 +232,10 @@ code_change(_OldVsn , State , _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
--spec(schedule_gc(Interval :: pos_integer()) ->
-    TimerRef :: reference()).
+-spec(schedule_gc(Interval :: integer()) ->
+    TimerRef :: reference() | ok).
+schedule_gc(0) ->
+    ok;
 schedule_gc(Interval) ->
     TimerRef = erlang:send_after(Interval , ?SERVER , gc).
 

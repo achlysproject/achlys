@@ -51,13 +51,7 @@ instead of binary strings.</td></tr>
   that could be potential neighbors.</td></tr>
 <tr><td valign="top"><a href="#join-1">join/1</a></td><td>A shortcut function that performs  
 a join operation on a Partisan node.</td></tr>
-<tr><td valign="top"><a href="#light-0">light/0</a></td><td></td></tr>
-<tr><td valign="top"><a href="#members-0">members/0</a></td><td>
-  Returns the local view of the Lasp
-  cluster membership.</td></tr>
-<tr><td valign="top"><a href="#mintemp-0">mintemp/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#pandemia-0">pandemia/0</a></td><td>Close disterl TCP connections with neighboring nodes.</td></tr>
-<tr><td valign="top"><a href="#rainbow-0">rainbow/0</a></td><td></td></tr>
 <tr><td valign="top"><a href="#start-0">start/0</a></td><td>Start the application.</td></tr>
 <tr><td valign="top"><a href="#stop-0">stop/0</a></td><td>Stop the Application.</td></tr>
 <tr><td valign="top"><a href="#venom-0">venom/0</a></td><td>Collect data based on sensors available on Pmod modules and store
@@ -92,8 +86,9 @@ a join operation on a Partisan node.</td></tr>
 
 <h3 class="function"><a name="clusterize-0">clusterize/0</a></h3>
 <div class="spec">
-<p><tt>clusterize() -&gt; [atom()]</tt><br></p>
-</div><p>Attempts to discover and join other neighboring nodes.</p>
+<p><tt>clusterize() -&gt; ok</tt><br></p>
+</div><p>Attempts to discover and join other neighboring nodes.
+ -spec clusterize() -&gt; [atom()].</p>
 
 <h3 class="function"><a name="contagion-0">contagion/0</a></h3>
 <div class="spec">
@@ -102,7 +97,7 @@ a join operation on a Partisan node.</td></tr>
 
 <h3 class="function"><a name="declare-4">declare/4</a></h3>
 <div class="spec">
-<p><tt>declare(Name::atom(), Targets::[node()] | all, ExecType::single | permanent, Func::function()) -&gt; <a href="#type-task">task()</a> | <a href="erlang.html#type-exception">erlang:exception()</a></tt><br></p>
+<p><tt>declare(Name::atom(), Targets::[node()] | all, ExecType::single | permanent, Func::function()) -&gt; <a href="achlys.html#type-task">achlys:task()</a></tt><br></p>
 </div><p><p>Shortcut function exposing the utility function that can be  
 used to pass more readable arguments to create a task model variable  
 instead of binary strings. The ExecType argument can currently not  
@@ -129,7 +124,9 @@ using Lasp's monotonic read function to have a distributed treshold.</p>
  
   The variable <em>Task</em> is now named <code>mytask</code>,
   is intended to run on all nodes in the cluster, and
-  will run function F in permanent cycles.</p>
+  will run function F in permanent cycles.
+  Returns the task model variable based on the given arguments
+  in the form of a map.</p>
 
 <h3 class="function"><a name="gc-0">gc/0</a></h3>
 <div class="spec">
@@ -162,34 +159,10 @@ a join operation on a Partisan node.</p>
  
   <pre>  &gt; lasp_peer_service:join('achlys@grisp_node_1').</pre></p>
 
-<h3 class="function"><a name="light-0">light/0</a></h3>
-<div class="spec">
-<p><tt>light() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
-</div>
-
-<h3 class="function"><a name="members-0">members/0</a></h3>
-<div class="spec">
-<p><tt>members() -&gt; any()</tt></p>
-</div><p>Equivalent to <a href="lasp_peer_service.html#members-0"><tt>lasp_peer_service:members()</tt></a>.</p>
-<p>
-  Returns the local view of the Lasp
-  cluster membership.
- </p>
-
-<h3 class="function"><a name="mintemp-0">mintemp/0</a></h3>
-<div class="spec">
-<p><tt>mintemp() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
-</div>
-
 <h3 class="function"><a name="pandemia-0">pandemia/0</a></h3>
 <div class="spec">
 <p><tt>pandemia() -&gt; ok</tt><br></p>
 </div><p>Close disterl TCP connections with neighboring nodes.</p>
-
-<h3 class="function"><a name="rainbow-0">rainbow/0</a></h3>
-<div class="spec">
-<p><tt>rainbow() -&gt; <a href="erlang.html#type-function">erlang:function()</a></tt><br></p>
-</div>
 
 <h3 class="function"><a name="start-0">start/0</a></h3>
 <div class="spec">

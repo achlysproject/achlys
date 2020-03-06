@@ -3,5 +3,5 @@
 {modules,[achlys,achlys_app,achlys_cleaner,achlys_config,
           achlys_pmod_als_worker,achlys_pmod_nav_worker,
           achlys_pmod_worker_sup,achlys_sensor_commander,
-          achlys_squadron_leader,achlys_sup,achlys_task_server,
-          achlys_task_worker,achlys_util]}.
+          achlys_squadron_leader,achlys_sup,achlys_task_container,
+          achlys_task_server,achlys_task_worker,achlys_util]}.

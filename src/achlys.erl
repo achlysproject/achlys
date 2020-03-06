@@ -146,7 +146,7 @@ get_all_tasks() ->
 %% The variable <em>Task</em> is now named `mytask',
 %% is intended to run on all nodes in the cluster, and
 %% will run function F in permanent cycles.
-%% @doc Returns the task model variable based on the given arguments
+%% Returns the task model variable based on the given arguments
 %% in the form of a map.
 -spec declare(Name::atom()
     , Targets::[node()] | all

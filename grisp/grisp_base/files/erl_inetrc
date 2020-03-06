@@ -8,16 +8,11 @@
 %% Also replace {X,X,X,X} by the IP starting with "172" when executing
 %% the "hostname -I" command
 
-{host, {X,X,X,X}, ["<hostname>"]}.
-
+% {host, {X,X,X,X}, ["<hostname>"]}.
 
 %--- GRiSP boards --------------------------------------------------------------
 
-{host, {169,254,16,1}, ["my_grisp_board_1"]}.
-{host, {169,254,16,2}, ["my_grisp_board_2"]}.
-{host, {169,254,16,3}, ["my_grisp_board_3"]}.
-{host, {169,254,16,4}, ["my_grisp_board_4"]}.
-{host, {169,254,16,5}, ["my_grisp_board_5"]}.
+% {host, {169,254,16,1}, ["my_grisp_board_1"]}.
 
 % Do not monitor the hosts file
 {hosts_file, ""}.

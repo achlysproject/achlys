@@ -31,6 +31,118 @@ declare_crdt(Name , Type) ->
     {ok , {Id , _ , _ , _}} = lasp:declare({Bitstring , Type} , Type) ,
     Id.
 
+lager_level() ->
+    % default to notice
+    lager:set_loglevel(lager_console_backend, notice).
+
+lager_level(ConsoleLevel) ->
+    lager:set_loglevel(lager_console_backend, ConsoleLevel).
+
+logger_level(LoggerPrimaryLevel) ->
+    % OTP Kernel logger module log level
+    logger:set_primary_config(level,LoggerPrimaryLevel).
+
+%%====================================================================
+%% Harware/IO helpers
+%%====================================================================
+
+gpio_pins() ->
+    [% slot 1
+    gpio1_1 
+    , gpio1_2 
+    , gpio1_3 
+    , gpio1_4
+    % slot 2
+    , gpio2_1 
+    , gpio2_2 
+    , gpio2_3 
+    , gpio2_4].
+
+gpio_clear() ->
+    [ grisp_gpio:clear(X) || X <- gpio_pins() ].
+
+gpio_set_all() ->
+    [ grisp_gpio:set(X) || X <- gpio_pins() ].
+
+pmod_led_set(Count) ->
+    Leds = lists:usort(gpio_pins()),
+    [ grisp_gpio:set(X) || X <- lists:sublist(Leds, Count) ].
+
+%%====================================================================
+%% Benchmark helpers
+%%====================================================================
+
+gset(Name) -> 
+    ?MODULE:declare_crdt(Name, state_gset).
+
+orset(Name) -> 
+    ?MODULE:declare_crdt(Name, state_orset).
+
+add_to_orset(Value) ->
+    lasp:update({<<"orset">>,state_orset}, {add, Value}, self()).
+
+rmv_from_orset(Value) ->
+    lasp:update({<<"orset">>,state_orset}, {rmv, Value}, self()).
+
+get_orset() ->
+    {ok, Set} = lasp:query({<<"orset">>,state_orset}) , 
+    sets:to_list(Set).
+
+populate_orset() ->
+    fun() ->
+        {ok, Backpressure} = achlys_config:get(backpressure_interval),
+        ?MODULE:add_to_orset(orset_test_atom),
+        erlang:send_after(Backpressure , self() , {added}),
+        receive
+            {added} ->
+                logger:log(notice, "added ~n"),
+                ?MODULE:rmv_from_orset(),
+                erlang:send_after(Backpressure , self() , {removed});
+            {removed} ->
+                logger:log(notice, "removed ~n"),
+                ?MODULE:add_to_orset(),
+                erlang:send_after(Backpressure , self() , {added})
+        after 10000 ->
+            logger:critical("benchmark update timeout ~n"),
+            logger:log(notice, "benchmark update timeout ~n")
+        end
+    end.
+
+recon_info() ->
+    CacheHitRates = recon_alloc:cache_hit_rates(),
+    Frag = recon_alloc:fragmentation(current),
+    Alloc = recon_alloc:memory(allocated),
+    Used = recon_alloc:memory(used),
+    Unused = recon_alloc:memory(unused),
+    SingleToMultiBlockRatio = recon_alloc:sbcs_to_mbcs(current),
+    [CacheHitRates
+        ,Frag
+        ,Alloc
+        ,Used
+        ,Unused
+        ,SingleToMultiBlockRatio].
+
+recon_info([CacheHitRates
+        ,Frag
+        ,Alloc
+        ,Used
+        ,Unused
+        ,SingleToMultiBlockRatio]) ->
+    logger:log(notice, "recon_alloc statistics : ~n 
+        cache_hit_rates = ~p ~n
+        Frag =  ~p ~n
+        Alloc =  ~p ~n
+        Used =  ~p ~n
+        Unused =  ~p ~n
+        SingleToMultiBlockRatio = ~p ~n"
+        , [CacheHitRates
+            ,Frag
+            ,Alloc
+            ,Used
+            ,Unused
+            ,SingleToMultiBlockRatio]).
+
+
 do_gc() ->
     achlys:gc().
 
