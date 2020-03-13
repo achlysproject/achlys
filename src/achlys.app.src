@@ -1,6 +1,6 @@
 {application,achlys,
              [{description,"A framework for applications using Lasp\n    on GRiSP embedded systems at the edge"},
-              {vsn,"0.4.0"},
+              {vsn,"0.4.1"},
               {registered,[achlys,achlys_app,achlys_sup,achlys_util,
                            achlys_config,achlys_cleaner,
                            achlys_sensor_commander,achlys_pmod_worker_sup,

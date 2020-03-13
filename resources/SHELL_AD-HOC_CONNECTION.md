@@ -169,10 +169,10 @@ By setting the following in the `grisp` section of the `rebar.config` file :
 ```
 
 The command below will clean the destination before attempting to copy
-version `0.4.0` of the `achlys` release to the MicroSD card, and unmount it :
+version `0.4.1` of the `achlys` release to the MicroSD card, and unmount it :
  
 ```
-NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy -n achlys -v 0.4.0
+NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy -n achlys -v 0.4.1
 ```
 
 ##### Passing the options when calling the `deploy` command
@@ -180,7 +180,7 @@ The alternative equivalent without configuring the destination in the `rebar.con
 is to specify the options when calling the command :
 
 ```
-NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy --relname achlys --relvsn 0.4.0 --force true --destination "/media/user/GRISP"
+NAME=my_grisp_board_1 PEER_IP=169,254,16,1 IP=169.254.16.1 rebar3 grisp deploy --relname achlys --relvsn 0.4.1 --force true --destination "/media/user/GRISP"
 ```
 
 #### Running the shell
